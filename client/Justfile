@@ -1,0 +1,12 @@
+TARGET := shell("rustc -vV | sed -n 's|host: ||p'")
+run:
+  RUST_LOG="info" cargo run --target {{ TARGET }}
+
+build:
+  cargo build --target {{ TARGET }}
+
+run_web: build_web
+  python3 -m http.server 8080
+
+build_web:
+  wasm-pack build --target web
