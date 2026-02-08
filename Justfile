@@ -1,10 +1,12 @@
 fix:
   cargo fmt
   cargo clippy --allow-dirty --fix -- -D warnings
+  cargo clippy -p client --target wasm32-unknown-unknown --allow-dirty --fix -- -D warnings
 
 lint:
   cargo fmt --check
   cargo clippy -- -D warnings
+  cargo clippy -p client --target wasm32-unknown-unknown -- -D warnings
 
 test:
   cargo test --all
