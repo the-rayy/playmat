@@ -1,0 +1,50 @@
+name: playmat
+
+on:
+  push:
+    paths:
+      - server/**
+      - client/**
+      - Cargo.toml
+      - .github/workflows/playmat.yml
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install just
+        uses: extractions/setup-just@v3
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          target: wasm32-unknown-unknown
+
+      - name: Lint
+        run: just lint
+
+      - name: Test
+        run: just test
+      
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install just
+        uses: extractions/setup-just@v3
+
+      - name: Setup Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          target: wasm32-unknown-unknown
+
+      - name: Install wasm-pack
+        uses: jetli/wasm-pack-action@v0.4.0
+
+      - name: Build client
+        run: just build
