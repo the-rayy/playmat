@@ -54,7 +54,8 @@ impl Renderer {
     let size = window.inner_size();
     let surface_format = surface.get_capabilities(&adapter).formats[0];
 
-    let egui_renderer = egui_wgpu::Renderer::new(&device, surface_format, RendererOptions::default());
+    let egui_renderer =
+      egui_wgpu::Renderer::new(&device, surface_format, RendererOptions::default());
 
     let state = Self {
       window,

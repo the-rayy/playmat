@@ -11,4 +11,3 @@ mod wasm;
 pub use wasm::logger;
 #[cfg(target_arch = "wasm32")]
 pub use wasm::runtime;
-

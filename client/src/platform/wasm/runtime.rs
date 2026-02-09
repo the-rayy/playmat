@@ -19,4 +19,3 @@ where
 {
   wasm_bindgen_futures::spawn_local(fut);
 }
-
