@@ -3,9 +3,9 @@ use winit::event_loop::EventLoop;
 mod app;
 mod debug_window;
 mod gui;
+mod net;
 mod platform;
 mod renderer;
-mod net;
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen::prelude::wasm_bindgen(start))]
 pub fn main() {
