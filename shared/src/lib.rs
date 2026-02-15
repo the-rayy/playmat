@@ -17,5 +17,3 @@ impl Envelope {
 pub enum Data {
   Empty,
 }
-
-

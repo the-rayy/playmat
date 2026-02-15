@@ -9,4 +9,3 @@ axum = { version = "0.8.8", features = ["ws"] }
 tokio = { version = "1.49.0", features = ["signal", "macros", "rt-multi-thread"] }
 log = { workspace = true }
 env_logger = { workspace = true }
-bitcode = { workspace = true }

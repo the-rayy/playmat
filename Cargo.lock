@@ -2636,7 +2636,6 @@ name = "server"
 version = "0.1.0"
 dependencies = [
  "axum",
- "bitcode",
  "env_logger",
  "log",
  "shared",

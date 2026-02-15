@@ -19,15 +19,15 @@ pub fn init(ctx: Arc<Mutex<Context>>) {
 
     while let Some(message) = ws.try_next().await.unwrap() {
       match message {
-      Message::Text(text) => {
-        log::info!("received: {text}");
-        ctx.lock().unwrap().debug = text;
-      },
-      Message::Binary(binary) => {
-        let env = Envelope::from_bytes(&binary).unwrap();
-        log::info!("received: {:?}", env);
-      },
-      _ => (),
+        Message::Text(text) => {
+          log::info!("received: {text}");
+          ctx.lock().unwrap().debug = text;
+        }
+        Message::Binary(binary) => {
+          let env = Envelope::from_bytes(&binary).unwrap();
+          log::info!("received: {:?}", env);
+        }
+        _ => (),
       }
     }
   });
