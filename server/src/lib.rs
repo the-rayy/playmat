@@ -9,17 +9,8 @@ use axum::{
   response::IntoResponse,
   routing::get,
 };
+use shared::{Data, Envelope};
 use tokio::time::sleep;
-
-#[derive(bitcode::Encode, bitcode::Decode)]
-struct Envelope {
-  data: Data,
-}
-
-#[derive(bitcode::Encode, bitcode::Decode)]
-enum Data {
-  Empty,
-}
 
 pub async fn run_server() {
   let router = Router::new()
@@ -50,8 +41,7 @@ async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
 
       loop {
         let env = Envelope{data: Data::Empty};
-        let env = bitcode::encode(&env);
-        let _ = socket.send(Message::Binary(env.into())).await;
+        let _ = socket.send(Message::Binary(env.to_bytes().into())).await;
         let _ = socket.send(Message::Text(format!("{}", i).into())).await;
         i += 1;
         sleep(Duration::from_secs(1)).await;

@@ -441,6 +441,7 @@ dependencies = [
  "log",
  "reqwest",
  "reqwest-websocket",
+ "shared",
  "tokio",
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -2638,6 +2639,7 @@ dependencies = [
  "bitcode",
  "env_logger",
  "log",
+ "shared",
  "tokio",
 ]
 
@@ -2650,6 +2652,13 @@ dependencies = [
  "cfg-if",
  "cpufeatures",
  "digest",
+]
+
+[[package]]
+name = "shared"
+version = "0.1.0"
+dependencies = [
+ "bitcode",
 ]
 
 [[package]]

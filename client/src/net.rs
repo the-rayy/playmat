@@ -2,6 +2,7 @@ use std::sync::{Arc, Mutex};
 
 use futures_util::TryStreamExt;
 use reqwest_websocket::{Message, Upgrade};
+use shared::Envelope;
 
 use crate::context::Context;
 
@@ -23,7 +24,8 @@ pub fn init(ctx: Arc<Mutex<Context>>) {
         ctx.lock().unwrap().debug = text;
       },
       Message::Binary(binary) => {
-        log::info!("received: {:?}", binary);
+        let env = Envelope::from_bytes(&binary).unwrap();
+        log::info!("received: {:?}", env);
       },
       _ => (),
       }
