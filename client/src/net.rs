@@ -25,6 +25,7 @@ pub fn init(ctx: Arc<Mutex<Context>>) {
         }
         Message::Binary(binary) => {
           let env = Envelope::from_bytes(&binary).unwrap();
+          ctx.lock().unwrap().timestamp = Some(env.timestamp());
           log::info!("received: {:?}", env);
         }
         _ => (),

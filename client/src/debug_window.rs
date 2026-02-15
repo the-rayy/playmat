@@ -27,7 +27,7 @@ impl gui::Draw for Window {
       .title_bar(false)
       .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
       .show(ctx, |ui: &mut Ui| {
-        ui.label(self.ctx.lock().unwrap().debug.clone());
+        ui.label(format!("{:?}", self.ctx.lock().unwrap().timestamp));
         ui.spacing_mut().item_spacing = Vec2::new(5.0, 5.0);
         if self.connected.load(std::sync::atomic::Ordering::SeqCst) {
           ui.label("connected");

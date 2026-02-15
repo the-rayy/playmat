@@ -1,9 +1,20 @@
 #[derive(bitcode::Encode, bitcode::Decode, Debug)]
 pub struct Envelope {
   pub data: Data,
+
+  timestamp: i64,
 }
 
 impl Envelope {
+  pub fn new() -> Envelope {
+    let t = time::OffsetDateTime::now_utc();
+    Envelope { data: Data::Empty, timestamp: t.unix_timestamp() }
+  }
+
+  pub fn timestamp(&self) -> time::OffsetDateTime {
+    time::OffsetDateTime::from_unix_timestamp(self.timestamp).unwrap()
+  }
+
   pub fn to_bytes(self) -> Vec<u8> {
     bitcode::encode(&self)
   }

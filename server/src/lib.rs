@@ -40,7 +40,7 @@ async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
       let mut i: u64 = 0;
 
       loop {
-        let env = Envelope { data: Data::Empty };
+        let env = Envelope::new();
         let _ = socket.send(Message::Binary(env.to_bytes().into())).await;
         let _ = socket.send(Message::Text(format!("{}", i).into())).await;
         i += 1;
