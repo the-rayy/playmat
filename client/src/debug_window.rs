@@ -12,7 +12,7 @@ pub struct Window {
 impl Window {
   pub fn new(ctx: Arc<Mutex<context::Context>>) -> Window {
     Window {
-      ctx: ctx,
+      ctx,
       connected: Default::default(),
     }
   }

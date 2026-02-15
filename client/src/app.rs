@@ -8,7 +8,10 @@ use winit::{
 };
 
 use crate::{
-  context::Context, debug_window, gui::{self, Gui}, renderer::Renderer
+  context::Context,
+  debug_window,
+  gui::{self, Gui},
+  renderer::Renderer,
 };
 
 #[derive(Default)]
@@ -28,7 +31,7 @@ impl App {
       renderer: None,
       gui: None,
       w: vec![],
-      ctx: ctx,
+      ctx,
     }
   }
 }
@@ -45,7 +48,9 @@ impl ApplicationHandler for App {
     self.window = Some(window);
     self.renderer = Some(renderer);
     self.gui = Some(gui);
-    self.w.push(Box::new(debug_window::Window::new(self.ctx.clone())));
+    self
+      .w
+      .push(Box::new(debug_window::Window::new(self.ctx.clone())));
   }
 
   fn window_event(
