@@ -8,7 +8,7 @@ use crate::context::Context;
 pub fn init(ctx: Arc<Mutex<Context>>) {
   crate::platform::runtime::_spawn_async(async move {
     let response = reqwest::Client::default()
-      .get("ws://localhost:8000/ws")
+      .get("ws://blackbook.local:8000/ws")
       .upgrade()
       .send()
       .await
