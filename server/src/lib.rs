@@ -11,6 +11,16 @@ use axum::{
 };
 use tokio::time::sleep;
 
+#[derive(bitcode::Encode, bitcode::Decode)]
+struct Envelope {
+  data: Data,
+}
+
+#[derive(bitcode::Encode, bitcode::Decode)]
+enum Data {
+  Empty,
+}
+
 pub async fn run_server() {
   let router = Router::new()
     .route("/", get(handler))
@@ -37,7 +47,11 @@ async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
   ws.on_upgrade(async |mut socket: WebSocket| {
     tokio::spawn(async move {
       let mut i: u64 = 0;
+
       loop {
+        let env = Envelope{data: Data::Empty};
+        let env = bitcode::encode(&env);
+        let _ = socket.send(Message::Binary(env.into())).await;
         let _ = socket.send(Message::Text(format!("{}", i).into())).await;
         i += 1;
         sleep(Duration::from_secs(1)).await;

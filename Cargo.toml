@@ -5,3 +5,4 @@ members = ["client","server"]
 [workspace.dependencies]
 log = "0.4.29"
 env_logger = "0.11.8"
+bitcode = "0.6.6"

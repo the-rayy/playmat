@@ -17,9 +17,15 @@ pub fn init(ctx: Arc<Mutex<Context>>) {
     let mut ws = response.into_websocket().await.unwrap();
 
     while let Some(message) = ws.try_next().await.unwrap() {
-      if let Message::Text(text) = message {
+      match message {
+      Message::Text(text) => {
         log::info!("received: {text}");
         ctx.lock().unwrap().debug = text;
+      },
+      Message::Binary(binary) => {
+        log::info!("received: {:?}", binary);
+      },
+      _ => (),
       }
     }
   });
