@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use winit::{
   application::ApplicationHandler,
@@ -8,9 +8,7 @@ use winit::{
 };
 
 use crate::{
-  debug_window,
-  gui::{self, Gui},
-  renderer::Renderer,
+  context::Context, debug_window, gui::{self, Gui}, renderer::Renderer
 };
 
 #[derive(Default)]
@@ -20,6 +18,19 @@ pub struct App {
   gui: Option<Gui>,
 
   w: Vec<Box<dyn gui::Draw>>,
+  ctx: Arc<Mutex<Context>>,
+}
+
+impl App {
+  pub fn new(ctx: Arc<Mutex<Context>>) -> App {
+    App {
+      window: None,
+      renderer: None,
+      gui: None,
+      w: vec![],
+      ctx: ctx,
+    }
+  }
 }
 
 impl ApplicationHandler for App {
@@ -34,7 +45,7 @@ impl ApplicationHandler for App {
     self.window = Some(window);
     self.renderer = Some(renderer);
     self.gui = Some(gui);
-    self.w.push(Box::new(debug_window::Window::default()));
+    self.w.push(Box::new(debug_window::Window::new(self.ctx.clone())));
   }
 
   fn window_event(

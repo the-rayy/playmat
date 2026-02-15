@@ -1,12 +1,21 @@
-use std::sync::{Arc, atomic::AtomicBool};
+use std::sync::{Arc, Mutex, atomic::AtomicBool};
 
 use egui::{Context, Ui, Vec2};
 
-use crate::gui;
+use crate::{context, gui};
 
-#[derive(Default)]
 pub struct Window {
+  ctx: Arc<Mutex<context::Context>>,
   connected: Arc<AtomicBool>,
+}
+
+impl Window {
+  pub fn new(ctx: Arc<Mutex<context::Context>>) -> Window {
+    Window {
+      ctx: ctx,
+      connected: Default::default(),
+    }
+  }
 }
 
 impl gui::Draw for Window {
@@ -18,6 +27,7 @@ impl gui::Draw for Window {
       .title_bar(false)
       .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
       .show(ctx, |ui: &mut Ui| {
+        ui.label(self.ctx.lock().unwrap().debug.clone());
         ui.spacing_mut().item_spacing = Vec2::new(5.0, 5.0);
         if self.connected.load(std::sync::atomic::Ordering::SeqCst) {
           ui.label("connected");
