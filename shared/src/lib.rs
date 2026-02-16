@@ -5,10 +5,19 @@ pub struct Envelope {
   timestamp: i64,
 }
 
+impl Default for Envelope {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Envelope {
   pub fn new() -> Envelope {
     let t = time::OffsetDateTime::now_utc();
-    Envelope { data: Data::Empty, timestamp: t.unix_timestamp() }
+    Envelope {
+      data: Data::Empty,
+      timestamp: t.unix_timestamp(),
+    }
   }
 
   pub fn timestamp(&self) -> time::OffsetDateTime {

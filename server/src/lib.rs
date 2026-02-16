@@ -9,7 +9,7 @@ use axum::{
   response::IntoResponse,
   routing::get,
 };
-use shared::{Data, Envelope};
+use shared::Envelope;
 use tokio::time::sleep;
 
 pub async fn run_server() {
