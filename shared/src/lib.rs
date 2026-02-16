@@ -6,9 +6,9 @@ pub struct Envelope {
 }
 
 impl Default for Envelope {
-    fn default() -> Self {
-        Self::new()
-    }
+  fn default() -> Self {
+    Self::new()
+  }
 }
 
 impl Envelope {

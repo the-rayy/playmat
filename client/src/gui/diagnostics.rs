@@ -10,9 +10,7 @@ pub struct Window {
 
 impl Window {
   pub fn new(ctx: Arc<Mutex<context::Context>>) -> Window {
-    Window {
-      ctx,
-    }
+    Window { ctx }
   }
 }
 
@@ -24,7 +22,7 @@ impl gui::Draw for Window {
         match self.ctx.lock().unwrap().timestamp {
           Some(x) => ui.label(format!("Server time: {x}")),
           None => ui.label("Not connected to server"),
-        }
+        };
       });
   }
 }

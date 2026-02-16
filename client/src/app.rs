@@ -54,7 +54,6 @@ impl ApplicationHandler for App {
     self
       .w
       .push(Box::new(diagnostics::Window::new(self.ctx.clone())));
-
   }
 
   fn window_event(
