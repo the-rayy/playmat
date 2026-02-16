@@ -10,7 +10,7 @@ use winit::{
 use crate::{
   context::Context,
   debug_window,
-  gui::{self, Gui},
+  gui::{self, Gui, diagnostics},
   renderer::Renderer,
 };
 
@@ -51,6 +51,10 @@ impl ApplicationHandler for App {
     self
       .w
       .push(Box::new(debug_window::Window::new(self.ctx.clone())));
+    self
+      .w
+      .push(Box::new(diagnostics::Window::new(self.ctx.clone())));
+
   }
 
   fn window_event(

@@ -3,6 +3,8 @@ use std::sync::Arc;
 use egui::{ClippedPrimitive, Context, TexturesDelta};
 use winit::{event::WindowEvent, window::Window};
 
+pub mod diagnostics;
+
 pub trait Draw: Send + Sync {
   fn draw(&mut self, ctx: &Context);
 }
