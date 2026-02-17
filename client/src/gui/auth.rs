@@ -42,7 +42,10 @@ impl gui::Draw for Window {
         ui.text_edit_singleline(&mut self.password);
 
         if ui.button("login").clicked() {
-          let msg = ClientMessage::SignIn(SignInCredentials{ email: self.email.clone(), password: self.password.clone() });
+          let msg = ClientMessage::SignIn(SignInCredentials {
+            email: self.email.clone(),
+            password: self.password.clone(),
+          });
           let _ = self.net_tx.blocking_send(msg);
         };
       });

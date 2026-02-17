@@ -11,7 +11,7 @@ use winit::{
 
 use crate::{
   context::Context,
-  gui::{self, Gui, diagnostics, auth},
+  gui::{self, Gui, auth, diagnostics},
   renderer::Renderer,
 };
 

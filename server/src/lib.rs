@@ -41,12 +41,9 @@ async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
 
     tokio::spawn(async move {
       while let Some(msg) = ws_receiver.next().await {
-        match msg.unwrap() {
-          Message::Binary(x) => {
-            let env = ClientMessageEnvelope::from_bytes(&x);
-            log::debug!("Received: {:?}", env);
-          },
-          _ => (),
+        if let Message::Binary(x) = msg.unwrap() {
+          let env = ClientMessageEnvelope::from_bytes(&x);
+          log::debug!("Received: {:?}", env);
         }
       }
     });
