@@ -47,8 +47,8 @@ pub fn init(ctx: Arc<Mutex<Context>>) -> mpsc::Sender<ClientMessage> {
             shared::ServerMessage::Empty => (),
             shared::ServerMessage::SignIn(sign_in_token) => {
               ctx.lock().unwrap().token = Some(sign_in_token.token);
-            },
-        }
+            }
+          }
         }
         _ => (),
       }
