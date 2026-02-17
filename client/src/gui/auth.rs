@@ -1,6 +1,7 @@
 use std::sync::{Arc, Mutex};
 
-use egui::{Context, Ui, Vec2};
+use egui::{Context, Ui};
+use shared::{ClientMessage, SignInCredentials};
 use tokio::sync::mpsc;
 
 use crate::{context, gui};
@@ -10,11 +11,11 @@ pub struct Window {
 
   email: String,
   password: String,
-  net_tx: mpsc::Sender<i64>,
+  net_tx: mpsc::Sender<ClientMessage>,
 }
 
 impl Window {
-  pub fn new(ctx: Arc<Mutex<context::Context>>, net_tx: mpsc::Sender<i64>) -> Window {
+  pub fn new(ctx: Arc<Mutex<context::Context>>, net_tx: mpsc::Sender<ClientMessage>) -> Window {
     Window {
       ctx,
 
@@ -41,7 +42,8 @@ impl gui::Draw for Window {
         ui.text_edit_singleline(&mut self.password);
 
         if ui.button("login").clicked() {
-          let _ = self.net_tx.blocking_send(1);
+          let msg = ClientMessage::SignIn(SignInCredentials{ email: self.email.clone(), password: self.password.clone() });
+          let _ = self.net_tx.blocking_send(msg);
         };
       });
   }

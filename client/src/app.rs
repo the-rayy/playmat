@@ -1,5 +1,6 @@
 use std::sync::{Arc, Mutex};
 
+use shared::ClientMessage;
 use tokio::sync::mpsc;
 use winit::{
   application::ApplicationHandler,
@@ -21,11 +22,11 @@ pub struct App {
 
   w: Vec<Box<dyn gui::Draw>>,
   ctx: Arc<Mutex<Context>>,
-  net_tx: mpsc::Sender<i64>,
+  net_tx: mpsc::Sender<ClientMessage>,
 }
 
 impl App {
-  pub fn new(ctx: Arc<Mutex<Context>>, net_tx: mpsc::Sender<i64>) -> App {
+  pub fn new(ctx: Arc<Mutex<Context>>, net_tx: mpsc::Sender<ClientMessage>) -> App {
     App {
       window: None,
       renderer: None,

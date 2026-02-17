@@ -2,13 +2,13 @@ use std::sync::{Arc, Mutex};
 
 use futures_util::{SinkExt, StreamExt, TryStreamExt};
 use reqwest_websocket::{Message, Upgrade};
-use shared::Envelope;
+use shared::{ClientMessage, ClientMessageEnvelope, ServerMessage, ServerMessageEnvelope};
 use tokio::sync::mpsc;
 
 use crate::{context::Context, platform::runtime};
 
-pub fn init(ctx: Arc<Mutex<Context>>) -> mpsc::Sender<i64> {
-  let (mut tx, mut rx) = mpsc::channel::<i64>(10);
+pub fn init(ctx: Arc<Mutex<Context>>) -> mpsc::Sender<ClientMessage> {
+  let (mut tx, mut rx) = mpsc::channel::<ClientMessage>(10);
 
   crate::platform::runtime::_spawn_async(async move {
     let response = reqwest::Client::default()
@@ -23,7 +23,7 @@ pub fn init(ctx: Arc<Mutex<Context>>) -> mpsc::Sender<i64> {
     runtime::_spawn_async(async move {
       loop { match rx.recv().await {
         Some(x) => {
-            let envelope = Envelope::new();
+            let envelope = ClientMessageEnvelope::new(x);
             let _ = ws_sender.send(Message::Binary(envelope.to_bytes().into())).await;
         },
         None => return,
@@ -37,7 +37,7 @@ pub fn init(ctx: Arc<Mutex<Context>>) -> mpsc::Sender<i64> {
           ctx.lock().unwrap().debug = text;
         }
         Message::Binary(binary) => {
-          let env = Envelope::from_bytes(&binary).unwrap();
+          let env = ServerMessageEnvelope::from_bytes(&binary).unwrap();
           ctx.lock().unwrap().timestamp = Some(env.timestamp());
           log::info!("received: {:?}", env);
         }

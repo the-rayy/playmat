@@ -10,7 +10,7 @@ use axum::{
   routing::get,
 };
 use futures_util::{SinkExt, StreamExt};
-use shared::Envelope;
+use shared::{ClientMessageEnvelope, ServerMessage, ServerMessageEnvelope};
 use tokio::time::sleep;
 
 pub async fn run_server() {
@@ -41,14 +41,20 @@ async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
 
     tokio::spawn(async move {
       while let Some(msg) = ws_receiver.next().await {
-        log::debug!("{:?}", msg);
+        match msg.unwrap() {
+          Message::Binary(x) => {
+            let env = ClientMessageEnvelope::from_bytes(&x);
+            log::debug!("Received: {:?}", env);
+          },
+          _ => (),
+        }
       }
     });
     tokio::spawn(async move {
       let mut i: u64 = 0;
 
       loop {
-        let env = Envelope::new();
+        let env = ServerMessageEnvelope::new(ServerMessage::Empty);
         let _ = ws_sender.send(Message::Binary(env.to_bytes().into())).await;
         let _ = ws_sender.send(Message::Text(format!("{}", i).into())).await;
         i += 1;
