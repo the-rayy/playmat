@@ -9,6 +9,7 @@ use axum::{
   response::IntoResponse,
   routing::get,
 };
+use futures_util::{SinkExt, StreamExt};
 use shared::Envelope;
 use tokio::time::sleep;
 
@@ -35,14 +36,21 @@ async fn handler() -> impl IntoResponse {
 }
 
 async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
-  ws.on_upgrade(async |mut socket: WebSocket| {
+  ws.on_upgrade(async |socket: WebSocket| {
+    let (mut ws_sender, mut ws_receiver) = socket.split();
+
+    tokio::spawn(async move {
+      while let Some(msg) = ws_receiver.next().await {
+        log::debug!("{:?}", msg);
+      }
+    });
     tokio::spawn(async move {
       let mut i: u64 = 0;
 
       loop {
         let env = Envelope::new();
-        let _ = socket.send(Message::Binary(env.to_bytes().into())).await;
-        let _ = socket.send(Message::Text(format!("{}", i).into())).await;
+        let _ = ws_sender.send(Message::Binary(env.to_bytes().into())).await;
+        let _ = ws_sender.send(Message::Text(format!("{}", i).into())).await;
         i += 1;
         sleep(Duration::from_secs(1)).await;
       }

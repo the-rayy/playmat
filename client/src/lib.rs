@@ -6,7 +6,6 @@ use crate::context::Context;
 
 mod app;
 mod context;
-mod debug_window;
 mod gui;
 mod net;
 mod platform;
@@ -17,9 +16,9 @@ pub fn main() {
   let ctx = Arc::new(Mutex::new(Context::default()));
   platform::logger::init();
   platform::runtime::init();
-  net::init(ctx.clone());
+  let net_tx = net::init(ctx.clone());
 
-  let mut winit_app = app::App::new(ctx.clone());
+  let mut winit_app = app::App::new(ctx.clone(), net_tx);
 
   let event_loop = EventLoop::new().expect("unable to initialize winit EventLoop");
   event_loop.set_control_flow(winit::event_loop::ControlFlow::Poll);

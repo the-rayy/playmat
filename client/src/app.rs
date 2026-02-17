@@ -1,5 +1,6 @@
 use std::sync::{Arc, Mutex};
 
+use tokio::sync::mpsc;
 use winit::{
   application::ApplicationHandler,
   dpi::PhysicalSize,
@@ -9,12 +10,10 @@ use winit::{
 
 use crate::{
   context::Context,
-  debug_window,
-  gui::{self, Gui, diagnostics},
+  gui::{self, Gui, diagnostics, auth},
   renderer::Renderer,
 };
 
-#[derive(Default)]
 pub struct App {
   window: Option<Arc<Window>>,
   renderer: Option<Renderer>,
@@ -22,16 +21,18 @@ pub struct App {
 
   w: Vec<Box<dyn gui::Draw>>,
   ctx: Arc<Mutex<Context>>,
+  net_tx: mpsc::Sender<i64>,
 }
 
 impl App {
-  pub fn new(ctx: Arc<Mutex<Context>>) -> App {
+  pub fn new(ctx: Arc<Mutex<Context>>, net_tx: mpsc::Sender<i64>) -> App {
     App {
       window: None,
       renderer: None,
       gui: None,
       w: vec![],
       ctx,
+      net_tx,
     }
   }
 }
@@ -48,9 +49,10 @@ impl ApplicationHandler for App {
     self.window = Some(window);
     self.renderer = Some(renderer);
     self.gui = Some(gui);
+    let net_tx = self.net_tx.clone();
     self
       .w
-      .push(Box::new(debug_window::Window::new(self.ctx.clone())));
+      .push(Box::new(auth::Window::new(self.ctx.clone(), net_tx)));
     self
       .w
       .push(Box::new(diagnostics::Window::new(self.ctx.clone())));
