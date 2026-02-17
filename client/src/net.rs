@@ -43,7 +43,12 @@ pub fn init(ctx: Arc<Mutex<Context>>) -> mpsc::Sender<ClientMessage> {
         Message::Binary(binary) => {
           let env = ServerMessageEnvelope::from_bytes(&binary).unwrap();
           ctx.lock().unwrap().timestamp = Some(env.timestamp());
-          log::info!("received: {:?}", env);
+          match env.msg {
+            shared::ServerMessage::Empty => (),
+            shared::ServerMessage::SignIn(sign_in_token) => {
+              ctx.lock().unwrap().token = Some(sign_in_token.token);
+            },
+        }
         }
         _ => (),
       }

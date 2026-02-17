@@ -35,6 +35,9 @@ impl gui::Draw for Window {
       .title_bar(false)
       .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
       .show(ctx, |ui: &mut Ui| {
+        if let Some(tok) = &self.ctx.lock().unwrap().token {
+          ui.label(format!("Logged in: {tok}"));
+        } else {
         ui.label("email");
         ui.text_edit_singleline(&mut self.email);
 
@@ -48,6 +51,7 @@ impl gui::Draw for Window {
           });
           let _ = self.net_tx.blocking_send(msg);
         };
+        }
       });
   }
 }
