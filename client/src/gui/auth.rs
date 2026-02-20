@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
 use egui::{Context, Ui};
-use shared::{ClientMessage, SignInCredentials};
+use shared::message::client::{ClientMessage, SignInCredentials};
 use tokio::sync::mpsc;
 
 use crate::{context, gui};

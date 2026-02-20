@@ -2,7 +2,9 @@ use std::sync::{Arc, Mutex};
 
 use futures_util::{SinkExt, StreamExt, TryStreamExt};
 use reqwest_websocket::{Message, Upgrade};
-use shared::{ClientMessage, ClientMessageEnvelope, ServerMessageEnvelope};
+use shared::message::{
+  ClientMessageEnvelope, ServerMessageEnvelope, client::ClientMessage, server::ServerMessage,
+};
 use tokio::sync::mpsc;
 
 use crate::{context::Context, platform::runtime};
@@ -44,8 +46,8 @@ pub fn init(ctx: Arc<Mutex<Context>>) -> mpsc::Sender<ClientMessage> {
           let env = ServerMessageEnvelope::from_bytes(&binary).unwrap();
           ctx.lock().unwrap().timestamp = Some(env.timestamp());
           match env.msg {
-            shared::ServerMessage::Empty => (),
-            shared::ServerMessage::SignIn(sign_in_token) => {
+            ServerMessage::Empty => (),
+            ServerMessage::SignIn(sign_in_token) => {
               ctx.lock().unwrap().token = Some(sign_in_token.token);
             }
           }

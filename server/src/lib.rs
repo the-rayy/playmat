@@ -1,3 +1,8 @@
+use shared::message::{
+  ClientMessageEnvelope, ServerMessageEnvelope,
+  client::{ClientMessage, SignInCredentials},
+  server::{ServerMessage, SignInToken},
+};
 use std::{sync::Arc, time::Duration};
 use tokio::sync::Mutex;
 
@@ -11,10 +16,6 @@ use axum::{
   routing::get,
 };
 use futures_util::{SinkExt, StreamExt};
-use shared::{
-  ClientMessage, ClientMessageEnvelope, ServerMessage, ServerMessageEnvelope, SignInCredentials,
-  SignInToken,
-};
 use tokio::time::sleep;
 
 pub async fn run_server() {

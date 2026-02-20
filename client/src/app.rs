@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 
-use shared::ClientMessage;
+use shared::message::client::ClientMessage;
 use tokio::sync::mpsc;
 use winit::{
   application::ApplicationHandler,
