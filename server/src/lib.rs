@@ -1,7 +1,7 @@
 use shared::message::{
   ClientMessageEnvelope, ServerMessageEnvelope,
-  client::{ClientMessage, SignInCredentials},
-  server::{ServerMessage, SignInToken},
+  client::ClientMessage,
+  server::ServerMessage,
 };
 use std::{sync::Arc, time::Duration};
 use tokio::sync::Mutex;
@@ -17,6 +17,8 @@ use axum::{
 };
 use futures_util::{SinkExt, StreamExt};
 use tokio::time::sleep;
+
+mod handlers;
 
 pub async fn run_server() {
   let router = Router::new()
@@ -40,13 +42,6 @@ async fn handler() -> impl IntoResponse {
   "ok"
 }
 
-async fn handle_signin(_data: SignInCredentials) -> ServerMessage {
-  sleep(Duration::from_secs(3)).await;
-  ServerMessage::SignIn(SignInToken {
-    token: String::from("asd"),
-  })
-}
-
 async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
   ws.on_upgrade(async |socket: WebSocket| {
     let (ws_sender, mut ws_receiver) = socket.split();
@@ -61,7 +56,7 @@ async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
           log::debug!("Received: {:?}", env);
 
           let resp = match env.msg {
-            ClientMessage::SignIn(data) => handle_signin(data).await,
+            ClientMessage::SignIn(data) => handlers::signin::handler(data).await,
           };
 
           let env = ServerMessageEnvelope::new(resp);
