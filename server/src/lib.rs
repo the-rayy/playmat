@@ -1,7 +1,5 @@
 use shared::message::{
-  ClientMessageEnvelope, ServerMessageEnvelope,
-  client::ClientMessage,
-  server::ServerMessage,
+  ClientMessageEnvelope, ServerMessageEnvelope, client::ClientMessage, server::ServerMessage,
 };
 use std::{sync::Arc, time::Duration};
 use tokio::sync::Mutex;
