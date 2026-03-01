@@ -73,16 +73,30 @@ async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
 
       loop {
         let env = ServerMessageEnvelope::new(ServerMessage::Empty);
-        let _ = ws_sender
+        match ws_sender
           .lock()
           .await
           .send(Message::Binary(env.to_bytes().into()))
-          .await;
-        let _ = ws_sender
+          .await
+        {
+          Ok(_) => (),
+          Err(e) => {
+            log::error!("{e}");
+            return;
+          }
+        }
+        match ws_sender
           .lock()
           .await
           .send(Message::Text(format!("{}", i).into()))
-          .await;
+          .await
+        {
+          Ok(_) => (),
+          Err(e) => {
+            log::error!("{e}");
+            return;
+          }
+        }
         i += 1;
         sleep(Duration::from_secs(1)).await;
       }
