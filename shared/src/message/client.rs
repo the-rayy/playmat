@@ -5,6 +5,5 @@ pub enum ClientMessage {
 
 #[derive(bitcode::Encode, bitcode::Decode, Debug)]
 pub struct SignInCredentials {
-  pub email: String,
-  pub password: String,
+  pub username: String,
 }

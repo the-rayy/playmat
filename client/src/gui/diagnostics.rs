@@ -19,9 +19,13 @@ impl gui::Draw for Window {
     egui::Window::new("Diagnostics")
       .auto_sized()
       .show(ctx, |ui: &mut Ui| {
-        match self.ctx.lock().unwrap().timestamp {
+        match &self.ctx.lock().unwrap().timestamp {
           Some(x) => ui.label(format!("Server time: {x}")),
           None => ui.label("Not connected to server"),
+        };
+        match &self.ctx.lock().unwrap().token {
+          Some(x) => ui.label(format!("Logged in as: {x}")),
+          None => ui.label("Not logged in"),
         };
       });
   }

@@ -9,8 +9,7 @@ use crate::{context, gui};
 pub struct Window {
   ctx: Arc<Mutex<context::Context>>,
 
-  email: String,
-  password: String,
+  username: String,
   net_tx: mpsc::Sender<ClientMessage>,
 }
 
@@ -19,8 +18,7 @@ impl Window {
     Window {
       ctx,
 
-      email: Default::default(),
-      password: Default::default(),
+      username: Default::default(),
       net_tx,
     }
   }
@@ -38,16 +36,12 @@ impl gui::Draw for Window {
         if let Some(tok) = &self.ctx.lock().unwrap().token {
           ui.label(format!("Logged in: {tok}"));
         } else {
-          ui.label("email");
-          ui.text_edit_singleline(&mut self.email);
-
-          ui.label("password");
-          ui.text_edit_singleline(&mut self.password);
+          ui.label("username");
+          ui.text_edit_singleline(&mut self.username);
 
           if ui.button("login").clicked() {
             let msg = ClientMessage::SignIn(SignInCredentials {
-              email: self.email.clone(),
-              password: self.password.clone(),
+              username: self.username.clone(),
             });
             let _ = self.net_tx.blocking_send(msg);
           };

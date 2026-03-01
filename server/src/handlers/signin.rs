@@ -6,9 +6,9 @@ use shared::message::{
 };
 use tokio::time::sleep;
 
-pub async fn handler(_data: SignInCredentials) -> ServerMessage {
+pub async fn handler(data: SignInCredentials) -> ServerMessage {
   sleep(Duration::from_secs(3)).await;
   ServerMessage::SignIn(SignInToken {
-    token: String::from("asd"),
+    token: data.username,
   })
 }
