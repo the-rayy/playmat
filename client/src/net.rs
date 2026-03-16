@@ -7,7 +7,7 @@ use shared::message::{
 };
 use tokio::sync::mpsc;
 
-use crate::{context::Context, platform::runtime};
+use crate::{context::{Context, Scene}, platform::runtime};
 
 pub fn init(ctx: Arc<Mutex<Context>>) -> mpsc::Sender<ClientMessage> {
   let (tx, mut rx) = mpsc::channel::<ClientMessage>(10);
@@ -49,6 +49,7 @@ pub fn init(ctx: Arc<Mutex<Context>>) -> mpsc::Sender<ClientMessage> {
             ServerMessage::Empty => (),
             ServerMessage::SignIn(sign_in_token) => {
               ctx.lock().unwrap().token = Some(sign_in_token.token);
+              ctx.lock().unwrap().scene = Scene::Rooms;
             }
           }
         }

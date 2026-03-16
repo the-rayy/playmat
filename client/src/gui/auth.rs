@@ -4,7 +4,7 @@ use egui::{Context, Ui};
 use shared::message::client::{ClientMessage, SignInCredentials};
 use tokio::sync::mpsc;
 
-use crate::{context, gui};
+use crate::{context::{self, Scene}, gui};
 
 pub struct Window {
   ctx: Arc<Mutex<context::Context>>,

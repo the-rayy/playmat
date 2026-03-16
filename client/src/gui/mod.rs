@@ -1,7 +1,11 @@
-use std::sync::Arc;
+use std::{collections::HashMap, sync::{Arc, Mutex}};
 
 use egui::{ClippedPrimitive, Context, TexturesDelta};
+use shared::message::client::ClientMessage;
+use tokio::sync::mpsc;
 use winit::{event::WindowEvent, window::Window};
+
+use crate::context::{self, Scene};
 
 pub mod auth;
 pub mod diagnostics;
@@ -57,5 +61,25 @@ impl Gui {
     let textures = output.textures_delta;
 
     (primitives, textures)
+  }
+}
+
+pub struct WindowManager {
+  w: HashMap<Scene, Vec<Box<dyn Draw>>>,
+}
+
+impl WindowManager {
+  fn new(ctx: Arc<Mutex<context::Context>>, net_tx: mpsc::Sender<ClientMessage>) -> Self {
+    let mut windows = Vec::<Box<dyn Draw>>::new();
+    let diag_window = diagnostics::Window::new(ctx.clone());
+    let auth_window = auth::Window::new(ctx.clone(), net_tx);
+
+    windows.push(Box::new(diag_window));
+    windows.push(Box::new(auth_window));
+
+    let mut scenes = HashMap::new();
+    scenes.insert(Scene::Login, windows);
+
+    Self { w: scenes }
   }
 }
