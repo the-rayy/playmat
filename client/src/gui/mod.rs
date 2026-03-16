@@ -69,7 +69,7 @@ pub struct WindowManager {
 }
 
 impl WindowManager {
-  fn new(ctx: Arc<Mutex<context::Context>>, net_tx: mpsc::Sender<ClientMessage>) -> Self {
+  pub fn new(ctx: Arc<Mutex<context::Context>>, net_tx: mpsc::Sender<ClientMessage>) -> Self {
     let mut windows = Vec::<Box<dyn Draw>>::new();
     let diag_window = diagnostics::Window::new(ctx.clone());
     let auth_window = auth::Window::new(ctx.clone(), net_tx);
@@ -81,5 +81,9 @@ impl WindowManager {
     scenes.insert(Scene::Login, windows);
 
     Self { w: scenes }
+  }
+
+  pub fn current_windows(&mut self) -> &mut Vec<Box<dyn Draw>> {
+    self.w.get_mut(&Scene::Login).unwrap()
   }
 }

@@ -11,7 +11,7 @@ use winit::{
 
 use crate::{
   context::Context,
-  gui::{self, Gui, auth, diagnostics},
+  gui::{self, Gui, WindowManager, auth, diagnostics},
   renderer::Renderer,
 };
 
@@ -20,9 +20,9 @@ pub struct App {
   renderer: Option<Renderer>,
   gui: Option<Gui>,
 
-  w: Vec<Box<dyn gui::Draw>>,
   ctx: Arc<Mutex<Context>>,
   net_tx: mpsc::Sender<ClientMessage>,
+  window_manager: WindowManager,
 }
 
 impl App {
@@ -31,9 +31,9 @@ impl App {
       window: None,
       renderer: None,
       gui: None,
-      w: vec![],
-      ctx,
-      net_tx,
+      ctx: ctx.clone(),
+      net_tx: net_tx.clone(),
+      window_manager: WindowManager::new(ctx, net_tx)
     }
   }
 }
@@ -50,13 +50,6 @@ impl ApplicationHandler for App {
     self.window = Some(window);
     self.renderer = Some(renderer);
     self.gui = Some(gui);
-    let net_tx = self.net_tx.clone();
-    self
-      .w
-      .push(Box::new(auth::Window::new(self.ctx.clone(), net_tx)));
-    self
-      .w
-      .push(Box::new(diagnostics::Window::new(self.ctx.clone())));
   }
 
   fn window_event(
@@ -70,7 +63,7 @@ impl ApplicationHandler for App {
       WindowEvent::CloseRequested => event_loop.exit(),
       WindowEvent::Resized(size) => self.renderer.as_mut().unwrap().resize(size),
       WindowEvent::RedrawRequested => {
-        let (primitives, textures) = self.gui.as_mut().unwrap().update(&mut self.w);
+        let (primitives, textures) = self.gui.as_mut().unwrap().update(&mut self.window_manager.current_windows());
         self.renderer.as_mut().unwrap().render(primitives, textures);
         self.window.as_mut().unwrap().request_redraw();
       }
