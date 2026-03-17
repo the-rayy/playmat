@@ -1,3 +1,3 @@
 fn main() {
-  client::main();
+  println!("Hello, world!");
 }
