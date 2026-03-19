@@ -5,15 +5,13 @@ use thiserror::Error as Thiserror;
 #[derive(Thiserror, Debug)]
 pub enum Error {
   #[error("")]
-  InitializationError(#[from] std::io::Error)
+  InitializationError(#[from] std::io::Error),
 }
 
 pub async fn run(ipport: &str) -> Result<(), Error> {
-  let router = Router::new()
-  .route("/", get(handler));
+  let router = Router::new().route("/", get(handler));
 
-  let listener = tokio::net::TcpListener::bind(ipport)
-    .await?;
+  let listener = tokio::net::TcpListener::bind(ipport).await?;
 
   axum::serve(listener, router)
     .with_graceful_shutdown(shutdown_signal())
