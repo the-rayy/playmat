@@ -17,7 +17,7 @@ pub struct Renderer {
 
 impl Renderer {
   pub async fn new(window: Arc<winit::window::Window>) -> Self {
-    let instance = wgpu::Instance::new(&super::platform::wgpu_instance::descriptor());
+    let instance = wgpu::Instance::new(&super::platform::wgpu::instance_descriptor());
     let surface = instance
       .create_surface(window.clone())
       .expect("Could not create surface");
@@ -33,11 +33,7 @@ impl Renderer {
       .request_device(&wgpu::DeviceDescriptor {
         label: None,
         required_features: wgpu::Features::empty(),
-        required_limits: if cfg!(target_arch = "wasm32") {
-          wgpu::Limits::downlevel_webgl2_defaults()
-        } else {
-          wgpu::Limits::default()
-        },
+        required_limits: super::platform::wgpu::device_limits(),
         memory_hints: Default::default(),
         trace: wgpu::Trace::Off,
         experimental_features: ExperimentalFeatures::default(),
