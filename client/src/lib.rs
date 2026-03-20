@@ -3,8 +3,8 @@ mod engine;
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen::prelude::wasm_bindgen(start))]
 pub fn main() {
   engine::logger::init();
+  engine::runtime::init();
   // let ctx = Arc::new(Mutex::new(Context::default()));
-  // platform::logger::init();
   // platform::runtime::init();
   // let net_tx = net::init(ctx.clone());
   //

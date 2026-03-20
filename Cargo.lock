@@ -163,6 +163,7 @@ dependencies = [
  "console_log",
  "env_logger",
  "log",
+ "tokio",
  "wasm-bindgen",
  "wasm-bindgen-futures",
 ]
