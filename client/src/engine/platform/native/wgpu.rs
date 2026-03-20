@@ -6,6 +6,5 @@ pub fn instance_descriptor() -> wgpu::InstanceDescriptor {
 }
 
 pub fn device_limits() -> wgpu::Limits {
-          wgpu::Limits::default()
-
+  wgpu::Limits::default()
 }

@@ -1,4 +1,4 @@
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
 use winit::{
   application::ApplicationHandler,
@@ -8,7 +8,6 @@ use winit::{
 };
 
 use crate::engine::rendering::Renderer;
-
 
 pub struct App {
   window: Option<Arc<Window>>,
