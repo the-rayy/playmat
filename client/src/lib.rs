@@ -5,7 +5,6 @@ pub fn main() {
   engine::logger::init();
   engine::runtime::init();
   // let ctx = Arc::new(Mutex::new(Context::default()));
-  // platform::runtime::init();
   // let net_tx = net::init(ctx.clone());
   //
   // let mut winit_app = app::App::new(ctx.clone(), net_tx);

@@ -6,6 +6,7 @@ edition = "2024"
 [dependencies]
 log = { workspace = true }
 env_logger = { workspace = true }
+winit = "0.30.12"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }
