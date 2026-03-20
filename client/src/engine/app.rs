@@ -1,12 +1,13 @@
 use std::sync::{Arc, Mutex};
 
-use tokio::sync::mpsc;
 use winit::{
   application::ApplicationHandler,
   dpi::PhysicalSize,
   event::WindowEvent,
   window::{Window, WindowAttributes},
 };
+
+use crate::engine::rendering::Renderer;
 
 
 pub struct App {
