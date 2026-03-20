@@ -17,13 +17,7 @@ pub struct Renderer {
 
 impl Renderer {
   pub async fn new(window: Arc<winit::window::Window>) -> Self {
-    let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor {
-      #[cfg(not(target_arch = "wasm32"))]
-      backends: wgpu::Backends::PRIMARY,
-      #[cfg(target_arch = "wasm32")]
-      backends: wgpu::Backends::GL,
-      ..Default::default()
-    });
+    let instance = wgpu::Instance::new(&super::platform::wgpu_instance::descriptor());
     let surface = instance
       .create_surface(window.clone())
       .expect("Could not create surface");
