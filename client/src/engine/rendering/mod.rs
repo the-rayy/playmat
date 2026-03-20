@@ -62,7 +62,8 @@ impl Renderer {
     state
   }
 
-  pub fn render(&mut self, gui_primitives: Vec<ClippedPrimitive>, gui_textures: TexturesDelta) {
+  // pub fn render(&mut self, gui_primitives: Vec<ClippedPrimitive>, gui_textures: TexturesDelta) {
+  pub fn render(&mut self) {
     let surface_texture = self
       .surface
       .get_current_texture()
@@ -77,7 +78,7 @@ impl Renderer {
     let mut encoder = self.device.create_command_encoder(&Default::default());
 
     self.render_3d(&mut encoder, &texture_view);
-    self.render_egui(&mut encoder, &texture_view, gui_primitives, gui_textures);
+    // self.render_egui(&mut encoder, &texture_view, gui_primitives, gui_textures);
 
     self.queue.submit([encoder.finish()]);
     self.window.pre_present_notify();

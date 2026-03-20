@@ -3,6 +3,9 @@ name = "client"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
 [dependencies]
 log = { workspace = true }
 env_logger = { workspace = true }
