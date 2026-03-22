@@ -1,9 +1,10 @@
 use std::sync::Arc;
 
-use egui::{ClippedPrimitive, TexturesDelta};
 use egui_wgpu::RendererOptions;
 use wgpu::{Color, ExperimentalFeatures};
 use winit::dpi::PhysicalSize;
+
+use crate::engine::gui::Renderable;
 
 pub struct Renderer {
   window: Arc<winit::window::Window>,
@@ -63,7 +64,7 @@ impl Renderer {
   }
 
   // pub fn render(&mut self, gui_primitives: Vec<ClippedPrimitive>, gui_textures: TexturesDelta) {
-  pub fn render(&mut self) {
+  pub fn render(&mut self, gui: Renderable) {
     let surface_texture = self
       .surface
       .get_current_texture()
@@ -78,7 +79,7 @@ impl Renderer {
     let mut encoder = self.device.create_command_encoder(&Default::default());
 
     self.render_3d(&mut encoder, &texture_view);
-    // self.render_egui(&mut encoder, &texture_view, gui_primitives, gui_textures);
+    self.render_egui(&mut encoder, &texture_view, gui);
 
     self.queue.submit([encoder.finish()]);
     self.window.pre_present_notify();
@@ -112,8 +113,7 @@ impl Renderer {
     &mut self,
     encoder: &mut wgpu::CommandEncoder,
     texture_view: &wgpu::TextureView,
-    primitives: Vec<ClippedPrimitive>,
-    textures: TexturesDelta,
+    gui: Renderable,
   ) {
     let screen_descriptor = egui_wgpu::ScreenDescriptor {
       size_in_pixels: [
@@ -122,7 +122,7 @@ impl Renderer {
       ],
       pixels_per_point: self.window.scale_factor() as f32,
     };
-    for (id, image_delta) in &textures.set {
+    for (id, image_delta) in &gui.textures.set {
       self
         .egui_renderer
         .update_texture(&self.device, &self.queue, *id, image_delta);
@@ -131,7 +131,7 @@ impl Renderer {
       &self.device,
       &self.queue,
       encoder,
-      &primitives,
+      &gui.primitives,
       &screen_descriptor,
     );
     let rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -152,9 +152,9 @@ impl Renderer {
     let mut rpass = rpass.forget_lifetime();
     self
       .egui_renderer
-      .render(&mut rpass, &primitives, &screen_descriptor);
+      .render(&mut rpass, &gui.primitives, &screen_descriptor);
     drop(rpass);
-    for x in &textures.free {
+    for x in &gui.textures.free {
       self.egui_renderer.free_texture(x)
     }
   }
