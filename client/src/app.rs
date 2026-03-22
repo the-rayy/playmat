@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use winit::{application::ApplicationHandler, event::WindowEvent, window::Window};
 
-use crate::engine::{gui::Gui, rendering::Renderer};
+use crate::engine::{self, gui::Gui, rendering::Renderer};
 
 pub struct App {
   window: Option<Arc<Window>>,
@@ -23,10 +23,10 @@ impl App {
 impl ApplicationHandler for App {
   fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
     let window = event_loop
-      .create_window(super::platform::window::attributes())
+      .create_window(engine::window::attributes())
       .expect("could not create window");
     let window = Arc::new(window);
-    let renderer = super::runtime::get().block_on(Renderer::new(window.clone()));
+    let renderer = engine::runtime::get().block_on(Renderer::new(window.clone()));
 
     self.window = Some(window.clone());
     self.renderer = Some(renderer);
