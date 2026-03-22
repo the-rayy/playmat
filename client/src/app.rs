@@ -5,9 +5,10 @@ use winit::{application::ApplicationHandler, event::WindowEvent, window::Window}
 use crate::{
   engine::{self, gui::Gui, rendering::Renderer},
   framework::window_manager::WindowManager,
+  game::Game,
 };
 
-pub struct App {
+pub struct App<T: Game> {
   //engine
   window: Option<Arc<Window>>,
   renderer: Option<Renderer>,
@@ -15,22 +16,28 @@ pub struct App {
 
   //framework
   window_manager: WindowManager,
+
+  //game
+  game: T,
 }
 
-impl App {
-  pub fn new() -> App {
+impl<T: Game> App<T> {
+  pub fn new(game: T) -> App<T> {
     App {
       window: None,
       renderer: None,
       gui: None,
 
       window_manager: WindowManager::default(),
+
+      game,
     }
   }
 }
 
-impl ApplicationHandler for App {
+impl<T: Game> ApplicationHandler for App<T> {
   fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
+    engine::runtime::init();
     let window = event_loop
       .create_window(engine::window::attributes())
       .expect("could not create window");
