@@ -2,12 +2,19 @@ use std::sync::Arc;
 
 use winit::{application::ApplicationHandler, event::WindowEvent, window::Window};
 
-use crate::engine::{self, gui::Gui, rendering::Renderer};
+use crate::{
+  engine::{self, gui::Gui, rendering::Renderer},
+  framework::window_manager::WindowManager,
+};
 
 pub struct App {
+  //engine
   window: Option<Arc<Window>>,
   renderer: Option<Renderer>,
   gui: Option<Gui>,
+
+  //framework
+  window_manager: WindowManager,
 }
 
 impl App {
@@ -16,6 +23,8 @@ impl App {
       window: None,
       renderer: None,
       gui: None,
+
+      window_manager: WindowManager::default(),
     }
   }
 }
@@ -44,7 +53,11 @@ impl ApplicationHandler for App {
       WindowEvent::CloseRequested => event_loop.exit(),
       WindowEvent::Resized(size) => self.renderer.as_mut().unwrap().resize(size),
       WindowEvent::RedrawRequested => {
-        let renderable_gui = self.gui.as_mut().unwrap().update(&mut vec![]);
+        let renderable_gui = self
+          .gui
+          .as_mut()
+          .unwrap()
+          .update(self.window_manager.get_current());
         self.renderer.as_mut().unwrap().render(renderable_gui);
         self.window.as_mut().unwrap().request_redraw();
       }
