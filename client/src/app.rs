@@ -5,7 +5,7 @@ use winit::{application::ApplicationHandler, event::WindowEvent, window::Window}
 use crate::{
   engine::{self, gui::Gui, rendering::Renderer},
   framework::window_manager::WindowManager,
-  game::Game,
+  framework::Game,
 };
 
 pub struct App<T: Game> {
@@ -47,6 +47,8 @@ impl<T: Game> ApplicationHandler for App<T> {
     self.window = Some(window.clone());
     self.renderer = Some(renderer);
     self.gui = Some(Gui::new(window));
+
+    self.game.start(&mut self.window_manager);
   }
 
   fn window_event(
