@@ -4,8 +4,8 @@ use winit::{application::ApplicationHandler, event::WindowEvent, window::Window}
 
 use crate::{
   engine::{self, gui::Gui, rendering::Renderer},
-  framework::window_manager::WindowManager,
   framework::Game,
+  framework::window_manager::WindowManager,
 };
 
 pub struct App<T: Game> {
