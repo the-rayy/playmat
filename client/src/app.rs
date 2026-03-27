@@ -4,8 +4,7 @@ use winit::{application::ApplicationHandler, event::WindowEvent, window::Window}
 
 use crate::{
   engine::{self, gui::Gui, rendering::Renderer},
-  framework::Game,
-  framework::window_manager::WindowManager,
+  framework::{self, Game},
 };
 
 pub struct App<T: Game> {
@@ -15,7 +14,7 @@ pub struct App<T: Game> {
   gui: Option<Gui>,
 
   //framework
-  window_manager: WindowManager,
+  framework_context: framework::Context,
 
   //game
   game: T,
@@ -28,7 +27,7 @@ impl<T: Game> App<T> {
       renderer: None,
       gui: None,
 
-      window_manager: WindowManager::default(),
+      framework_context: framework::Context::default(),
 
       game,
     }
@@ -48,7 +47,7 @@ impl<T: Game> ApplicationHandler for App<T> {
     self.renderer = Some(renderer);
     self.gui = Some(Gui::new(window));
 
-    self.game.start(&mut self.window_manager);
+    self.game.start(&mut self.framework_context);
   }
 
   fn window_event(
@@ -66,7 +65,7 @@ impl<T: Game> ApplicationHandler for App<T> {
           .gui
           .as_mut()
           .unwrap()
-          .update(self.window_manager.get_current());
+          .update(self.framework_context.window_manager.get_current());
         self.renderer.as_mut().unwrap().render(renderable_gui);
         self.window.as_mut().unwrap().request_redraw();
       }

@@ -5,8 +5,8 @@ mod windows;
 pub struct GameImpl {}
 
 impl framework::Game for GameImpl {
-  fn start(&self, wm: &mut framework::window_manager::WindowManager) {
+  fn start(&self, ctx: &mut framework::Context) {
     let auth_window = windows::login::Window::new();
-    wm.add(auth_window);
+    ctx.window_manager.add(auth_window);
   }
 }

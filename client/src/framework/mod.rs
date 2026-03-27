@@ -1,5 +1,10 @@
 pub mod window_manager;
 
 pub trait Game {
-  fn start(&self, wm: &mut window_manager::WindowManager);
+  fn start(&self, ctx: &mut Context);
+}
+
+#[derive(Default)]
+pub struct Context {
+  pub window_manager: window_manager::WindowManager,
 }
