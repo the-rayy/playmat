@@ -1,4 +1,5 @@
 pub mod gui;
+pub mod network;
 mod platform;
 pub mod rendering;
 

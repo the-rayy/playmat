@@ -27,7 +27,7 @@ impl<T: Game> App<T> {
       renderer: None,
       gui: None,
 
-      framework_context: framework::Context::default(),
+      framework_context: framework::Context::new(),
 
       game,
     }
