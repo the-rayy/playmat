@@ -50,9 +50,7 @@ impl<T: Game> ApplicationHandler for App<T> {
     self.gui = Some(Gui::new(window));
     self.framework_context = Some(framework_context);
 
-    self
-      .game
-      .start(self.framework_context.as_mut().unwrap());
+    self.game.start(self.framework_context.as_mut().unwrap());
   }
 
   fn window_event(
@@ -62,6 +60,9 @@ impl<T: Game> ApplicationHandler for App<T> {
     event: winit::event::WindowEvent,
   ) {
     self.gui.as_mut().unwrap().handle_event(&event);
+    while let Ok(msg) = self.framework_context.as_mut().unwrap().rx.try_recv() {
+      self.game.handle(msg);
+    }
     match event {
       WindowEvent::CloseRequested => event_loop.exit(),
       WindowEvent::Resized(size) => self.renderer.as_mut().unwrap().resize(size),

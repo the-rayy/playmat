@@ -28,7 +28,7 @@ pub fn connect(
     runtime::_spawn_async(async move {
       while let Some(Message::Binary(binary)) = ws_receiver.try_next().await.unwrap() {
         let env = ServerMessageEnvelope::from_bytes(&binary).unwrap();
-        let _ = server_tx.send(env.msg);
+        let _ = server_tx.send(env.msg).await;
       }
     });
 
