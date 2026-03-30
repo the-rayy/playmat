@@ -8,9 +8,11 @@ use axum::{
   routing::get,
 };
 
-use futures_util::StreamExt;
-use protocol::message::ClientMessageEnvelope;
+use futures_util::{SinkExt, StreamExt};
+use protocol::message::{ClientMessageEnvelope, ServerMessageEnvelope, client::ClientMessage};
 use thiserror::Error as Thiserror;
+
+use crate::handlers;
 
 #[derive(Thiserror, Debug)]
 pub enum Error {
@@ -41,12 +43,17 @@ async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
   log::debug!("Running websocket");
   ws.on_upgrade(async |socket: WebSocket| {
     log::debug!("Upgrading websocket");
-    let (_tx, mut rx) = socket.split();
+    let (mut tx, mut rx) = socket.split();
     tokio::spawn(async move {
       while let Some(msg) = rx.next().await {
         if let Message::Binary(x) = msg.unwrap() {
           let env = ClientMessageEnvelope::from_bytes(&x).unwrap();
-          log::debug!("Received: {:?}", env);
+          let resp = match env.msg {
+            ClientMessage::SignIn(data) => handlers::signin::handler(data).await,
+          };
+
+          let env = ServerMessageEnvelope::new(resp);
+          let _ = tx.send(Message::Binary(env.to_bytes().into())).await;
         }
       }
     });

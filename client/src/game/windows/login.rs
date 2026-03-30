@@ -1,18 +1,20 @@
 use protocol::message::client::{ClientMessage, SignInCredentials};
 use tokio::sync::mpsc::Sender;
 
-use crate::engine::gui;
+use crate::{engine::gui, game::GameState};
 
 pub struct Window {
   username: String,
   tx: Sender<ClientMessage>,
+  game_state: GameState,
 }
 
 impl Window {
-  pub fn new(tx: Sender<ClientMessage>) -> Window {
+  pub fn new(tx: Sender<ClientMessage>, game_state: GameState) -> Window {
     Window {
       username: Default::default(),
       tx,
+      game_state,
     }
   }
 }
@@ -26,6 +28,9 @@ impl gui::Draw for Window {
       .title_bar(false)
       .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
       .show(ctx, |ui: &mut egui::Ui| {
+        if let Some(token) = &self.game_state.lock().unwrap().user_token {
+          ui.label(format!("Logged in as {token}"));
+        } else {
         ui.label("username");
         ui.text_edit_singleline(&mut self.username);
 
@@ -35,6 +40,7 @@ impl gui::Draw for Window {
           });
           let _ = self.tx.blocking_send(msg);
         };
+        }
       });
   }
 }
