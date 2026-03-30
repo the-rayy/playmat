@@ -1,6 +1,6 @@
 mod config;
-mod http;
 mod handlers;
+mod http;
 
 #[tokio::main]
 async fn main() {

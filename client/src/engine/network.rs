@@ -1,8 +1,8 @@
-use futures_util::{SinkExt, StreamExt, TryStreamExt, stream::SplitSink};
+use futures_util::{SinkExt, StreamExt, TryStreamExt};
 use protocol::message::{
   ClientMessageEnvelope, ServerMessageEnvelope, client::ClientMessage, server::ServerMessage,
 };
-use reqwest_websocket::{Message, Upgrade, WebSocket};
+use reqwest_websocket::{Message, Upgrade};
 
 use crate::engine::runtime;
 
@@ -13,8 +13,8 @@ pub fn connect(
   tokio::sync::mpsc::Receiver<ServerMessage>,
 ) {
   let url = url.into();
-  let (mut server_tx, mut server_rx) = tokio::sync::mpsc::channel::<ServerMessage>(10);
-  let (mut client_tx, mut client_rx) = tokio::sync::mpsc::channel::<ClientMessage>(10);
+  let (server_tx, server_rx) = tokio::sync::mpsc::channel::<ServerMessage>(10);
+  let (client_tx, mut client_rx) = tokio::sync::mpsc::channel::<ClientMessage>(10);
   runtime::_spawn_async(async move {
     let response = reqwest::Client::default()
       .get(url)

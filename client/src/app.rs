@@ -1,6 +1,5 @@
-use std::{cell::RefCell, rc::Rc, sync::Arc};
+use std::sync::Arc;
 
-use tokio::sync::Mutex;
 use winit::{application::ApplicationHandler, event::WindowEvent, window::Window};
 
 use crate::{
@@ -51,7 +50,9 @@ impl<T: Game> ApplicationHandler for App<T> {
     self.gui = Some(Gui::new(window));
     self.framework_context = Some(framework_context);
 
-    self.game.start(&mut self.framework_context.as_mut().unwrap());
+    self
+      .game
+      .start(self.framework_context.as_mut().unwrap());
   }
 
   fn window_event(
@@ -65,11 +66,14 @@ impl<T: Game> ApplicationHandler for App<T> {
       WindowEvent::CloseRequested => event_loop.exit(),
       WindowEvent::Resized(size) => self.renderer.as_mut().unwrap().resize(size),
       WindowEvent::RedrawRequested => {
-        let renderable_gui = self
-          .gui
-          .as_mut()
-          .unwrap()
-          .update(self.framework_context.as_mut().unwrap().window_manager.get_current());
+        let renderable_gui = self.gui.as_mut().unwrap().update(
+          self
+            .framework_context
+            .as_mut()
+            .unwrap()
+            .window_manager
+            .get_current(),
+        );
         self.renderer.as_mut().unwrap().render(renderable_gui);
         self.window.as_mut().unwrap().request_redraw();
       }

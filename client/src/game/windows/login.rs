@@ -31,15 +31,15 @@ impl gui::Draw for Window {
         if let Some(token) = &self.game_state.lock().unwrap().user_token {
           ui.label(format!("Logged in as {token}"));
         } else {
-        ui.label("username");
-        ui.text_edit_singleline(&mut self.username);
+          ui.label("username");
+          ui.text_edit_singleline(&mut self.username);
 
-        if ui.button("login").clicked() {
-          let msg = ClientMessage::SignIn(SignInCredentials {
-            username: self.username.clone(),
-          });
-          let _ = self.tx.blocking_send(msg);
-        };
+          if ui.button("login").clicked() {
+            let msg = ClientMessage::SignIn(SignInCredentials {
+              username: self.username.clone(),
+            });
+            let _ = self.tx.blocking_send(msg);
+          };
         }
       });
   }
