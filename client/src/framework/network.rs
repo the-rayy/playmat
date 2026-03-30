@@ -13,6 +13,10 @@ impl ServerConnection {
     }
   }
 
+  pub async fn connect(&mut self) {
+    self.net.connect().await
+  }
+
   pub async fn send(&mut self, msg: ClientMessage) {
     let envelope = ClientMessageEnvelope::new(msg);
     self.net.send(envelope.to_bytes()).await;

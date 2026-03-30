@@ -23,6 +23,7 @@ impl Context {
     let mut net = network::ServerConnection::new();
 
     runtime::_spawn_async(async move {
+      net.connect().await;
       loop {
         match rx.recv().await {
           Some(x) => {
