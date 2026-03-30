@@ -1,46 +1,26 @@
-use protocol::message::client::ClientMessage;
-use tokio::sync::mpsc::{self, Sender};
+use protocol::message::{client::ClientMessage, server::ServerMessage};
+use tokio::sync::mpsc::{self, Receiver, Sender};
 
-use crate::engine::runtime;
+use crate::engine::{self, runtime};
 
-pub mod network;
 pub mod window_manager;
 
 pub trait Game {
   fn start(&self, ctx: &mut Context);
+  fn handle(&mut self, msg: ServerMessage);
 }
 
 pub struct Context {
   pub window_manager: window_manager::WindowManager,
-
-  client_message_tx: Sender<ClientMessage>,
+  pub tx: tokio::sync::mpsc::Sender<ClientMessage>,
 }
 
 impl Context {
   pub fn new() -> Self {
-    let (tx, mut rx) = mpsc::channel::<ClientMessage>(10);
-
-    let mut net = network::ServerConnection::new();
-
-    runtime::_spawn_async(async move {
-      net.connect().await;
-      loop {
-        match rx.recv().await {
-          Some(x) => {
-            let _ = net.send(x).await;
-          }
-          None => return,
-        }
-      }
-    });
-
+    let (tx, rx) = engine::network::connect("ws://blackbook.local:8000/ws");
     Self {
       window_manager: Default::default(),
-      client_message_tx: tx,
+      tx: tx,
     }
-  }
-
-  pub fn get_client_message_tx(&self) -> Sender<ClientMessage> {
-    self.client_message_tx.clone()
   }
 }

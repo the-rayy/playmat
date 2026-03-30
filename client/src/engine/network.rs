@@ -1,53 +1,44 @@
-use futures_util::{SinkExt, StreamExt, stream::SplitSink, TryStreamExt};
+use futures_util::{SinkExt, StreamExt, TryStreamExt, stream::SplitSink};
+use protocol::message::{
+  ClientMessageEnvelope, ServerMessageEnvelope, client::ClientMessage, server::ServerMessage,
+};
 use reqwest_websocket::{Message, Upgrade, WebSocket};
 
 use crate::engine::runtime;
 
-pub struct Network {
-  url: String,
-  tx: Option<SplitSink<WebSocket, Message>>,
-}
-
-impl Network {
-  pub fn new(url: impl Into<String>) -> Self {
-    Self {
-      url: url.into(),
-      tx: None,
-    }
-  }
-
-  pub async fn connect(&mut self) -> tokio::sync::mpsc::Receiver<Vec<u8>> {
+pub fn connect(
+  url: impl Into<String>,
+) -> (
+  tokio::sync::mpsc::Sender<ClientMessage>,
+  tokio::sync::mpsc::Receiver<ServerMessage>,
+) {
+  let url = url.into();
+  let (mut server_tx, mut server_rx) = tokio::sync::mpsc::channel::<ServerMessage>(10);
+  let (mut client_tx, mut client_rx) = tokio::sync::mpsc::channel::<ClientMessage>(10);
+  runtime::_spawn_async(async move {
     let response = reqwest::Client::default()
-      .get(self.url.clone())
+      .get(url)
       .upgrade()
       .send()
       .await
       .unwrap();
 
-    let (ws_sender, mut ws_receiver) = response.into_websocket().await.unwrap().split();
-    self.tx = Some(ws_sender);
+    let (mut ws_sender, mut ws_receiver) = response.into_websocket().await.unwrap().split();
 
-    let (mut tx, mut rx) = tokio::sync::mpsc::channel::<Vec<u8>>(10);
     runtime::_spawn_async(async move {
       while let Some(Message::Binary(binary)) = ws_receiver.try_next().await.unwrap() {
-        let _ = tx.send(binary.into());
+        let env = ServerMessageEnvelope::from_bytes(&binary).unwrap();
+        let _ = server_tx.send(env.msg);
       }
     });
 
-    rx
-  }
+    runtime::_spawn_async(async move {
+      while let Some(msg) = client_rx.recv().await {
+        let env = ClientMessageEnvelope::new(msg);
+        let _ = ws_sender.send(Message::Binary(env.to_bytes().into())).await;
+      }
+    });
+  });
 
-  pub async fn send(&mut self, data: Vec<u8>) {
-    if self.tx.is_none() {
-      panic!("network not connected. please handle this gracefully");
-    }
-
-    let resp = self
-      .tx
-      .as_mut()
-      .unwrap()
-      .send(Message::Binary(data.into()))
-      .await;
-    log::warn!("{:?}", resp);
-  }
+  (client_tx, server_rx)
 }
