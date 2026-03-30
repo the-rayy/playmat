@@ -1,13 +1,18 @@
+use protocol::message::client::{ClientMessage, SignInCredentials};
+use tokio::sync::mpsc::Sender;
+
 use crate::engine::gui;
 
 pub struct Window {
   username: String,
+  tx: Sender<ClientMessage>,
 }
 
 impl Window {
-  pub fn new() -> Window {
+  pub fn new(tx: Sender<ClientMessage>) -> Window {
     Window {
       username: Default::default(),
+      tx,
     }
   }
 }
@@ -24,7 +29,12 @@ impl gui::Draw for Window {
         ui.label("username");
         ui.text_edit_singleline(&mut self.username);
 
-        if ui.button("login").clicked() {};
+        if ui.button("login").clicked() {
+          let msg = ClientMessage::SignIn(SignInCredentials{
+            username: self.username.clone(),
+          });
+          let _ = self.tx.blocking_send(msg);
+        };
       });
   }
 }
