@@ -8,6 +8,8 @@ pub struct ServerConnection {
 
 impl ServerConnection {
   pub fn new() -> Self {
+    
+
     Self {
       net: Network::new("ws://blackbook.local:8000/ws"),
     }
