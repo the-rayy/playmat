@@ -8,6 +8,7 @@ mod game;
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen::prelude::wasm_bindgen(start))]
 pub fn main() {
   engine::logger::init();
+  engine::runtime::init();
   let game = game::GameImpl {};
   let mut winit_app = app::App::new(game);
 

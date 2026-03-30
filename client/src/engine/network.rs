@@ -1,4 +1,3 @@
-
 use futures_util::{SinkExt, StreamExt, stream::SplitSink};
 use reqwest_websocket::{Message, Upgrade, WebSocket};
 
@@ -26,6 +25,7 @@ impl Network {
   }
 
   pub async fn send(&mut self, data: Vec<u8>) {
-    let _ = self.tx.send(Message::Binary(data.into())).await;
+    let resp = self.tx.send(Message::Binary(data.into())).await;
+    log::warn!("{:?}", resp);
   }
 }

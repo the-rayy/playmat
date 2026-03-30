@@ -1,4 +1,4 @@
-use protocol::message::{ClientMessageEnvelope, client::ClientMessage};
+use protocol::message::client::ClientMessage;
 use tokio::sync::mpsc::{self, Sender};
 
 use crate::engine::runtime;

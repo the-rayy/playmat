@@ -30,7 +30,7 @@ impl gui::Draw for Window {
         ui.text_edit_singleline(&mut self.username);
 
         if ui.button("login").clicked() {
-          let msg = ClientMessage::SignIn(SignInCredentials{
+          let msg = ClientMessage::SignIn(SignInCredentials {
             username: self.username.clone(),
           });
           let _ = self.tx.blocking_send(msg);
