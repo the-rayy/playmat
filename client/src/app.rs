@@ -22,6 +22,8 @@ pub struct App<T: Game> {
 
 impl<T: Game> App<T> {
   pub fn new(game: T) -> App<T> {
+    engine::runtime::init();
+
     App {
       window: None,
       renderer: None,
@@ -36,7 +38,6 @@ impl<T: Game> App<T> {
 
 impl<T: Game> ApplicationHandler for App<T> {
   fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
-    engine::runtime::init();
     let window = event_loop
       .create_window(engine::window::attributes())
       .expect("could not create window");

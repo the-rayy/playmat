@@ -1,1 +1,1 @@
-pub const SERVER_IP_PORT: &str = "0.0.0.0:8080";
+pub const SERVER_IP_PORT: &str = "0.0.0.0:8000";

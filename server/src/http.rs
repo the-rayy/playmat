@@ -1,6 +1,8 @@
-use axum::{Router, response::IntoResponse, routing::get};
+use axum::{Router, extract::{WebSocketUpgrade, ws::{Message, WebSocket}}, response::IntoResponse, routing::get};
 
+use protocol::message::ClientMessageEnvelope;
 use thiserror::Error as Thiserror;
+use futures_util::{SinkExt, StreamExt};
 
 #[derive(Thiserror, Debug)]
 pub enum Error {
@@ -9,7 +11,7 @@ pub enum Error {
 }
 
 pub async fn run(ipport: &str) -> Result<(), Error> {
-  let router = Router::new().route("/", get(handler));
+  let router = Router::new().route("/", get(handler)).route("/ws", get(ws_handler));
 
   let listener = tokio::net::TcpListener::bind(ipport).await?;
 
@@ -23,6 +25,23 @@ pub async fn run(ipport: &str) -> Result<(), Error> {
 
 async fn handler() -> impl IntoResponse {
   "ok"
+}
+
+async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
+          log::debug!("Running websocket");
+  ws.on_upgrade(async |socket: WebSocket| {
+          log::debug!("Upgrading websocket");
+    let (tx, mut rx) = socket.split();
+    tokio::spawn(async move {
+      while let Some(msg) = rx.next().await {
+        if let Message::Binary(x) = msg.unwrap() {
+          let env = ClientMessageEnvelope::from_bytes(&x).unwrap();
+          log::debug!("Received: {:?}", env);
+        }
+      }
+    });
+
+  })
 }
 
 async fn shutdown_signal() {
