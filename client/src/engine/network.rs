@@ -1,6 +1,7 @@
-use futures_util::{SinkExt, StreamExt, stream::SplitSink};
+use futures_util::{SinkExt, StreamExt, stream::SplitSink, TryStreamExt};
 use reqwest_websocket::{Message, Upgrade, WebSocket};
 
+use crate::engine::runtime;
 
 pub struct Network {
   url: String,
@@ -15,7 +16,7 @@ impl Network {
     }
   }
 
-  pub async fn connect(&mut self) {
+  pub async fn connect(&mut self) -> tokio::sync::mpsc::Receiver<Vec<u8>> {
     let response = reqwest::Client::default()
       .get(self.url.clone())
       .upgrade()
@@ -23,8 +24,17 @@ impl Network {
       .await
       .unwrap();
 
-    let (ws_sender, _ws_receiver) = response.into_websocket().await.unwrap().split();
-    self.tx = Some(ws_sender)
+    let (ws_sender, mut ws_receiver) = response.into_websocket().await.unwrap().split();
+    self.tx = Some(ws_sender);
+
+    let (mut tx, mut rx) = tokio::sync::mpsc::channel::<Vec<u8>>(10);
+    runtime::_spawn_async(async move {
+      while let Some(Message::Binary(binary)) = ws_receiver.try_next().await.unwrap() {
+        let _ = tx.send(binary.into());
+      }
+    });
+
+    rx
   }
 
   pub async fn send(&mut self, data: Vec<u8>) {
