@@ -21,9 +21,7 @@ pub enum Error {
 }
 
 pub async fn run(ipport: &str) -> Result<(), Error> {
-  let router = Router::new()
-    .route("/", get(handler))
-    .route("/ws", get(ws_handler));
+  let router = Router::new().route("/ws", get(ws_handler));
 
   let listener = tokio::net::TcpListener::bind(ipport).await?;
 
@@ -35,17 +33,16 @@ pub async fn run(ipport: &str) -> Result<(), Error> {
   Ok(())
 }
 
-async fn handler() -> impl IntoResponse {
-  "ok"
-}
-
 async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
-  log::debug!("Running websocket");
+  log::info!("Websocket connected");
   ws.on_upgrade(async |socket: WebSocket| {
-    log::debug!("Upgrading websocket");
+    log::info!("Websocket upgraded");
     let (mut tx, mut rx) = socket.split();
+
     tokio::spawn(async move {
+      log::info!("Websocket thread starting");
       while let Some(msg) = rx.next().await {
+        log::debug!("Websocket message received");
         if let Message::Binary(x) = msg.unwrap() {
           let env = ClientMessageEnvelope::from_bytes(&x).unwrap();
           let resp = match env.msg {
@@ -53,7 +50,12 @@ async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
           };
 
           let env = ServerMessageEnvelope::new(resp);
-          let _ = tx.send(Message::Binary(env.to_bytes().into())).await;
+          if let Err(e) = tx.send(Message::Binary(env.to_bytes().into())).await {
+            log::error!("Websocket message sending error: {}", e);
+          }
+          log::debug!("Websocket message handled");
+        } else {
+          log::warn!("Websocket message was not binary!");
         }
       }
     });
