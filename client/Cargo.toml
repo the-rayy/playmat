@@ -10,17 +10,17 @@ crate-type = ["cdylib", "rlib"]
 protocol = { path = "../protocol" }
 log = { workspace = true }
 env_logger = { workspace = true }
-winit = "0.30.12"
-egui = "0.33.0"
-egui-wgpu = "0.33.0"
-egui-winit = { version = "0.33.0", default-features = false }
+winit = "0.30.13"
+egui = "0.34.1"
+egui-wgpu = "0.34.1"
+egui-winit = { version = "0.34.1", default-features = false }
 reqwest = "0.13.2"
 reqwest-websocket = "0.6.0"
 futures-util = "0.3"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }
-wgpu = "27"
+wgpu = "29.0.1"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen = "0.2.108"
@@ -28,4 +28,4 @@ wasm-bindgen-futures = "0.4.50"
 console_error_panic_hook = "0.1.7"
 console_log = "1.0.0"
 tokio = { workspace = true, features = ["macros", "rt"]}
-wgpu = { version = "27", features = ["webgl"] }
+wgpu = { version = "29.0.1", features = ["webgl"] }

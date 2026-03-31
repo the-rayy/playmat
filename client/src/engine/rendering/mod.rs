@@ -18,7 +18,7 @@ pub struct Renderer {
 
 impl Renderer {
   pub async fn new(window: Arc<winit::window::Window>) -> Self {
-    let instance = wgpu::Instance::new(&super::platform::wgpu::instance_descriptor());
+    let instance = wgpu::Instance::new(super::platform::wgpu::instance_descriptor());
     let surface = instance
       .create_surface(window.clone())
       .expect("Could not create surface");
@@ -64,17 +64,26 @@ impl Renderer {
   }
 
   pub fn render(&mut self, gui: Renderable) {
-    let surface_texture = self
-      .surface
-      .get_current_texture()
-      .expect("Unable to acquire next surface texture");
-    let texture_view = surface_texture
-      .texture
-      .create_view(&wgpu::TextureViewDescriptor {
-        format: Some(self.surface_format.add_srgb_suffix()),
-        ..Default::default()
-      });
-
+        let output = match self.surface.get_current_texture() {
+            wgpu::CurrentSurfaceTexture::Success(surface_texture) => surface_texture,
+            wgpu::CurrentSurfaceTexture::Suboptimal(surface_texture) => {
+                self.configure_surface();
+                surface_texture
+            }
+            wgpu::CurrentSurfaceTexture::Timeout
+            | wgpu::CurrentSurfaceTexture::Occluded
+            | wgpu::CurrentSurfaceTexture::Validation => {return}
+            wgpu::CurrentSurfaceTexture::Outdated => {
+                self.configure_surface();
+        return;
+            }
+            wgpu::CurrentSurfaceTexture::Lost => {
+                // You could recreate the devices and all resources
+                // created with it here, but we'll just bail
+                panic!("Lost device");
+            }
+        };
+        let texture_view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
     let mut encoder = self.device.create_command_encoder(&Default::default());
 
     self.render_3d(&mut encoder, &texture_view);
@@ -82,7 +91,7 @@ impl Renderer {
 
     self.queue.submit([encoder.finish()]);
     self.window.pre_present_notify();
-    surface_texture.present();
+    output.present();
   }
 
   pub fn resize(&mut self, new_size: PhysicalSize<u32>) {
@@ -105,6 +114,7 @@ impl Renderer {
       depth_stencil_attachment: None,
       timestamp_writes: None,
       occlusion_query_set: None,
+        multiview_mask: None,
     });
   }
 
@@ -147,6 +157,7 @@ impl Renderer {
       label: Some("egui main render pass"),
       timestamp_writes: None,
       occlusion_query_set: None,
+        multiview_mask: None,
     });
     let mut rpass = rpass.forget_lifetime();
     self
