@@ -1,7 +1,5 @@
 use futures_util::{SinkExt, StreamExt, TryStreamExt};
-use protocol::message::{
-  ServerMessageEnvelope, client::ClientMessage, server::ServerMessage,
-};
+use protocol::message::{ServerMessageEnvelope, client::ClientMessage, server::ServerMessage};
 use reqwest_websocket::{Message, Upgrade};
 
 use crate::engine::runtime;

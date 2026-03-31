@@ -63,7 +63,6 @@ impl Renderer {
     state
   }
 
-  // pub fn render(&mut self, gui_primitives: Vec<ClippedPrimitive>, gui_textures: TexturesDelta) {
   pub fn render(&mut self, gui: Renderable) {
     let surface_texture = self
       .surface
