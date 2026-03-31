@@ -1,16 +1,20 @@
+use std::collections::HashMap;
+
 use crate::engine::gui::Draw;
 
 #[derive(Default)]
 pub struct WindowManager {
-  windows: Vec<Box<dyn Draw>>,
+  windows: HashMap<String, Box<dyn Draw + 'static>>,
 }
 
 impl WindowManager {
-  pub fn add<T: Draw + 'static>(&mut self, window: T) {
-    self.windows.push(Box::new(window))
+  pub fn add<T: Draw + 'static>(&mut self, id: String, window: T) {
+    self.windows.insert(id, Box::new(window));
   }
+}
 
-  pub fn get_current(&mut self) -> &mut Vec<Box<dyn Draw>> {
-    &mut self.windows
-  }
+impl Draw for WindowManager {
+    fn draw(&mut self, ctx: &egui::Context) {
+        self.windows.values_mut().for_each(|w| w.draw(ctx));
+    }
 }

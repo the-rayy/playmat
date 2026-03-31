@@ -68,12 +68,7 @@ impl<T: Game> ApplicationHandler for App<T> {
       WindowEvent::Resized(size) => self.renderer.as_mut().unwrap().resize(size),
       WindowEvent::RedrawRequested => {
         let renderable_gui = self.gui.as_mut().unwrap().update(
-          self
-            .framework_context
-            .as_mut()
-            .unwrap()
-            .window_manager
-            .get_current(),
+          self.framework_context.as_mut().unwrap()
         );
         self.renderer.as_mut().unwrap().render(renderable_gui);
         self.window.as_mut().unwrap().request_redraw();

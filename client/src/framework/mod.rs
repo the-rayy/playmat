@@ -1,6 +1,6 @@
 use protocol::message::{client::ClientMessage, server::ServerMessage};
 
-use crate::engine::{self};
+use crate::engine::{self, gui::Draw};
 
 pub mod window_manager;
 
@@ -24,4 +24,10 @@ impl Context {
       rx,
     }
   }
+}
+
+impl Draw for Context {
+    fn draw(&mut self, ctx: &egui::Context) {
+        self.window_manager.draw(ctx);
+    }
 }
