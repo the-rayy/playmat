@@ -7,19 +7,12 @@ pub mod server;
 
 #[derive(bitcode::Encode, bitcode::Decode, Debug)]
 pub struct ClientMessageEnvelope {
-  pub msg: ClientMessage,
+  msg: ClientMessage,
 
   timestamp: i64,
 }
 
 impl ClientMessageEnvelope {
-  pub fn new(msg: ClientMessage) -> Self {
-    Self {
-      msg,
-      timestamp: crate::time::now_utc().unix_timestamp(),
-    }
-  }
-
   pub fn timestamp(&self) -> OffsetDateTime {
     OffsetDateTime::from_unix_timestamp(self.timestamp).unwrap()
   }
@@ -30,24 +23,21 @@ impl ClientMessageEnvelope {
 
   pub fn from_bytes(bin: &[u8]) -> Result<Self, String> {
     bitcode::decode(bin).map_err(|e| format!("{e}"))
+  }
+
+  pub fn unpack(self) -> ClientMessage {
+    self.msg
   }
 }
 
 #[derive(bitcode::Encode, bitcode::Decode, Debug)]
 pub struct ServerMessageEnvelope {
-  pub msg: ServerMessage,
+  msg: ServerMessage,
 
   timestamp: i64,
 }
 
 impl ServerMessageEnvelope {
-  pub fn new(msg: ServerMessage) -> Self {
-    Self {
-      msg,
-      timestamp: crate::time::now_utc().unix_timestamp(),
-    }
-  }
-
   pub fn timestamp(&self) -> OffsetDateTime {
     OffsetDateTime::from_unix_timestamp(self.timestamp).unwrap()
   }
@@ -58,5 +48,9 @@ impl ServerMessageEnvelope {
 
   pub fn from_bytes(bin: &[u8]) -> Result<Self, String> {
     bitcode::decode(bin).map_err(|e| format!("{e}"))
+  }
+
+  pub fn unpack(self) -> ServerMessage {
+    self.msg
   }
 }

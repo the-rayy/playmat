@@ -28,14 +28,13 @@ pub fn connect(
     runtime::_spawn_async(async move {
       while let Some(Message::Binary(binary)) = ws_receiver.try_next().await.unwrap() {
         let env = ServerMessageEnvelope::from_bytes(&binary).unwrap();
-        let _ = server_tx.send(env.msg).await;
+        let _ = server_tx.send(env.unpack()).await;
       }
     });
 
     runtime::_spawn_async(async move {
       while let Some(msg) = client_rx.recv().await {
-        let env = ClientMessageEnvelope::new(msg);
-        let _ = ws_sender.send(Message::Binary(env.to_bytes().into())).await;
+        let _ = ws_sender.send(Message::Binary(msg.pack().to_bytes().into())).await;
       }
     });
   });

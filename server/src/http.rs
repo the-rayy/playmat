@@ -45,12 +45,11 @@ async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
         log::debug!("Websocket message received");
         if let Message::Binary(x) = msg.unwrap() {
           let env = ClientMessageEnvelope::from_bytes(&x).unwrap();
-          let resp = match env.msg {
+          let resp = match env.unpack() {
             ClientMessage::SignIn(data) => handlers::signin::handler(data).await,
           };
 
-          let env = ServerMessageEnvelope::new(resp);
-          if let Err(e) = tx.send(Message::Binary(env.to_bytes().into())).await {
+          if let Err(e) = tx.send(Message::Binary(resp.pack().to_bytes().into())).await {
             log::error!("Websocket message sending error: {}", e);
           }
           log::debug!("Websocket message handled");
