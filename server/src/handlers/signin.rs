@@ -1,6 +1,6 @@
 use std::time::Duration;
 
-use shared::message::{
+use protocol::message::{
   client::SignInCredentials,
   server::{ServerMessage, SignInToken},
 };

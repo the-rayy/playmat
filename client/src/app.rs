@@ -1,55 +1,56 @@
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
-use shared::message::client::ClientMessage;
-use tokio::sync::mpsc;
-use winit::{
-  application::ApplicationHandler,
-  dpi::PhysicalSize,
-  event::WindowEvent,
-  window::{Window, WindowAttributes},
-};
+use winit::{application::ApplicationHandler, event::WindowEvent, window::Window};
 
 use crate::{
-  context::Context,
-  gui::{self, Gui, WindowManager, auth, diagnostics},
-  renderer::Renderer,
+  engine::{self, gui::Gui, rendering::Renderer},
+  framework::{self, Context, Game},
 };
 
-pub struct App {
+pub struct App<T: Game> {
+  //engine
   window: Option<Arc<Window>>,
   renderer: Option<Renderer>,
   gui: Option<Gui>,
 
-  ctx: Arc<Mutex<Context>>,
-  net_tx: mpsc::Sender<ClientMessage>,
-  window_manager: WindowManager,
+  //framework
+  framework_context: Option<framework::Context>,
+
+  //game
+  game: T,
 }
 
-impl App {
-  pub fn new(ctx: Arc<Mutex<Context>>, net_tx: mpsc::Sender<ClientMessage>) -> App {
+impl<T: Game> App<T> {
+  pub fn new(game: T) -> App<T> {
+    engine::runtime::init();
+
     App {
       window: None,
       renderer: None,
       gui: None,
-      ctx: ctx.clone(),
-      net_tx: net_tx.clone(),
-      window_manager: WindowManager::new(ctx, net_tx)
+
+      framework_context: None,
+
+      game,
     }
   }
 }
 
-impl ApplicationHandler for App {
+impl<T: Game> ApplicationHandler for App<T> {
   fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
     let window = event_loop
-      .create_window(window_attributes())
+      .create_window(engine::window::attributes())
       .expect("could not create window");
     let window = Arc::new(window);
-    let renderer = crate::platform::runtime::get().block_on(Renderer::new(window.clone()));
-    let gui = Gui::new(window.clone());
+    let renderer = engine::runtime::get().block_on(Renderer::new(window.clone()));
+    let framework_context = Context::new();
 
-    self.window = Some(window);
+    self.window = Some(window.clone());
     self.renderer = Some(renderer);
-    self.gui = Some(gui);
+    self.gui = Some(Gui::new(window));
+    self.framework_context = Some(framework_context);
+
+    self.game.start(self.framework_context.as_mut().unwrap());
   }
 
   fn window_event(
@@ -59,38 +60,25 @@ impl ApplicationHandler for App {
     event: winit::event::WindowEvent,
   ) {
     self.gui.as_mut().unwrap().handle_event(&event);
+    while let Ok(msg) = self.framework_context.as_mut().unwrap().rx.try_recv() {
+      self.game.handle(msg);
+    }
     match event {
       WindowEvent::CloseRequested => event_loop.exit(),
       WindowEvent::Resized(size) => self.renderer.as_mut().unwrap().resize(size),
       WindowEvent::RedrawRequested => {
-        let (primitives, textures) = self.gui.as_mut().unwrap().update(&mut self.window_manager.current_windows());
-        self.renderer.as_mut().unwrap().render(primitives, textures);
+        let renderable_gui = self.gui.as_mut().unwrap().update(
+          self
+            .framework_context
+            .as_mut()
+            .unwrap()
+            .window_manager
+            .get_current(),
+        );
+        self.renderer.as_mut().unwrap().render(renderable_gui);
         self.window.as_mut().unwrap().request_redraw();
       }
       _ => (),
     }
   }
-}
-
-fn window_attributes() -> WindowAttributes {
-  let mut window_attributes = Window::default_attributes();
-  let size = winit::dpi::Size::Physical(PhysicalSize::new(1920, 1080));
-  window_attributes = window_attributes.with_inner_size(size);
-  #[cfg(target_arch = "wasm32")]
-  {
-    use wasm_bindgen::JsCast;
-    use winit::platform::web::WindowAttributesExtWebSys;
-
-    const CANVAS_ID: &str = "canvas";
-
-    let window = wgpu::web_sys::window().expect("Unable to get window");
-    let document = window.document().expect("Unable to get document");
-    let canvas = document
-      .get_element_by_id(CANVAS_ID)
-      .expect("Unable to get canvas");
-    let html_canvas_element = canvas.unchecked_into();
-    window_attributes = window_attributes.with_canvas(Some(html_canvas_element));
-  }
-
-  window_attributes
 }

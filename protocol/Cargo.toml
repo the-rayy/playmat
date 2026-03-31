@@ -1,11 +1,11 @@
 [package]
-name = "shared"
+name = "protocol"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-bitcode = "0.6.6"
+bitcode = "0.6.9"
 time = { workspace = true }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-js-sys = "0.3"
+js-sys = "0.3.93"

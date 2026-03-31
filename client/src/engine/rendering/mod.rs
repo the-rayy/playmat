@@ -1,9 +1,10 @@
 use std::sync::Arc;
 
-use egui::{ClippedPrimitive, TexturesDelta};
 use egui_wgpu::RendererOptions;
 use wgpu::{Color, ExperimentalFeatures};
 use winit::dpi::PhysicalSize;
+
+use crate::engine::gui::Renderable;
 
 pub struct Renderer {
   window: Arc<winit::window::Window>,
@@ -17,13 +18,7 @@ pub struct Renderer {
 
 impl Renderer {
   pub async fn new(window: Arc<winit::window::Window>) -> Self {
-    let instance = wgpu::Instance::new(&wgpu::InstanceDescriptor {
-      #[cfg(not(target_arch = "wasm32"))]
-      backends: wgpu::Backends::PRIMARY,
-      #[cfg(target_arch = "wasm32")]
-      backends: wgpu::Backends::GL,
-      ..Default::default()
-    });
+    let instance = wgpu::Instance::new(super::platform::wgpu::instance_descriptor());
     let surface = instance
       .create_surface(window.clone())
       .expect("Could not create surface");
@@ -39,11 +34,7 @@ impl Renderer {
       .request_device(&wgpu::DeviceDescriptor {
         label: None,
         required_features: wgpu::Features::empty(),
-        required_limits: if cfg!(target_arch = "wasm32") {
-          wgpu::Limits::downlevel_webgl2_defaults()
-        } else {
-          wgpu::Limits::default()
-        },
+        required_limits: super::platform::wgpu::device_limits(),
         memory_hints: Default::default(),
         trace: wgpu::Trace::Off,
         experimental_features: ExperimentalFeatures::default(),
@@ -72,26 +63,37 @@ impl Renderer {
     state
   }
 
-  pub fn render(&mut self, gui_primitives: Vec<ClippedPrimitive>, gui_textures: TexturesDelta) {
-    let surface_texture = self
-      .surface
-      .get_current_texture()
-      .expect("Unable to acquire next surface texture");
-    let texture_view = surface_texture
+  pub fn render(&mut self, gui: Renderable) {
+    let output = match self.surface.get_current_texture() {
+      wgpu::CurrentSurfaceTexture::Success(surface_texture) => surface_texture,
+      wgpu::CurrentSurfaceTexture::Suboptimal(surface_texture) => {
+        self.configure_surface();
+        surface_texture
+      }
+      wgpu::CurrentSurfaceTexture::Timeout
+      | wgpu::CurrentSurfaceTexture::Occluded
+      | wgpu::CurrentSurfaceTexture::Validation => return,
+      wgpu::CurrentSurfaceTexture::Outdated => {
+        self.configure_surface();
+        return;
+      }
+      wgpu::CurrentSurfaceTexture::Lost => {
+        // You could recreate the devices and all resources
+        // created with it here, but we'll just bail
+        panic!("Lost device");
+      }
+    };
+    let texture_view = output
       .texture
-      .create_view(&wgpu::TextureViewDescriptor {
-        format: Some(self.surface_format.add_srgb_suffix()),
-        ..Default::default()
-      });
-
+      .create_view(&wgpu::TextureViewDescriptor::default());
     let mut encoder = self.device.create_command_encoder(&Default::default());
 
     self.render_3d(&mut encoder, &texture_view);
-    self.render_egui(&mut encoder, &texture_view, gui_primitives, gui_textures);
+    self.render_egui(&mut encoder, &texture_view, gui);
 
     self.queue.submit([encoder.finish()]);
     self.window.pre_present_notify();
-    surface_texture.present();
+    output.present();
   }
 
   pub fn resize(&mut self, new_size: PhysicalSize<u32>) {
@@ -114,6 +116,7 @@ impl Renderer {
       depth_stencil_attachment: None,
       timestamp_writes: None,
       occlusion_query_set: None,
+      multiview_mask: None,
     });
   }
 
@@ -121,8 +124,7 @@ impl Renderer {
     &mut self,
     encoder: &mut wgpu::CommandEncoder,
     texture_view: &wgpu::TextureView,
-    primitives: Vec<ClippedPrimitive>,
-    textures: TexturesDelta,
+    gui: Renderable,
   ) {
     let screen_descriptor = egui_wgpu::ScreenDescriptor {
       size_in_pixels: [
@@ -131,7 +133,7 @@ impl Renderer {
       ],
       pixels_per_point: self.window.scale_factor() as f32,
     };
-    for (id, image_delta) in &textures.set {
+    for (id, image_delta) in &gui.textures.set {
       self
         .egui_renderer
         .update_texture(&self.device, &self.queue, *id, image_delta);
@@ -140,7 +142,7 @@ impl Renderer {
       &self.device,
       &self.queue,
       encoder,
-      &primitives,
+      &gui.primitives,
       &screen_descriptor,
     );
     let rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
@@ -157,13 +159,14 @@ impl Renderer {
       label: Some("egui main render pass"),
       timestamp_writes: None,
       occlusion_query_set: None,
+      multiview_mask: None,
     });
     let mut rpass = rpass.forget_lifetime();
     self
       .egui_renderer
-      .render(&mut rpass, &primitives, &screen_descriptor);
+      .render(&mut rpass, &gui.primitives, &screen_descriptor);
     drop(rpass);
-    for x in &textures.free {
+    for x in &gui.textures.free {
       self.egui_renderer.free_texture(x)
     }
   }

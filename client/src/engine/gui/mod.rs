@@ -1,14 +1,7 @@
-use std::{collections::HashMap, sync::{Arc, Mutex}};
+use std::sync::Arc;
 
 use egui::{ClippedPrimitive, Context, TexturesDelta};
-use shared::message::client::ClientMessage;
-use tokio::sync::mpsc;
 use winit::{event::WindowEvent, window::Window};
-
-use crate::context::{self, Scene};
-
-pub mod auth;
-pub mod diagnostics;
 
 pub trait Draw: Send + Sync {
   fn draw(&mut self, ctx: &Context);
@@ -18,6 +11,11 @@ pub struct Gui {
   context: egui::Context,
   state: egui_winit::State,
   window: Arc<Window>,
+}
+
+pub struct Renderable {
+  pub primitives: Vec<ClippedPrimitive>,
+  pub textures: TexturesDelta,
 }
 
 impl Gui {
@@ -43,12 +41,9 @@ impl Gui {
     let _ = self.state.on_window_event(self.window.as_ref(), event);
   }
 
-  pub fn update(
-    &mut self,
-    windows: &mut Vec<Box<dyn Draw>>,
-  ) -> (Vec<ClippedPrimitive>, TexturesDelta) {
+  pub fn update(&mut self, windows: &mut Vec<Box<dyn Draw>>) -> Renderable {
     let input = self.state.take_egui_input(self.window.as_ref());
-    let output = self.context.run(input, |ui| {
+    let output = self.context.run_ui(input, |ui| {
       windows.iter_mut().for_each(|w| w.draw(ui));
     });
     self
@@ -60,30 +55,9 @@ impl Gui {
       .tessellate(output.shapes, output.pixels_per_point);
     let textures = output.textures_delta;
 
-    (primitives, textures)
-  }
-}
-
-pub struct WindowManager {
-  w: HashMap<Scene, Vec<Box<dyn Draw>>>,
-}
-
-impl WindowManager {
-  pub fn new(ctx: Arc<Mutex<context::Context>>, net_tx: mpsc::Sender<ClientMessage>) -> Self {
-    let mut windows = Vec::<Box<dyn Draw>>::new();
-    let diag_window = diagnostics::Window::new(ctx.clone());
-    let auth_window = auth::Window::new(ctx.clone(), net_tx);
-
-    windows.push(Box::new(diag_window));
-    windows.push(Box::new(auth_window));
-
-    let mut scenes = HashMap::new();
-    scenes.insert(Scene::Login, windows);
-
-    Self { w: scenes }
-  }
-
-  pub fn current_windows(&mut self) -> &mut Vec<Box<dyn Draw>> {
-    self.w.get_mut(&Scene::Login).unwrap()
+    Renderable {
+      primitives,
+      textures,
+    }
   }
 }
