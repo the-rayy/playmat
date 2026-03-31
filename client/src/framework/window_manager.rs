@@ -14,7 +14,7 @@ impl WindowManager {
 }
 
 impl Draw for WindowManager {
-    fn draw(&mut self, ctx: &egui::Context) {
-        self.windows.values_mut().for_each(|w| w.draw(ctx));
-    }
+  fn draw(&mut self, ctx: &egui::Context) {
+    self.windows.values_mut().for_each(|w| w.draw(ctx));
+  }
 }

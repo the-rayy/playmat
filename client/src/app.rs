@@ -67,9 +67,11 @@ impl<T: Game> ApplicationHandler for App<T> {
       WindowEvent::CloseRequested => event_loop.exit(),
       WindowEvent::Resized(size) => self.renderer.as_mut().unwrap().resize(size),
       WindowEvent::RedrawRequested => {
-        let renderable_gui = self.gui.as_mut().unwrap().update(
-          self.framework_context.as_mut().unwrap()
-        );
+        let renderable_gui = self
+          .gui
+          .as_mut()
+          .unwrap()
+          .update(&mut self.framework_context.as_mut().unwrap().window_manager);
         self.renderer.as_mut().unwrap().render(renderable_gui);
         self.window.as_mut().unwrap().request_redraw();
       }
