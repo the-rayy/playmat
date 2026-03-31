@@ -7,7 +7,7 @@ edition = "2024"
 protocol = { path = "../protocol" }
 thiserror = { workspace = true }
 axum = { version = "0.8.8", features = ["ws"] }
-futures-util = "0.3"
+futures-util = "0.3.32"
 log = { workspace = true }
 env_logger = { workspace = true }
 tokio = { workspace = true, features = ["signal", "macros", "rt-multi-thread"]  }
