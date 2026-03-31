@@ -64,26 +64,28 @@ impl Renderer {
   }
 
   pub fn render(&mut self, gui: Renderable) {
-        let output = match self.surface.get_current_texture() {
-            wgpu::CurrentSurfaceTexture::Success(surface_texture) => surface_texture,
-            wgpu::CurrentSurfaceTexture::Suboptimal(surface_texture) => {
-                self.configure_surface();
-                surface_texture
-            }
-            wgpu::CurrentSurfaceTexture::Timeout
-            | wgpu::CurrentSurfaceTexture::Occluded
-            | wgpu::CurrentSurfaceTexture::Validation => {return}
-            wgpu::CurrentSurfaceTexture::Outdated => {
-                self.configure_surface();
+    let output = match self.surface.get_current_texture() {
+      wgpu::CurrentSurfaceTexture::Success(surface_texture) => surface_texture,
+      wgpu::CurrentSurfaceTexture::Suboptimal(surface_texture) => {
+        self.configure_surface();
+        surface_texture
+      }
+      wgpu::CurrentSurfaceTexture::Timeout
+      | wgpu::CurrentSurfaceTexture::Occluded
+      | wgpu::CurrentSurfaceTexture::Validation => return,
+      wgpu::CurrentSurfaceTexture::Outdated => {
+        self.configure_surface();
         return;
-            }
-            wgpu::CurrentSurfaceTexture::Lost => {
-                // You could recreate the devices and all resources
-                // created with it here, but we'll just bail
-                panic!("Lost device");
-            }
-        };
-        let texture_view = output.texture.create_view(&wgpu::TextureViewDescriptor::default());
+      }
+      wgpu::CurrentSurfaceTexture::Lost => {
+        // You could recreate the devices and all resources
+        // created with it here, but we'll just bail
+        panic!("Lost device");
+      }
+    };
+    let texture_view = output
+      .texture
+      .create_view(&wgpu::TextureViewDescriptor::default());
     let mut encoder = self.device.create_command_encoder(&Default::default());
 
     self.render_3d(&mut encoder, &texture_view);
@@ -114,7 +116,7 @@ impl Renderer {
       depth_stencil_attachment: None,
       timestamp_writes: None,
       occlusion_query_set: None,
-        multiview_mask: None,
+      multiview_mask: None,
     });
   }
 
@@ -157,7 +159,7 @@ impl Renderer {
       label: Some("egui main render pass"),
       timestamp_writes: None,
       occlusion_query_set: None,
-        multiview_mask: None,
+      multiview_mask: None,
     });
     let mut rpass = rpass.forget_lifetime();
     self
