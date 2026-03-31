@@ -43,7 +43,7 @@ impl Gui {
 
   pub fn update(&mut self, windows: &mut Vec<Box<dyn Draw>>) -> Renderable {
     let input = self.state.take_egui_input(self.window.as_ref());
-    let output = self.context.run(input, |ui| {
+    let output = self.context.run_ui(input, |ui| {
       windows.iter_mut().for_each(|w| w.draw(ui));
     });
     self
