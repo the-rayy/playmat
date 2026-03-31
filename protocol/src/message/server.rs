@@ -8,7 +8,10 @@ pub enum ServerMessage {
 
 impl ServerMessage {
   pub fn pack(self) -> ServerMessageEnvelope {
-    ServerMessageEnvelope { msg: self, timestamp: now_utc().unix_timestamp() }
+    ServerMessageEnvelope {
+      msg: self,
+      timestamp: now_utc().unix_timestamp(),
+    }
   }
 }
 

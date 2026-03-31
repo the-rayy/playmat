@@ -9,7 +9,7 @@ use axum::{
 };
 
 use futures_util::{SinkExt, StreamExt};
-use protocol::message::{ClientMessageEnvelope, ServerMessageEnvelope, client::ClientMessage};
+use protocol::message::{ClientMessageEnvelope, client::ClientMessage};
 use thiserror::Error as Thiserror;
 
 use crate::handlers;
@@ -49,7 +49,10 @@ async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
             ClientMessage::SignIn(data) => handlers::signin::handler(data).await,
           };
 
-          if let Err(e) = tx.send(Message::Binary(resp.pack().to_bytes().into())).await {
+          if let Err(e) = tx
+            .send(Message::Binary(resp.pack().to_bytes().into()))
+            .await
+          {
             log::error!("Websocket message sending error: {}", e);
           }
           log::debug!("Websocket message handled");

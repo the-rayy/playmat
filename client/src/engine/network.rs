@@ -1,6 +1,6 @@
 use futures_util::{SinkExt, StreamExt, TryStreamExt};
 use protocol::message::{
-  ClientMessageEnvelope, ServerMessageEnvelope, client::ClientMessage, server::ServerMessage,
+  ServerMessageEnvelope, client::ClientMessage, server::ServerMessage,
 };
 use reqwest_websocket::{Message, Upgrade};
 
@@ -34,7 +34,9 @@ pub fn connect(
 
     runtime::_spawn_async(async move {
       while let Some(msg) = client_rx.recv().await {
-        let _ = ws_sender.send(Message::Binary(msg.pack().to_bytes().into())).await;
+        let _ = ws_sender
+          .send(Message::Binary(msg.pack().to_bytes().into()))
+          .await;
       }
     });
   });

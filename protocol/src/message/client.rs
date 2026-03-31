@@ -7,7 +7,10 @@ pub enum ClientMessage {
 
 impl ClientMessage {
   pub fn pack(self) -> ClientMessageEnvelope {
-    ClientMessageEnvelope { msg: self, timestamp: now_utc().unix_timestamp() }
+    ClientMessageEnvelope {
+      msg: self,
+      timestamp: now_utc().unix_timestamp(),
+    }
   }
 }
 
