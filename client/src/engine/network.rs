@@ -19,23 +19,55 @@ pub fn connect(
       .upgrade()
       .send()
       .await
-      .unwrap();
+      .expect("unable to connect to server");
 
-    let (mut ws_sender, mut ws_receiver) = response.into_websocket().await.unwrap().split();
-
+    let (mut ws_sender, mut ws_receiver) = response
+      .into_websocket()
+      .await
+      .expect("unable to open websocket")
+      .split();
     runtime::_spawn_async(async move {
-      while let Some(Message::Binary(binary)) = ws_receiver.try_next().await.unwrap() {
-        let env = ServerMessageEnvelope::from_bytes(&binary).unwrap();
-        let _ = server_tx.send(env.unpack()).await;
+      loop {
+        match ws_receiver.try_next().await {
+          Err(e) => {
+            log::error!("Websocket receiver error: {}", e);
+            break;
+          }
+          Ok(None) => {
+            log::warn!("Websocket receiver stream ended");
+            break;
+          }
+          Ok(Some(Message::Binary(binary))) => {
+            let env = match ServerMessageEnvelope::from_bytes(&binary) {
+              Ok(e) => e,
+              Err(e) => {
+                log::error!("Failed to decode server message: {}", e);
+                continue;
+              }
+            };
+
+            if let Err(e) = server_tx.send(env.unpack()).await {
+              log::error!("Failed to forward server message: {}", e);
+            }
+          }
+          Ok(Some(_)) => {
+            log::warn!("Received non-binary websocket message, ignoring");
+          }
+        }
       }
     });
 
     runtime::_spawn_async(async move {
       while let Some(msg) = client_rx.recv().await {
-        let _ = ws_sender
+        if let Err(e) = ws_sender
           .send(Message::Binary(msg.pack().to_bytes().into()))
-          .await;
+          .await
+        {
+          log::error!("Failed to send websocket message: {}", e);
+          break;
+        }
       }
+      log::warn!("Client message channel closed");
     });
   });
 

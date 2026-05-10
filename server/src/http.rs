@@ -34,52 +34,55 @@ pub async fn run(ipport: &str) -> Result<(), Error> {
 }
 
 async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
-    log::info!("Websocket connected");
-    ws.on_upgrade(async |socket: WebSocket| {
-        log::info!("Websocket upgraded");
-        let (mut tx, mut rx) = socket.split();
+  log::info!("Websocket connected");
+  ws.on_upgrade(async |socket: WebSocket| {
+    log::info!("Websocket upgraded");
+    let (mut tx, mut rx) = socket.split();
 
-        tokio::spawn(async move {
-            log::info!("Websocket thread starting");
-            while let Some(msg) = rx.next().await {
-                log::debug!("Websocket message received");
+    tokio::spawn(async move {
+      log::info!("Websocket thread starting");
+      while let Some(msg) = rx.next().await {
+        log::debug!("Websocket message received");
 
-                let msg = match msg {
-                    Ok(m) => m,
-                    Err(e) => {
-                        log::error!("Websocket message read error: {}", e);
-                        continue;
-                    }
-                };
+        let msg = match msg {
+          Ok(m) => m,
+          Err(e) => {
+            log::error!("Websocket message read error: {}", e);
+            continue;
+          }
+        };
 
-                let msg = match msg {
-                    Message::Binary(x) => x,
-                    _ => {
-                        log::warn!("Websocket message was not binary!");
-                        continue;
-                    }
-                };
+        let msg = match msg {
+          Message::Binary(x) => x,
+          _ => {
+            log::warn!("Websocket message was not binary!");
+            continue;
+          }
+        };
 
-                let env = match ClientMessageEnvelope::from_bytes(&msg) {
-                    Ok(e) => e,
-                    Err(e) => {
-                        log::error!("Websocket message decode error: {}", e);
-                        continue;
-                    }
-                };
+        let env = match ClientMessageEnvelope::from_bytes(&msg) {
+          Ok(e) => e,
+          Err(e) => {
+            log::error!("Websocket message decode error: {}", e);
+            continue;
+          }
+        };
 
-                let resp = match env.unpack() {
-                    ClientMessage::SignIn(data) => handlers::signin::handler(data).await,
-                };
+        let resp = match env.unpack() {
+          ClientMessage::SignIn(data) => handlers::signin::handler(data).await,
+        };
 
-                if let Err(e) = tx.send(Message::Binary(resp.pack().to_bytes().into())).await {
-                    log::error!("Websocket message sending error: {}", e);
-                }
+        if let Err(e) = tx
+          .send(Message::Binary(resp.pack().to_bytes().into()))
+          .await
+        {
+          log::error!("Websocket message sending error: {}", e);
+        }
 
-                log::debug!("Websocket message handled");
-            }
-        });
-    })
+        log::debug!("Websocket message handled");
+      }
+    });
+  })
 }
 
 async fn shutdown_signal() {

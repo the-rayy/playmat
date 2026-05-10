@@ -18,7 +18,7 @@ impl<T: Game> App<T> {
 
     Self {
       game: Some(game),
-      running_app: None
+      running_app: None,
     }
   }
 }
@@ -33,9 +33,9 @@ impl<T: Game> ApplicationHandler for App<T> {
     let framework_context = Context::new();
 
     let mut running_app = RunningApp {
-      window: window,
-      renderer: renderer,
-      framework_context: framework_context,
+      window,
+      renderer,
+      framework_context,
       game: self.game.take().expect("resume called twice"),
     };
 
@@ -49,7 +49,11 @@ impl<T: Game> ApplicationHandler for App<T> {
     _window_id: winit::window::WindowId,
     event: winit::event::WindowEvent,
   ) {
-    self.running_app.as_mut().expect("app not running").window_event(event_loop, _window_id, event);
+    self
+      .running_app
+      .as_mut()
+      .expect("app not running")
+      .window_event(event_loop, _window_id, event);
   }
 }
 
@@ -84,5 +88,4 @@ impl<T: Game> RunningApp<T> {
       _ => (),
     }
   }
-
 }
