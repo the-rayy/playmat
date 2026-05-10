@@ -4,14 +4,10 @@ use protocol::message::server::ServerMessage;
 
 use crate::framework;
 
-mod windows;
-
 #[derive(Default)]
 pub struct GameStateData {
   user_token: Option<String>,
 }
-
-pub type GameState = Arc<Mutex<GameStateData>>;
 
 #[derive(Default)]
 pub struct GameImpl {
@@ -19,10 +15,7 @@ pub struct GameImpl {
 }
 
 impl framework::Game for GameImpl {
-  fn start(&self, ctx: &mut framework::Context) {
-    let auth_window = windows::login::Window::new(ctx.tx.clone(), self.game_state.clone());
-    ctx.window_manager.add("auth".to_string(), auth_window);
-  }
+  fn start(&self, _ctx: &mut framework::Context) {}
 
   fn handle(&mut self, msg: ServerMessage) {
     match msg {

@@ -1,10 +1,7 @@
 use std::sync::Arc;
 
-use egui_wgpu::RendererOptions;
 use wgpu::{Color, ExperimentalFeatures};
 use winit::dpi::PhysicalSize;
-
-use crate::engine::gui::Renderable;
 
 pub struct Renderer {
   window: Arc<winit::window::Window>,
@@ -13,7 +10,6 @@ pub struct Renderer {
   size: winit::dpi::PhysicalSize<u32>,
   surface: wgpu::Surface<'static>,
   surface_format: wgpu::TextureFormat,
-  egui_renderer: egui_wgpu::Renderer,
 }
 
 impl Renderer {
@@ -45,9 +41,6 @@ impl Renderer {
     let size = window.inner_size();
     let surface_format = surface.get_capabilities(&adapter).formats[0];
 
-    let egui_renderer =
-      egui_wgpu::Renderer::new(&device, surface_format, RendererOptions::default());
-
     let state = Self {
       window,
       device,
@@ -55,7 +48,6 @@ impl Renderer {
       size,
       surface,
       surface_format,
-      egui_renderer,
     };
 
     state.configure_surface();
@@ -63,7 +55,7 @@ impl Renderer {
     state
   }
 
-  pub fn render(&mut self, gui: Renderable) {
+  pub fn render(&mut self) {
     let output = match self.surface.get_current_texture() {
       wgpu::CurrentSurfaceTexture::Success(surface_texture) => surface_texture,
       wgpu::CurrentSurfaceTexture::Suboptimal(surface_texture) => {
@@ -88,24 +80,10 @@ impl Renderer {
       .create_view(&wgpu::TextureViewDescriptor::default());
     let mut encoder = self.device.create_command_encoder(&Default::default());
 
-    self.render_3d(&mut encoder, &texture_view);
-    self.render_egui(&mut encoder, &texture_view, gui);
-
-    self.queue.submit([encoder.finish()]);
-    self.window.pre_present_notify();
-    output.present();
-  }
-
-  pub fn resize(&mut self, new_size: PhysicalSize<u32>) {
-    self.size = new_size;
-    self.configure_surface();
-  }
-
-  fn render_3d(&self, encoder: &mut wgpu::CommandEncoder, texture_view: &wgpu::TextureView) {
     let _renderpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
       label: None,
       color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-        view: texture_view,
+        view: &texture_view,
         resolve_target: None,
         ops: wgpu::Operations {
           load: wgpu::LoadOp::Clear(Color::BLUE),
@@ -118,57 +96,17 @@ impl Renderer {
       occlusion_query_set: None,
       multiview_mask: None,
     });
+
+    drop(_renderpass);
+
+    self.queue.submit([encoder.finish()]);
+    self.window.pre_present_notify();
+    output.present();
   }
 
-  fn render_egui(
-    &mut self,
-    encoder: &mut wgpu::CommandEncoder,
-    texture_view: &wgpu::TextureView,
-    gui: Renderable,
-  ) {
-    let screen_descriptor = egui_wgpu::ScreenDescriptor {
-      size_in_pixels: [
-        self.window.inner_size().width,
-        self.window.inner_size().height,
-      ],
-      pixels_per_point: self.window.scale_factor() as f32,
-    };
-    for (id, image_delta) in &gui.textures.set {
-      self
-        .egui_renderer
-        .update_texture(&self.device, &self.queue, *id, image_delta);
-    }
-    self.egui_renderer.update_buffers(
-      &self.device,
-      &self.queue,
-      encoder,
-      &gui.primitives,
-      &screen_descriptor,
-    );
-    let rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-      color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-        view: texture_view,
-        resolve_target: None,
-        ops: wgpu::Operations {
-          load: wgpu::LoadOp::Load,
-          store: wgpu::StoreOp::Store,
-        },
-        depth_slice: None,
-      })],
-      depth_stencil_attachment: None,
-      label: Some("egui main render pass"),
-      timestamp_writes: None,
-      occlusion_query_set: None,
-      multiview_mask: None,
-    });
-    let mut rpass = rpass.forget_lifetime();
-    self
-      .egui_renderer
-      .render(&mut rpass, &gui.primitives, &screen_descriptor);
-    drop(rpass);
-    for x in &gui.textures.free {
-      self.egui_renderer.free_texture(x)
-    }
+  pub fn resize(&mut self, new_size: PhysicalSize<u32>) {
+    self.size = new_size;
+    self.configure_surface();
   }
 
   fn configure_surface(&self) {
