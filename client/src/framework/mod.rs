@@ -8,16 +8,13 @@ pub trait Game {
 }
 
 pub struct Context {
-  pub tx: tokio::sync::mpsc::Sender<ClientMessage>,
+  pub _tx: tokio::sync::mpsc::Sender<ClientMessage>,
   pub rx: tokio::sync::mpsc::Receiver<ServerMessage>,
 }
 
 impl Context {
   pub fn new() -> Self {
     let (tx, rx) = engine::network::connect("ws://blackbook.local:8000/ws");
-    Self {
-      tx,
-      rx,
-    }
+    Self { _tx: tx, rx }
   }
 }

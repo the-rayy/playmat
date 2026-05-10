@@ -4,13 +4,10 @@ use protocol::message::server::ServerMessage;
 
 use crate::framework;
 
-
 #[derive(Default)]
 pub struct GameStateData {
   user_token: Option<String>,
 }
-
-pub type GameState = Arc<Mutex<GameStateData>>;
 
 #[derive(Default)]
 pub struct GameImpl {
@@ -18,8 +15,7 @@ pub struct GameImpl {
 }
 
 impl framework::Game for GameImpl {
-  fn start(&self, ctx: &mut framework::Context) {
-  }
+  fn start(&self, _ctx: &mut framework::Context) {}
 
   fn handle(&mut self, msg: ServerMessage) {
     match msg {

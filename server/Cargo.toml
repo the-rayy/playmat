@@ -6,8 +6,8 @@ edition = "2024"
 [dependencies]
 protocol = { path = "../protocol" }
 thiserror = { workspace = true }
-axum = { version = "0.8.8", features = ["ws"] }
-futures-util = "0.3.32"
+axum = { version = "0.8.9", features = ["ws"] }
+futures-util = { workspace = true }
 log = { workspace = true }
 env_logger = { workspace = true }
 tokio = { workspace = true, features = ["signal", "macros", "rt-multi-thread"]  }
