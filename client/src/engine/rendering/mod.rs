@@ -39,7 +39,11 @@ impl Renderer {
       .expect("Unable to request device");
 
     let size = window.inner_size();
-    let surface_format = surface.get_capabilities(&adapter).formats[0];
+    let surface_format = *surface
+      .get_capabilities(&adapter)
+      .formats
+      .first()
+      .expect("no available surface formats");
 
     let state = Self {
       window,
@@ -55,7 +59,8 @@ impl Renderer {
     state
   }
 
-  pub fn render(&mut self) {
+  #[expect(clippy::panic, reason = "device lost")]
+  pub fn render(&self) {
     let output = match self.surface.get_current_texture() {
       wgpu::CurrentSurfaceTexture::Success(surface_texture) => surface_texture,
       wgpu::CurrentSurfaceTexture::Suboptimal(surface_texture) => {
@@ -72,6 +77,7 @@ impl Renderer {
       wgpu::CurrentSurfaceTexture::Lost => {
         // You could recreate the devices and all resources
         // created with it here, but we'll just bail
+
         panic!("Lost device");
       }
     };
@@ -110,7 +116,7 @@ impl Renderer {
   }
 
   fn configure_surface(&self) {
-    if self.window.inner_size().width + self.window.inner_size().height == 0 {
+    if self.window.inner_size().width == 0 || self.window.inner_size().height == 0 {
       return;
     }
     let surface_config = wgpu::SurfaceConfiguration {

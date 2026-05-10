@@ -8,28 +8,17 @@ use crate::{
 };
 
 pub struct App<T: Game> {
-  //engine
-  window: Option<Arc<Window>>,
-  renderer: Option<Renderer>,
-
-  //framework
-  framework_context: Option<framework::Context>,
-
-  //game
-  game: T,
+  game: Option<T>, //store game only between new() and resumed() calls
+  running_app: Option<RunningApp<T>>,
 }
 
 impl<T: Game> App<T> {
-  pub fn new(game: T) -> App<T> {
+  pub fn new(game: T) -> Self {
     engine::runtime::init();
 
-    App {
-      window: None,
-      renderer: None,
-
-      framework_context: None,
-
-      game,
+    Self {
+      game: Some(game),
+      running_app: None,
     }
   }
 }
@@ -43,11 +32,15 @@ impl<T: Game> ApplicationHandler for App<T> {
     let renderer = engine::runtime::get().block_on(Renderer::new(window.clone()));
     let framework_context = Context::new();
 
-    self.window = Some(window.clone());
-    self.renderer = Some(renderer);
-    self.framework_context = Some(framework_context);
+    let mut running_app = RunningApp {
+      window,
+      renderer,
+      framework_context,
+      game: self.game.take().expect("resume called twice"),
+    };
 
-    self.game.start(self.framework_context.as_mut().unwrap());
+    running_app.start();
+    self.running_app = Some(running_app);
   }
 
   fn window_event(
@@ -56,15 +49,41 @@ impl<T: Game> ApplicationHandler for App<T> {
     _window_id: winit::window::WindowId,
     event: winit::event::WindowEvent,
   ) {
-    while let Ok(msg) = self.framework_context.as_mut().unwrap().rx.try_recv() {
+    self
+      .running_app
+      .as_mut()
+      .expect("app not running")
+      .window_event(event_loop, _window_id, event);
+  }
+}
+
+struct RunningApp<T: Game> {
+  window: Arc<Window>,
+  renderer: Renderer,
+  framework_context: framework::Context,
+  game: T,
+}
+
+impl<T: Game> RunningApp<T> {
+  fn start(&mut self) {
+    self.game.start(&mut self.framework_context);
+  }
+
+  fn window_event(
+    &mut self,
+    event_loop: &winit::event_loop::ActiveEventLoop,
+    _window_id: winit::window::WindowId,
+    event: winit::event::WindowEvent,
+  ) {
+    while let Ok(msg) = self.framework_context.rx.try_recv() {
       self.game.handle(msg);
     }
     match event {
       WindowEvent::CloseRequested => event_loop.exit(),
-      WindowEvent::Resized(size) => self.renderer.as_mut().unwrap().resize(size),
+      WindowEvent::Resized(size) => self.renderer.resize(size),
       WindowEvent::RedrawRequested => {
-        self.renderer.as_mut().unwrap().render();
-        self.window.as_mut().unwrap().request_redraw();
+        self.renderer.render();
+        self.window.request_redraw();
       }
       _ => (),
     }

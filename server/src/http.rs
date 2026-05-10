@@ -43,22 +43,43 @@ async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
       log::info!("Websocket thread starting");
       while let Some(msg) = rx.next().await {
         log::debug!("Websocket message received");
-        if let Message::Binary(x) = msg.unwrap() {
-          let env = ClientMessageEnvelope::from_bytes(&x).unwrap();
-          let resp = match env.unpack() {
-            ClientMessage::SignIn(data) => handlers::signin::handler(data).await,
-          };
 
-          if let Err(e) = tx
-            .send(Message::Binary(resp.pack().to_bytes().into()))
-            .await
-          {
-            log::error!("Websocket message sending error: {}", e);
+        let msg = match msg {
+          Ok(m) => m,
+          Err(e) => {
+            log::error!("Websocket message read error: {}", e);
+            continue;
           }
-          log::debug!("Websocket message handled");
-        } else {
-          log::warn!("Websocket message was not binary!");
+        };
+
+        let msg = match msg {
+          Message::Binary(x) => x,
+          _ => {
+            log::warn!("Websocket message was not binary!");
+            continue;
+          }
+        };
+
+        let env = match ClientMessageEnvelope::from_bytes(&msg) {
+          Ok(e) => e,
+          Err(e) => {
+            log::error!("Websocket message decode error: {}", e);
+            continue;
+          }
+        };
+
+        let resp = match env.unpack() {
+          ClientMessage::SignIn(data) => handlers::signin::handler(data).await,
+        };
+
+        if let Err(e) = tx
+          .send(Message::Binary(resp.pack().to_bytes().into()))
+          .await
+        {
+          log::error!("Websocket message sending error: {}", e);
         }
+
+        log::debug!("Websocket message handled");
       }
     });
   })
@@ -66,8 +87,8 @@ async fn ws_handler(ws: WebSocketUpgrade) -> impl IntoResponse {
 
 async fn shutdown_signal() {
   use tokio::signal::unix::{SignalKind, signal};
-  let mut sigint = signal(SignalKind::interrupt()).unwrap();
-  let mut sigterm = signal(SignalKind::terminate()).unwrap();
+  let mut sigint = signal(SignalKind::interrupt()).expect("could not get interrupt signal");
+  let mut sigterm = signal(SignalKind::terminate()).expect("could not get terminate signal");
 
   tokio::select! {
       _ = sigint.recv() => {},

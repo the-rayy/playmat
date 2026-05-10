@@ -5,7 +5,7 @@ pub fn init() {
     .worker_threads(4)
     .enable_all()
     .build()
-    .unwrap();
+    .expect("unable to build runtime");
 
   RUNTIME.set(rt).expect("runtime already initialized");
 }
