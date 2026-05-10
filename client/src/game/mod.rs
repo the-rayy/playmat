@@ -19,9 +19,14 @@ impl framework::Game for GameImpl {
 
   fn handle(&mut self, msg: ServerMessage) {
     match msg {
-      ServerMessage::Empty => todo!(),
+      ServerMessage::Empty => {}
       ServerMessage::SignIn(sign_in_token) => {
-        self.game_state.lock().as_mut().unwrap().user_token = Some(sign_in_token.token)
+        self
+          .game_state
+          .lock()
+          .as_mut()
+          .expect("unable to acquire lock")
+          .user_token = Some(sign_in_token.token)
       }
     }
   }
