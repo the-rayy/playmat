@@ -179,11 +179,9 @@ A multiplayer turn-based card game engine written in Rust. Runs natively on desk
 
 | Done | Feature | Priority | Layer | Description |
 |:---:|---|:---:|---|---|
-| - [x] | egui + wgpu integration | MVP | client | egui render pass on top of wgpu surface, native and WASM |
 | - [ ] | Game plugin registry | MVP | server | Server map of game ID → `Box<dyn Game>` factory |
 | - [ ] | Server-side game test harness | Core | server | Scripted sequences to regression-test game plugins |
 | - [ ] | Client-side automated UI tests | Nice | client | Simulate input events to test screen flows without a real server |
-| - [ ] | Custom widget layer (replace egui) | Future | client | Bespoke widgets rendered directly via wgpu — only if egui becomes limiting |
 
 ---
 
