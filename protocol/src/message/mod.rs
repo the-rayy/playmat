@@ -14,7 +14,7 @@ pub struct ClientMessageEnvelope {
 
 impl ClientMessageEnvelope {
   pub fn timestamp(&self) -> OffsetDateTime {
-    OffsetDateTime::from_unix_timestamp(self.timestamp).unwrap()
+    OffsetDateTime::from_unix_timestamp(self.timestamp).expect("could not read datetime from timestamp")
   }
 
   pub fn to_bytes(self) -> Vec<u8> {
@@ -39,7 +39,7 @@ pub struct ServerMessageEnvelope {
 
 impl ServerMessageEnvelope {
   pub fn timestamp(&self) -> OffsetDateTime {
-    OffsetDateTime::from_unix_timestamp(self.timestamp).unwrap()
+    OffsetDateTime::from_unix_timestamp(self.timestamp).expect("could not read datetime from timestamp")
   }
 
   pub fn to_bytes(self) -> Vec<u8> {

@@ -8,6 +8,6 @@ pub fn instance_descriptor() -> wgpu::InstanceDescriptor {
   }
 }
 
-pub fn device_limits() -> wgpu::Limits {
+pub const fn device_limits() -> wgpu::Limits {
   wgpu::Limits::downlevel_webgl2_defaults()
 }

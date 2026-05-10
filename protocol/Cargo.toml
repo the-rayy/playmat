@@ -3,6 +3,9 @@ name = "protocol"
 version = "0.1.0"
 edition = "2024"
 
+[lints]
+workspace = true
+
 [dependencies]
 bitcode = "0.6.9"
 time = { workspace = true }
