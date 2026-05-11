@@ -2,6 +2,7 @@ use protocol::message::{client::ClientMessage, server::ServerMessage};
 
 use crate::engine::{self};
 
+
 pub trait Game {
   fn start(&self, ctx: &mut Context);
   fn handle(&mut self, msg: ServerMessage);

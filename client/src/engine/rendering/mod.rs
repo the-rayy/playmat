@@ -3,6 +3,12 @@ use std::sync::Arc;
 use wgpu::{Color, ExperimentalFeatures};
 use winit::dpi::PhysicalSize;
 
+use crate::engine::rendering::scene_renderer::SceneRenderer;
+
+mod vertex;
+mod mesh;
+mod scene_renderer;
+
 pub struct Renderer {
   window: Arc<winit::window::Window>,
   device: wgpu::Device,
@@ -10,6 +16,7 @@ pub struct Renderer {
   size: winit::dpi::PhysicalSize<u32>,
   surface: wgpu::Surface<'static>,
   surface_format: wgpu::TextureFormat,
+  scene_renderer: SceneRenderer,
 }
 
 impl Renderer {
@@ -45,6 +52,8 @@ impl Renderer {
       .first()
       .expect("no available surface formats");
 
+    let scene_renderer = SceneRenderer::new(&device, surface_format, size);
+
     let state = Self {
       window,
       device,
@@ -52,6 +61,8 @@ impl Renderer {
       size,
       surface,
       surface_format,
+
+      scene_renderer,
     };
 
     state.configure_surface();
@@ -113,6 +124,7 @@ impl Renderer {
   pub fn resize(&mut self, new_size: PhysicalSize<u32>) {
     self.size = new_size;
     self.configure_surface();
+    self.scene_renderer.resize(&self.device, new_size.width, new_size.height);
   }
 
   fn configure_surface(&self) {
