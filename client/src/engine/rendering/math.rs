@@ -1,4 +1,4 @@
-type Mat4 = [f32; 16];
+pub type Mat4 = [f32; 16];
 
 pub fn mat4_mul(a: Mat4, b: Mat4) -> Mat4 {
     let mut out = [0f32; 16];
@@ -51,12 +51,12 @@ pub fn compute_mvp(angle: f32, aspect: f32) -> Mat4 {
         rotation_y(angle),
         rotation_x(0.4),
     );
-    let view = translation(0., 0., -3.);   // camera pulled back on Z
+    let view = translation(0., 0., -10.);   // camera pulled back on Z
     let proj = perspective(
-        std::f32::consts::FRAC_PI_4,
+        std::f32::consts::FRAC_PI_2,
         aspect,
-        0.1,
-        100.0,
+        0.01,
+        1000.0,
     );
     mat4_mul(proj, mat4_mul(view, model))
 }

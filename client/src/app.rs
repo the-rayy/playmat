@@ -80,7 +80,8 @@ impl<T: Game> RunningApp<T> {
       WindowEvent::CloseRequested => event_loop.exit(),
       WindowEvent::Resized(size) => self.framework_context.renderer.resize(size),
       WindowEvent::RedrawRequested => {
-        self.framework_context.renderer.render();
+        self.game.render(&mut self.framework_context);
+        // self.framework_context.renderer.render();
         self.window.request_redraw();
       }
       _ => (),

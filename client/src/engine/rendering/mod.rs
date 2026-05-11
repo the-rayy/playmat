@@ -3,12 +3,12 @@ use std::sync::Arc;
 use wgpu::{Color, ExperimentalFeatures};
 use winit::dpi::PhysicalSize;
 
-use crate::engine::rendering::scene_renderer::SceneRenderer;
+use crate::engine::rendering::{mesh::Mesh, scene_renderer::SceneRenderer};
 
 mod vertex;
 pub mod mesh;
 mod scene_renderer;
-mod math;
+pub mod math;
 
 pub struct Renderer {
   window: Arc<winit::window::Window>,
@@ -72,7 +72,8 @@ impl Renderer {
   }
 
   #[expect(clippy::panic, reason = "device lost")]
-  pub fn render(&self) {
+  pub fn render(&self, mvp: math::Mat4, mesh: &Mesh) {
+    self.scene_renderer.update_mvp(&self.queue, &mvp);
     let output = match self.surface.get_current_texture() {
       wgpu::CurrentSurfaceTexture::Success(surface_texture) => surface_texture,
       wgpu::CurrentSurfaceTexture::Suboptimal(surface_texture) => {
@@ -97,25 +98,7 @@ impl Renderer {
       .texture
       .create_view(&wgpu::TextureViewDescriptor::default());
     let mut encoder = self.device.create_command_encoder(&Default::default());
-
-    let _renderpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-      label: None,
-      color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-        view: &texture_view,
-        resolve_target: None,
-        ops: wgpu::Operations {
-          load: wgpu::LoadOp::Clear(Color::BLUE),
-          store: wgpu::StoreOp::Store,
-        },
-        depth_slice: None,
-      })],
-      depth_stencil_attachment: None,
-      timestamp_writes: None,
-      occlusion_query_set: None,
-      multiview_mask: None,
-    });
-
-    drop(_renderpass);
+    self.scene_renderer.draw(&mut encoder, &texture_view, mesh);
 
     self.queue.submit([encoder.finish()]);
     self.window.pre_present_notify();

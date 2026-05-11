@@ -34,4 +34,8 @@ impl framework::Game for GameImpl {
       }
     }
   }
+
+  fn render(&self, ctx: &mut framework::Context) {
+    ctx.draw(self.debug_cube.as_ref().unwrap(), 0.2);
+  }
 }
