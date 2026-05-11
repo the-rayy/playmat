@@ -6,12 +6,13 @@ use winit::dpi::PhysicalSize;
 use crate::engine::rendering::scene_renderer::SceneRenderer;
 
 mod vertex;
-mod mesh;
+pub mod mesh;
 mod scene_renderer;
+mod math;
 
 pub struct Renderer {
   window: Arc<winit::window::Window>,
-  device: wgpu::Device,
+  pub device: wgpu::Device,
   queue: wgpu::Queue,
   size: winit::dpi::PhysicalSize<u32>,
   surface: wgpu::Surface<'static>,

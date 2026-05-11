@@ -2,7 +2,7 @@ use std::sync::{Arc, Mutex};
 
 use protocol::message::server::ServerMessage;
 
-use crate::framework;
+use crate::{engine::rendering::mesh::Mesh, framework};
 
 #[derive(Default)]
 pub struct GameStateData {
@@ -12,10 +12,14 @@ pub struct GameStateData {
 #[derive(Default)]
 pub struct GameImpl {
   game_state: Arc<Mutex<GameStateData>>,
+
+  debug_cube: Option<Mesh>
 }
 
 impl framework::Game for GameImpl {
-  fn start(&self, _ctx: &mut framework::Context) {}
+  fn start(&mut self, ctx: &mut framework::Context) {
+    self.debug_cube = Some(ctx.create_debug_cube());
+  }
 
   fn handle(&mut self, msg: ServerMessage) {
     match msg {

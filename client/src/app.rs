@@ -30,11 +30,10 @@ impl<T: Game> ApplicationHandler for App<T> {
       .expect("could not create window");
     let window = Arc::new(window);
     let renderer = engine::runtime::get().block_on(Renderer::new(window.clone()));
-    let framework_context = Context::new();
+    let framework_context = Context::new(renderer);
 
     let mut running_app = RunningApp {
       window,
-      renderer,
       framework_context,
       game: self.game.take().expect("resume called twice"),
     };
@@ -59,7 +58,6 @@ impl<T: Game> ApplicationHandler for App<T> {
 
 struct RunningApp<T: Game> {
   window: Arc<Window>,
-  renderer: Renderer,
   framework_context: framework::Context,
   game: T,
 }
@@ -80,9 +78,9 @@ impl<T: Game> RunningApp<T> {
     }
     match event {
       WindowEvent::CloseRequested => event_loop.exit(),
-      WindowEvent::Resized(size) => self.renderer.resize(size),
+      WindowEvent::Resized(size) => self.framework_context.renderer.resize(size),
       WindowEvent::RedrawRequested => {
-        self.renderer.render();
+        self.framework_context.renderer.render();
         self.window.request_redraw();
       }
       _ => (),
