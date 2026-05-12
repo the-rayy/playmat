@@ -5,6 +5,7 @@ use winit::dpi::PhysicalSize;
 
 mod mesh;
 mod vertex;
+mod instance;
 
 pub struct Renderer {
   window: Arc<winit::window::Window>,
@@ -67,7 +68,7 @@ impl Renderer {
       vertex: wgpu::VertexState {
         module: &shader,
         entry_point: Some("vs_main"), // 1.
-        buffers: &[vertex::Vertex::buffer_layout()],
+        buffers: &[vertex::Vertex::buffer_layout(), instance::Instance::buffer_layout()],
         compilation_options: wgpu::PipelineCompilationOptions::default(),
       },
       fragment: Some(wgpu::FragmentState {
@@ -121,7 +122,7 @@ impl Renderer {
   }
 
   #[expect(clippy::panic, reason = "device lost")]
-  pub fn render(&self) {
+  pub fn render(&self, frame_no: u64) {
     let output = match self.surface.get_current_texture() {
       wgpu::CurrentSurfaceTexture::Success(surface_texture) => surface_texture,
       wgpu::CurrentSurfaceTexture::Suboptimal(surface_texture) => {
@@ -163,9 +164,12 @@ impl Renderer {
       occlusion_query_set: None,
       multiview_mask: None,
     });
-    let mesh = mesh::Mesh::debug_pentagon(&self.device);
+    let mesh = mesh::Mesh::debug_cube(&self.device);
     renderpass.set_pipeline(&self.pipeline);
     renderpass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
+    let instance = instance::Instance::debug(&self.device, frame_no);
+    renderpass.set_vertex_buffer(1, instance.buffer.slice(..));
+
     renderpass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16); // 1.
     renderpass.draw_indexed(0..mesh.index_count, 0, 0..1); // 2.
 

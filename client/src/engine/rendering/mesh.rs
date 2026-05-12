@@ -42,7 +42,7 @@ impl Mesh {
         color: [0.0, 0.0, 1.0],
       },
     ];
-    let indices = vec![];
+    let indices = vec![0, 1, 2];
 
     Self::new(device, &vertices, &indices)
   }

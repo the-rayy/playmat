@@ -33,6 +33,7 @@ impl<T: Game> ApplicationHandler for App<T> {
     let framework_context = Context::new();
 
     let mut running_app = RunningApp {
+      frame_no: 0,
       window,
       renderer,
       framework_context,
@@ -58,6 +59,7 @@ impl<T: Game> ApplicationHandler for App<T> {
 }
 
 struct RunningApp<T: Game> {
+  frame_no: u64,
   window: Arc<Window>,
   renderer: Renderer,
   framework_context: framework::Context,
@@ -82,7 +84,8 @@ impl<T: Game> RunningApp<T> {
       WindowEvent::CloseRequested => event_loop.exit(),
       WindowEvent::Resized(size) => self.renderer.resize(size),
       WindowEvent::RedrawRequested => {
-        self.renderer.render();
+        self.renderer.render(self.frame_no);
+        self.frame_no += 1;
         self.window.request_redraw();
       }
       _ => (),
