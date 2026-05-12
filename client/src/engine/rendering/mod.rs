@@ -3,6 +3,9 @@ use std::sync::Arc;
 use wgpu::{Color, ExperimentalFeatures};
 use winit::dpi::PhysicalSize;
 
+mod mesh;
+mod vertex;
+
 pub struct Renderer {
   window: Arc<winit::window::Window>,
   device: wgpu::Device,
@@ -64,7 +67,7 @@ impl Renderer {
       vertex: wgpu::VertexState {
         module: &shader,
         entry_point: Some("vs_main"), // 1.
-        buffers: &[],                 // 2.
+        buffers: &[vertex::Vertex::buffer_layout()],
         compilation_options: wgpu::PipelineCompilationOptions::default(),
       },
       fragment: Some(wgpu::FragmentState {
@@ -160,8 +163,10 @@ impl Renderer {
       occlusion_query_set: None,
       multiview_mask: None,
     });
+    let mesh = mesh::Mesh::debug_triangle(&self.device);
     renderpass.set_pipeline(&self.pipeline);
-    renderpass.draw(0..3, 0..1);
+    renderpass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
+    renderpass.draw(0..mesh.vertex_count, 0..1);
 
     drop(renderpass);
 
