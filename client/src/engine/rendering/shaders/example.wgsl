@@ -1,5 +1,3 @@
-// Vertex shader
-
 struct VertexInput {
     @location(0) position: vec3<f32>,
     @location(1) color: vec3<f32>,
@@ -33,8 +31,6 @@ fn vs_main(
     out.clip_position = model_matrix * vec4<f32>(model.position, 1.0);
     return out;
 }
-
-// Fragment shader
 
 @fragment
 fn fs_main(in: VertexOutput) -> @location(0) vec4<f32> {
