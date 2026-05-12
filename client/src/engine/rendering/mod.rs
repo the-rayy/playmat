@@ -3,6 +3,10 @@ use std::sync::Arc;
 use wgpu::{Color, ExperimentalFeatures};
 use winit::dpi::PhysicalSize;
 
+mod instance;
+mod mesh;
+mod vertex;
+
 pub struct Renderer {
   window: Arc<winit::window::Window>,
   device: wgpu::Device,
@@ -10,6 +14,8 @@ pub struct Renderer {
   size: winit::dpi::PhysicalSize<u32>,
   surface: wgpu::Surface<'static>,
   surface_format: wgpu::TextureFormat,
+
+  pipeline: wgpu::RenderPipeline,
 }
 
 impl Renderer {
@@ -45,6 +51,58 @@ impl Renderer {
       .first()
       .expect("no available surface formats");
 
+    let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+      label: Some("Shader"),
+      source: wgpu::ShaderSource::Wgsl(include_str!("shaders/example.wgsl").into()),
+    });
+
+    let render_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+      label: Some("Render Pipeline Layout"),
+      bind_group_layouts: &[],
+      immediate_size: 0,
+    });
+
+    let render_pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+      label: Some("Render Pipeline"),
+      layout: Some(&render_pipeline_layout),
+      vertex: wgpu::VertexState {
+        module: &shader,
+        entry_point: Some("vs_main"),
+        buffers: &[
+          vertex::Vertex::buffer_layout(),
+          instance::Instance::buffer_layout(),
+        ],
+        compilation_options: wgpu::PipelineCompilationOptions::default(),
+      },
+      fragment: Some(wgpu::FragmentState {
+        module: &shader,
+        entry_point: Some("fs_main"),
+        targets: &[Some(wgpu::ColorTargetState {
+          format: surface_format,
+          blend: Some(wgpu::BlendState::REPLACE),
+          write_mask: wgpu::ColorWrites::ALL,
+        })],
+        compilation_options: wgpu::PipelineCompilationOptions::default(),
+      }),
+      primitive: wgpu::PrimitiveState {
+        topology: wgpu::PrimitiveTopology::TriangleList,
+        strip_index_format: None,
+        front_face: wgpu::FrontFace::Ccw,
+        cull_mode: Some(wgpu::Face::Back),
+        polygon_mode: wgpu::PolygonMode::Fill,
+        unclipped_depth: false,
+        conservative: false,
+      },
+      depth_stencil: None,
+      multisample: wgpu::MultisampleState {
+        count: 1,
+        mask: !0,
+        alpha_to_coverage_enabled: false,
+      },
+      multiview_mask: None,
+      cache: None,
+    });
+
     let state = Self {
       window,
       device,
@@ -52,6 +110,8 @@ impl Renderer {
       size,
       surface,
       surface_format,
+
+      pipeline: render_pipeline,
     };
 
     state.configure_surface();
@@ -60,7 +120,7 @@ impl Renderer {
   }
 
   #[expect(clippy::panic, reason = "device lost")]
-  pub fn render(&self) {
+  pub fn render(&self, frame_no: u64) {
     let output = match self.surface.get_current_texture() {
       wgpu::CurrentSurfaceTexture::Success(surface_texture) => surface_texture,
       wgpu::CurrentSurfaceTexture::Suboptimal(surface_texture) => {
@@ -86,7 +146,7 @@ impl Renderer {
       .create_view(&wgpu::TextureViewDescriptor::default());
     let mut encoder = self.device.create_command_encoder(&Default::default());
 
-    let _renderpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+    let mut renderpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
       label: None,
       color_attachments: &[Some(wgpu::RenderPassColorAttachment {
         view: &texture_view,
@@ -102,8 +162,17 @@ impl Renderer {
       occlusion_query_set: None,
       multiview_mask: None,
     });
+    let mesh = mesh::Mesh::debug_cube(&self.device);
+    renderpass.set_pipeline(&self.pipeline);
+    renderpass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
 
-    drop(_renderpass);
+    let instance = instance::Instance::debug(&self.device, frame_no);
+    renderpass.set_vertex_buffer(1, instance.buffer.slice(..));
+
+    renderpass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+    renderpass.draw_indexed(0..mesh.index_count, 0, 0..1);
+
+    drop(renderpass);
 
     self.queue.submit([encoder.finish()]);
     self.window.pre_present_notify();
