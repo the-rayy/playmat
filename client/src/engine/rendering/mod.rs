@@ -3,9 +3,9 @@ use std::sync::Arc;
 use wgpu::{Color, ExperimentalFeatures};
 use winit::dpi::PhysicalSize;
 
+mod instance;
 mod mesh;
 mod vertex;
-mod instance;
 
 pub struct Renderer {
   window: Arc<winit::window::Window>,
@@ -68,7 +68,10 @@ impl Renderer {
       vertex: wgpu::VertexState {
         module: &shader,
         entry_point: Some("vs_main"),
-        buffers: &[vertex::Vertex::buffer_layout(), instance::Instance::buffer_layout()],
+        buffers: &[
+          vertex::Vertex::buffer_layout(),
+          instance::Instance::buffer_layout(),
+        ],
         compilation_options: wgpu::PipelineCompilationOptions::default(),
       },
       fragment: Some(wgpu::FragmentState {
@@ -82,7 +85,7 @@ impl Renderer {
         compilation_options: wgpu::PipelineCompilationOptions::default(),
       }),
       primitive: wgpu::PrimitiveState {
-        topology: wgpu::PrimitiveTopology::TriangleList, 
+        topology: wgpu::PrimitiveTopology::TriangleList,
         strip_index_format: None,
         front_face: wgpu::FrontFace::Ccw,
         cull_mode: Some(wgpu::Face::Back),
@@ -90,14 +93,14 @@ impl Renderer {
         unclipped_depth: false,
         conservative: false,
       },
-      depth_stencil: None, 
+      depth_stencil: None,
       multisample: wgpu::MultisampleState {
-        count: 1,          
-        mask: !0,         
-        alpha_to_coverage_enabled: false, 
+        count: 1,
+        mask: !0,
+        alpha_to_coverage_enabled: false,
       },
       multiview_mask: None,
-      cache: None,        
+      cache: None,
     });
 
     let state = Self {
@@ -166,8 +169,8 @@ impl Renderer {
     let instance = instance::Instance::debug(&self.device, frame_no);
     renderpass.set_vertex_buffer(1, instance.buffer.slice(..));
 
-    renderpass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16); 
-    renderpass.draw_indexed(0..mesh.index_count, 0, 0..1); 
+    renderpass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+    renderpass.draw_indexed(0..mesh.index_count, 0, 0..1);
 
     drop(renderpass);
 

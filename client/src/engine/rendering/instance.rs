@@ -31,7 +31,7 @@ impl Instance {
     Self::new(device, &mtx)
   }
 
-  pub fn buffer_layout() -> wgpu::VertexBufferLayout<'static> {
+  pub const fn buffer_layout() -> wgpu::VertexBufferLayout<'static> {
     use std::mem;
     wgpu::VertexBufferLayout {
       array_stride: mem::size_of::<Mat4>() as wgpu::BufferAddress,
@@ -64,7 +64,7 @@ impl Instance {
 
 type Mat4 = [[f32; 4]; 4];
 
-fn identity() -> Mat4 {
+const fn identity() -> Mat4 {
   [
     [1.0, 0.0, 0.0, 0.0],
     [0.0, 1.0, 0.0, 0.0],
@@ -73,6 +73,7 @@ fn identity() -> Mat4 {
   ]
 }
 
+#[expect(clippy::indexing_slicing, reason = "we know the dimensions")]
 fn multiply(a: Mat4, b: Mat4) -> Mat4 {
   let mut result = [[0.0; 4]; 4];
 
