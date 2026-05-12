@@ -163,10 +163,11 @@ impl Renderer {
       occlusion_query_set: None,
       multiview_mask: None,
     });
-    let mesh = mesh::Mesh::debug_triangle(&self.device);
+    let mesh = mesh::Mesh::debug_pentagon(&self.device);
     renderpass.set_pipeline(&self.pipeline);
     renderpass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
-    renderpass.draw(0..mesh.vertex_count, 0..1);
+    renderpass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16); // 1.
+    renderpass.draw_indexed(0..mesh.index_count, 0, 0..1); // 2.
 
     drop(renderpass);
 
