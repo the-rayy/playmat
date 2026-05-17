@@ -24,9 +24,7 @@ impl Renderer {
       vertex: wgpu::VertexState {
         module: &shader,
         entry_point: Some("vs_main"),
-        buffers: &[
-          vertex::Vertex::buffer_layout(),
-        ],
+        buffers: &[vertex::Vertex::buffer_layout()],
         compilation_options: wgpu::PipelineCompilationOptions::default(),
       },
       fragment: Some(wgpu::FragmentState {
@@ -58,15 +56,19 @@ impl Renderer {
       cache: None,
     });
 
-    Self {pipeline}
-
+    Self { pipeline }
   }
 
-  pub fn render(&self, device: &wgpu::Device, encoder: &mut wgpu::CommandEncoder, texture_view: &wgpu::TextureView) {
+  pub fn render(
+    &self,
+    device: &wgpu::Device,
+    encoder: &mut wgpu::CommandEncoder,
+    texture_view: &wgpu::TextureView,
+  ) {
     let mut renderpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
       label: None,
       color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-        view: &texture_view,
+        view: texture_view,
         resolve_target: None,
         ops: wgpu::Operations {
           load: wgpu::LoadOp::Load,

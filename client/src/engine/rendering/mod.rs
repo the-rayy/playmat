@@ -1,10 +1,10 @@
 use std::sync::Arc;
 
-use wgpu::{Color, ExperimentalFeatures};
+use wgpu::ExperimentalFeatures;
 use winit::dpi::PhysicalSize;
 
-mod scene;
 mod canvas;
+mod scene;
 
 pub struct Renderer {
   window: Arc<winit::window::Window>,
@@ -13,7 +13,7 @@ pub struct Renderer {
   size: winit::dpi::PhysicalSize<u32>,
   surface: wgpu::Surface<'static>,
   surface_format: wgpu::TextureFormat,
-  
+
   renderer_scene: scene::Renderer,
   renderer_canvas: canvas::Renderer,
 }
@@ -51,8 +51,8 @@ impl Renderer {
       .first()
       .expect("no available surface formats");
 
-    let renderer_scene = scene::Renderer::new(&device, surface_format.clone());
-    let renderer_canvas = canvas::Renderer::new(&device, surface_format.clone());
+    let renderer_scene = scene::Renderer::new(&device, surface_format);
+    let renderer_canvas = canvas::Renderer::new(&device, surface_format);
 
     let state = Self {
       window,
@@ -62,7 +62,7 @@ impl Renderer {
       surface,
       surface_format,
       renderer_scene,
-      renderer_canvas
+      renderer_canvas,
     };
 
     state.configure_surface();
@@ -97,9 +97,13 @@ impl Renderer {
       .create_view(&wgpu::TextureViewDescriptor::default());
     let mut encoder = self.device.create_command_encoder(&Default::default());
 
-    self.renderer_scene.render(&self.device, &mut encoder, &texture_view, frame_no);
-    self.renderer_canvas.render(&self.device, &mut encoder, &texture_view);
-    
+    self
+      .renderer_scene
+      .render(&self.device, &mut encoder, &texture_view, frame_no);
+    self
+      .renderer_canvas
+      .render(&self.device, &mut encoder, &texture_view);
+
     self.queue.submit([encoder.finish()]);
     self.window.pre_present_notify();
     output.present();

@@ -63,11 +63,17 @@ impl Renderer {
     Self { pipeline }
   }
 
-  pub fn render(&self, device: &wgpu::Device, encoder: &mut wgpu::CommandEncoder, texture_view: &wgpu::TextureView, frame_no: u64) {
+  pub fn render(
+    &self,
+    device: &wgpu::Device,
+    encoder: &mut wgpu::CommandEncoder,
+    texture_view: &wgpu::TextureView,
+    frame_no: u64,
+  ) {
     let mut renderpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
       label: None,
       color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-        view: &texture_view,
+        view: texture_view,
         resolve_target: None,
         ops: wgpu::Operations {
           load: wgpu::LoadOp::Clear(wgpu::Color::BLUE),
