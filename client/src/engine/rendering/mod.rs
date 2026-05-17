@@ -3,9 +3,7 @@ use std::sync::Arc;
 use wgpu::{Color, ExperimentalFeatures};
 use winit::dpi::PhysicalSize;
 
-mod instance;
-mod mesh;
-mod vertex;
+mod scene;
 mod gui_vertex;
 mod gui_mesh;
 
@@ -16,8 +14,9 @@ pub struct Renderer {
   size: winit::dpi::PhysicalSize<u32>,
   surface: wgpu::Surface<'static>,
   surface_format: wgpu::TextureFormat,
+  
+  renderer_scene: scene::Renderer,
 
-  pipeline_3d: wgpu::RenderPipeline,
   pipeline_gui: wgpu::RenderPipeline,
 }
 
@@ -54,11 +53,6 @@ impl Renderer {
       .first()
       .expect("no available surface formats");
 
-    let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
-      label: Some("Shader"),
-      source: wgpu::ShaderSource::Wgsl(include_str!("shaders/3d.wgsl").into()),
-    });
-
     let shader_gui = device.create_shader_module(wgpu::ShaderModuleDescriptor {
       label: Some("GUI Shader"),
       source: wgpu::ShaderSource::Wgsl(include_str!("shaders/gui.wgsl").into()),
@@ -68,47 +62,6 @@ impl Renderer {
       label: Some("Render Pipeline Layout"),
       bind_group_layouts: &[],
       immediate_size: 0,
-    });
-
-    let pipeline_3d = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
-      label: Some("Render Pipeline"),
-      layout: Some(&render_pipeline_layout),
-      vertex: wgpu::VertexState {
-        module: &shader,
-        entry_point: Some("vs_main"),
-        buffers: &[
-          vertex::Vertex::buffer_layout(),
-          instance::Instance::buffer_layout(),
-        ],
-        compilation_options: wgpu::PipelineCompilationOptions::default(),
-      },
-      fragment: Some(wgpu::FragmentState {
-        module: &shader,
-        entry_point: Some("fs_main"),
-        targets: &[Some(wgpu::ColorTargetState {
-          format: surface_format,
-          blend: Some(wgpu::BlendState::REPLACE),
-          write_mask: wgpu::ColorWrites::ALL,
-        })],
-        compilation_options: wgpu::PipelineCompilationOptions::default(),
-      }),
-      primitive: wgpu::PrimitiveState {
-        topology: wgpu::PrimitiveTopology::TriangleList,
-        strip_index_format: None,
-        front_face: wgpu::FrontFace::Ccw,
-        cull_mode: Some(wgpu::Face::Back),
-        polygon_mode: wgpu::PolygonMode::Fill,
-        unclipped_depth: false,
-        conservative: false,
-      },
-      depth_stencil: None,
-      multisample: wgpu::MultisampleState {
-        count: 1,
-        mask: !0,
-        alpha_to_coverage_enabled: false,
-      },
-      multiview_mask: None,
-      cache: None,
     });
 
     let pipeline_gui = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
@@ -151,6 +104,8 @@ impl Renderer {
       cache: None,
     });
 
+    let renderer_scene = scene::Renderer::new(&device, surface_format.clone());
+
     let state = Self {
       window,
       device,
@@ -159,8 +114,8 @@ impl Renderer {
       surface,
       surface_format,
 
-      pipeline_3d,
       pipeline_gui,
+      renderer_scene
     };
 
     state.configure_surface();
@@ -195,35 +150,8 @@ impl Renderer {
       .create_view(&wgpu::TextureViewDescriptor::default());
     let mut encoder = self.device.create_command_encoder(&Default::default());
 
-    let mut renderpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
-      label: None,
-      color_attachments: &[Some(wgpu::RenderPassColorAttachment {
-        view: &texture_view,
-        resolve_target: None,
-        ops: wgpu::Operations {
-          load: wgpu::LoadOp::Clear(Color::BLUE),
-          store: wgpu::StoreOp::Store,
-        },
-        depth_slice: None,
-      })],
-      depth_stencil_attachment: None,
-      timestamp_writes: None,
-      occlusion_query_set: None,
-      multiview_mask: None,
-    });
-    let mesh = mesh::Mesh::debug_cube(&self.device);
-    renderpass.set_pipeline(&self.pipeline_3d);
-    renderpass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
-
-    let instance = instance::Instance::debug(&self.device, frame_no);
-    renderpass.set_vertex_buffer(1, instance.buffer.slice(..));
-
-    renderpass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
-    renderpass.draw_indexed(0..mesh.index_count, 0, 0..1);
-
-    drop(renderpass);
-
-
+    self.renderer_scene.render(&self.device, &mut encoder, &texture_view, frame_no);
+    
     let mut renderpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
       label: None,
       color_attachments: &[Some(wgpu::RenderPassColorAttachment {
