@@ -1,14 +1,14 @@
 #[repr(C)]
 #[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
-pub struct GuiVertex {
+pub struct Vertex {
   pub position: [f32; 2],
   pub color: [f32; 4],
 }
 
-impl GuiVertex {
+impl Vertex {
   pub fn buffer_layout() -> wgpu::VertexBufferLayout<'static> {
     wgpu::VertexBufferLayout {
-      array_stride: std::mem::size_of::<GuiVertex>() as u64,
+      array_stride: std::mem::size_of::<Vertex>() as u64,
       step_mode: wgpu::VertexStepMode::Vertex,
       attributes: &[
         wgpu::VertexAttribute {

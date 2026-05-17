@@ -1,15 +1,15 @@
 use wgpu::util::DeviceExt;
 
-use crate::engine::rendering::gui_vertex::GuiVertex;
+use super::vertex::Vertex;
 
-pub struct GuiMesh {
+pub struct Mesh {
   pub vertex_buffer: wgpu::Buffer,
   pub index_buffer: wgpu::Buffer,
   pub index_count: u32,
 }
 
-impl GuiMesh {
-  pub fn new(device: &wgpu::Device, vertices: &[GuiVertex], indices: &[u16]) -> Self {
+impl Mesh {
+  pub fn new(device: &wgpu::Device, vertices: &[Vertex], indices: &[u16]) -> Self {
     Self {
       vertex_buffer: device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
         label: Some("gui vertex"),
@@ -27,27 +27,27 @@ impl GuiMesh {
 
   pub fn debug_quad(device: &wgpu::Device) -> Self {
     let vertices = vec![
-      GuiVertex {
+      Vertex {
         position: [-0.5, 0.5],
         color: [1.0, 0.0, 0.0, 1.0],
       },
-      GuiVertex {
+      Vertex {
         position: [-0.5, -0.5],
         color: [1.0, 0.0, 0.0, 1.0],
       },
-      GuiVertex {
+      Vertex {
         position: [0.5, -0.5],
         color: [1.0, 0.0, 0.0, 1.0],
       },
-      GuiVertex {
+      Vertex {
         position: [-0.5, 0.5],
         color: [1.0, 0.0, 0.0, 1.0],
       },
-      GuiVertex {
+      Vertex {
         position: [0.5, -0.5],
         color: [1.0, 0.0, 0.0, 1.0],
       },
-      GuiVertex {
+      Vertex {
         position: [0.5, 0.5],
         color: [1.0, 0.0, 0.0, 1.0],
       },
