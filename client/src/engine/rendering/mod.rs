@@ -100,7 +100,7 @@ impl Renderer {
       .render(&self.device, &mut encoder, &texture_view, frame_no);
     self
       .renderer_canvas
-      .render(&self.device, &mut encoder, &texture_view, draw_list);
+      .render(&self.queue, &mut encoder, &texture_view, draw_list);
 
     self.queue.submit([encoder.finish()]);
     self.window.pre_present_notify();

@@ -1,10 +1,15 @@
 use wgpu::util::DeviceExt;
 
-use crate::engine::context;
+use crate::engine::{context, rendering::canvas::vertex::Vertex};
 pub mod vertex;
+
+const MAX_VERTICES: u64 = 1024;
+const MAX_INDICES: u64 = 1024;
 
 pub struct Renderer {
   pipeline: wgpu::RenderPipeline,
+  vertex_buffer: wgpu::Buffer,
+  index_buffer: wgpu::Buffer,
 }
 
 impl Renderer {
@@ -58,17 +63,36 @@ impl Renderer {
       cache: None,
     });
 
-    Self { pipeline }
+    let vertex_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+      label: Some("gui vertex"),
+      usage: wgpu::BufferUsages::COPY_DST | wgpu::BufferUsages::VERTEX,
+      size: MAX_VERTICES * std::mem::size_of::<Vertex>() as u64,
+      mapped_at_creation: false,
+    });
+    let index_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+      label: Some("gui index"),
+      size: MAX_INDICES * std::mem::size_of::<u16>() as u64,
+      usage: wgpu::BufferUsages::COPY_DST | wgpu::BufferUsages::INDEX,
+      mapped_at_creation: false,
+    });
+
+    Self {
+      pipeline,
+      vertex_buffer,
+      index_buffer,
+    }
   }
 
   pub fn render(
     &self,
-    device: &wgpu::Device,
+    queue: &wgpu::Queue,
     encoder: &mut wgpu::CommandEncoder,
     texture_view: &wgpu::TextureView,
     draw_list: &context::DrawList,
   ) {
-    if draw_list.is_empty() { return }
+    if draw_list.is_empty() {
+      return;
+    }
 
     let mut renderpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
       label: None,
@@ -87,21 +111,20 @@ impl Renderer {
       multiview_mask: None,
     });
 
-    let vb = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("gui vertex"),
-        contents: bytemuck::cast_slice(&draw_list.vertices),
-        usage: wgpu::BufferUsages::VERTEX,
-      });
-    let ib = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
-        label: Some("gui index"),
-        contents: bytemuck::cast_slice(&draw_list.indices),
-        usage: wgpu::BufferUsages::INDEX,
-      });
+    queue.write_buffer(
+      &self.vertex_buffer,
+      0,
+      bytemuck::cast_slice(&draw_list.vertices),
+    );
+    queue.write_buffer(
+      &self.index_buffer,
+      0,
+      bytemuck::cast_slice(&draw_list.indices),
+    );
 
     renderpass.set_pipeline(&self.pipeline);
-    renderpass.set_vertex_buffer(0, vb.slice(..));
-
-    renderpass.set_index_buffer(ib.slice(..), wgpu::IndexFormat::Uint16);
+    renderpass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
+    renderpass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
     renderpass.draw_indexed(0..draw_list.indices.len() as u32, 0, 0..1);
   }
 }
