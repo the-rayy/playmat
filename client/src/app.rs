@@ -10,8 +10,11 @@ pub struct App<T: Game> {
 }
 
 impl<T: Game> App<T> {
-  pub fn new(engine: Engine<T>) -> Self {
-    Self { window: None, engine: engine }
+  pub const fn new(engine: Engine<T>) -> Self {
+    Self {
+      window: None,
+      engine,
+    }
   }
 }
 
@@ -22,7 +25,7 @@ impl<T: Game> ApplicationHandler for App<T> {
       .expect("could not create window");
     let window = Arc::new(window);
     self.engine.init_rendering(window.clone());
-    self.window = Some(window.clone());
+    self.window = Some(window);
   }
 
   fn window_event(
@@ -37,7 +40,11 @@ impl<T: Game> ApplicationHandler for App<T> {
       WindowEvent::RedrawRequested => {
         self.engine.update();
         self.engine.render();
-        self.window.as_ref().expect("requestind redraw on non-existent window").request_redraw();
+        self
+          .window
+          .as_ref()
+          .expect("requestind redraw on non-existent window")
+          .request_redraw();
       }
       event => self.engine.handle(event.into()),
     }
@@ -45,11 +52,10 @@ impl<T: Game> ApplicationHandler for App<T> {
 }
 
 impl From<winit::event::WindowEvent> for engine::Event {
-    fn from(value: winit::event::WindowEvent) -> Self {
-        match value {
-          WindowEvent::Resized(_) => Self::WindowResized,
-          _ => Self::Noop
-        }
+  fn from(value: winit::event::WindowEvent) -> Self {
+    match value {
+      WindowEvent::Resized(_) => Self::WindowResized,
+      _ => Self::Noop,
     }
+  }
 }
-
