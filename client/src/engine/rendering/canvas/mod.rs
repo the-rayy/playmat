@@ -1,5 +1,7 @@
-mod mesh;
-mod vertex;
+use wgpu::util::DeviceExt;
+
+use crate::engine::context;
+pub mod vertex;
 
 pub struct Renderer {
   pipeline: wgpu::RenderPipeline,
@@ -64,7 +66,10 @@ impl Renderer {
     device: &wgpu::Device,
     encoder: &mut wgpu::CommandEncoder,
     texture_view: &wgpu::TextureView,
+    draw_list: &context::DrawList,
   ) {
+    if draw_list.is_empty() { return }
+
     let mut renderpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
       label: None,
       color_attachments: &[Some(wgpu::RenderPassColorAttachment {
@@ -81,11 +86,22 @@ impl Renderer {
       occlusion_query_set: None,
       multiview_mask: None,
     });
-    let mesh = mesh::Mesh::debug_quad(device);
-    renderpass.set_pipeline(&self.pipeline);
-    renderpass.set_vertex_buffer(0, mesh.vertex_buffer.slice(..));
 
-    renderpass.set_index_buffer(mesh.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
-    renderpass.draw_indexed(0..mesh.index_count, 0, 0..1);
+    let vb = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        label: Some("gui vertex"),
+        contents: bytemuck::cast_slice(&draw_list.vertices),
+        usage: wgpu::BufferUsages::VERTEX,
+      });
+    let ib = device.create_buffer_init(&wgpu::util::BufferInitDescriptor {
+        label: Some("gui index"),
+        contents: bytemuck::cast_slice(&draw_list.indices),
+        usage: wgpu::BufferUsages::INDEX,
+      });
+
+    renderpass.set_pipeline(&self.pipeline);
+    renderpass.set_vertex_buffer(0, vb.slice(..));
+
+    renderpass.set_index_buffer(ib.slice(..), wgpu::IndexFormat::Uint16);
+    renderpass.draw_indexed(0..draw_list.indices.len() as u32, 0, 0..1);
   }
 }

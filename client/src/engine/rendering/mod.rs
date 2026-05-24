@@ -2,7 +2,9 @@ use std::sync::Arc;
 
 use wgpu::ExperimentalFeatures;
 
-mod canvas;
+use crate::engine::context;
+
+pub mod canvas;
 mod scene;
 
 pub struct Renderer {
@@ -67,7 +69,7 @@ impl Renderer {
   }
 
   #[expect(clippy::panic, reason = "device lost")]
-  pub fn render(&self, frame_no: u64) {
+  pub fn render(&self, draw_list: &context::DrawList, frame_no: u64) {
     let output = match self.surface.get_current_texture() {
       wgpu::CurrentSurfaceTexture::Success(surface_texture) => surface_texture,
       wgpu::CurrentSurfaceTexture::Suboptimal(surface_texture) => {
@@ -98,7 +100,7 @@ impl Renderer {
       .render(&self.device, &mut encoder, &texture_view, frame_no);
     self
       .renderer_canvas
-      .render(&self.device, &mut encoder, &texture_view);
+      .render(&self.device, &mut encoder, &texture_view, draw_list);
 
     self.queue.submit([encoder.finish()]);
     self.window.pre_present_notify();
