@@ -2,9 +2,7 @@ use std::sync::Arc;
 
 use winit::{application::ApplicationHandler, event::WindowEvent, window::Window};
 
-use crate::{
-  engine::{Engine, Game},
-};
+use crate::engine::{self, Engine, Game};
 
 pub struct App<T: Game> {
   window: Option<Arc<Window>>,
@@ -41,8 +39,17 @@ impl<T: Game> ApplicationHandler for App<T> {
         self.engine.render();
         self.window.as_ref().expect("requestind redraw on non-existent window").request_redraw();
       }
-      _ => (),
+      event => self.engine.handle(event.into()),
     }
   }
+}
+
+impl From<winit::event::WindowEvent> for engine::Event {
+    fn from(value: winit::event::WindowEvent) -> Self {
+        match value {
+          WindowEvent::Resized(_) => Self::WindowResized,
+          _ => Self::Noop
+        }
+    }
 }
 

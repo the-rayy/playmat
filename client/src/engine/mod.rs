@@ -1,6 +1,7 @@
 pub mod network;
 mod platform;
 pub mod rendering;
+mod event;
 
 use std::sync::Arc;
 
@@ -8,6 +9,7 @@ pub use platform::logger;
 pub use platform::runtime;
 pub use platform::window;
 use winit::window::Window;
+pub use event::Event;
 
 pub trait Game {
   fn start(&self, ctx: &mut Context);
@@ -47,4 +49,12 @@ impl<T: Game> Engine<T> {
     self.renderer.as_ref().expect("renderer not initialized").render(self.frame_no);
     self.frame_no += 1;
   }
+
+  pub fn handle(&mut self, ev: Event) {
+    match ev {
+      Event::Noop => (),
+      Event::WindowResized => self.renderer.as_ref().expect("renderer not initialized").resize(),
+    }
+  }
+
 }
