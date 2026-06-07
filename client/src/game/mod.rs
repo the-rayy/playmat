@@ -4,7 +4,7 @@ use crate::engine;
 pub struct Game {}
 
 impl engine::Game for Game {
-    fn update(&mut self, ctx: &mut engine::context::Context) {
-        ctx.gui_draw_list.debug_push();
-    }
+  fn update(&mut self, ctx: &mut engine::context::Context) {
+    ctx.gui_draw_list.debug_push();
+  }
 }

@@ -6,9 +6,9 @@ pub struct Context {
 }
 
 #[derive(Default)]
-pub struct DrawList{
+pub struct DrawList {
   pub vertices: Vec<Vertex>,
-  pub indices: Vec<u16>
+  pub indices: Vec<u16>,
 }
 
 impl DrawList {
@@ -17,7 +17,7 @@ impl DrawList {
     self.indices.clear();
   }
 
-  pub fn is_empty(&self) -> bool {
+  pub const fn is_empty(&self) -> bool {
     self.indices.is_empty()
   }
 
@@ -52,4 +52,3 @@ impl DrawList {
     self.indices = vec![0, 1, 2, 3, 4, 5];
   }
 }
-

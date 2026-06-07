@@ -36,7 +36,6 @@ impl<T: Game> ApplicationHandler for App<T> {
   ) {
     match event {
       WindowEvent::CloseRequested => event_loop.exit(),
-      // WindowEvent::Resized(size) => self.renderer.resize(size),
       WindowEvent::RedrawRequested => {
         self.engine.update();
         self.engine.render();

@@ -1,8 +1,7 @@
+pub mod context;
 mod event;
-pub mod network;
 mod platform;
 pub mod rendering;
-pub mod context;
 
 use std::sync::Arc;
 
@@ -55,7 +54,7 @@ impl<T: Game> Engine<T> {
     self.frame_no += 1;
   }
 
-  pub fn handle(&mut self, ev: Event) {
+  pub fn handle(&self, ev: Event) {
     match ev {
       Event::Noop => (),
       Event::WindowResized => self

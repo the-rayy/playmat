@@ -1,5 +1,3 @@
-use wgpu::util::DeviceExt;
-
 use crate::engine::{context, rendering::canvas::vertex::Vertex};
 pub mod vertex;
 
