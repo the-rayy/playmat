@@ -80,7 +80,7 @@ fn multiply(a: Mat4, b: Mat4) -> Mat4 {
   for i in 0..4 {
     for j in 0..4 {
       for k in 0..4 {
-        result[i][j] += a[i][k] * b[k][j];
+        result[i][j] = a[i][k].mul_add(b[k][j], result[i][j]);
       }
     }
   }

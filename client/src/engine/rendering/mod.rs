@@ -1,16 +1,16 @@
 use std::sync::Arc;
 
 use wgpu::ExperimentalFeatures;
-use winit::dpi::PhysicalSize;
 
-mod canvas;
+use crate::engine::context;
+
+pub mod canvas;
 mod scene;
 
 pub struct Renderer {
   window: Arc<winit::window::Window>,
   device: wgpu::Device,
   queue: wgpu::Queue,
-  size: winit::dpi::PhysicalSize<u32>,
   surface: wgpu::Surface<'static>,
   surface_format: wgpu::TextureFormat,
 
@@ -44,7 +44,6 @@ impl Renderer {
       .await
       .expect("Unable to request device");
 
-    let size = window.inner_size();
     let surface_format = *surface
       .get_capabilities(&adapter)
       .formats
@@ -58,7 +57,6 @@ impl Renderer {
       window,
       device,
       queue,
-      size,
       surface,
       surface_format,
       renderer_scene,
@@ -71,7 +69,7 @@ impl Renderer {
   }
 
   #[expect(clippy::panic, reason = "device lost")]
-  pub fn render(&self, frame_no: u64) {
+  pub fn render(&self, draw_list: &context::DrawList, frame_no: u64) {
     let output = match self.surface.get_current_texture() {
       wgpu::CurrentSurfaceTexture::Success(surface_texture) => surface_texture,
       wgpu::CurrentSurfaceTexture::Suboptimal(surface_texture) => {
@@ -102,15 +100,14 @@ impl Renderer {
       .render(&self.device, &mut encoder, &texture_view, frame_no);
     self
       .renderer_canvas
-      .render(&self.device, &mut encoder, &texture_view);
+      .render(&self.queue, &mut encoder, &texture_view, draw_list);
 
     self.queue.submit([encoder.finish()]);
     self.window.pre_present_notify();
     output.present();
   }
 
-  pub fn resize(&mut self, new_size: PhysicalSize<u32>) {
-    self.size = new_size;
+  pub fn resize(&self) {
     self.configure_surface();
   }
 
