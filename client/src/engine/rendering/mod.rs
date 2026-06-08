@@ -2,7 +2,6 @@ use std::sync::Arc;
 
 use wgpu::ExperimentalFeatures;
 
-
 pub mod canvas;
 mod scene;
 

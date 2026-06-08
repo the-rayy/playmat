@@ -2,10 +2,9 @@ use winit::event_loop::EventLoop;
 
 mod app;
 mod engine;
-mod game;
 mod framework;
+mod game;
 mod math;
-
 
 #[cfg_attr(target_arch = "wasm32", wasm_bindgen::prelude::wasm_bindgen(start))]
 pub fn main() {

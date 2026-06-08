@@ -1,5 +1,5 @@
-mod rect;
 mod point;
+mod rect;
 
-pub use rect::Rect;
 pub use point::Point;
+pub use rect::Rect;

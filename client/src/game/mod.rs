@@ -5,8 +5,8 @@ pub struct Game {
 }
 
 impl Game {
-  pub fn new() -> Self {
-    Game {
+  pub const fn new() -> Self {
+    Self {
       debug_button: framework::gui::Button::new(crate::math::Rect::new(-0.5, -0.5, 1.0, 1.0)),
     }
   }

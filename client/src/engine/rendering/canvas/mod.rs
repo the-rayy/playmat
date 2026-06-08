@@ -1,6 +1,6 @@
 use crate::engine::rendering::canvas::{draw_list::DrawList, vertex::Vertex};
-pub mod vertex;
 pub mod draw_list;
+pub mod vertex;
 
 const MAX_VERTICES: u64 = 1024;
 const MAX_INDICES: u64 = 1024;
