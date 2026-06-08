@@ -1,4 +1,3 @@
-pub mod context;
 mod event;
 mod platform;
 pub mod rendering;
@@ -11,26 +10,24 @@ pub use platform::runtime;
 pub use platform::window;
 use winit::window::Window;
 
-pub trait Game {
-  fn update(&mut self, ctx: &mut context::Context);
-}
+use crate::framework;
 
-pub struct Engine<T: Game> {
+pub struct Engine<T: framework::Game> {
   game: T,
-  context: context::Context,
+  context: framework::Context,
 
   renderer: Option<rendering::Renderer>,
   frame_no: u64,
 }
 
-impl<T: Game> Engine<T> {
+impl<T: framework::Game> Engine<T> {
   pub fn new(game: T) -> Self {
     runtime::init();
     logger::init();
 
     Self {
       game,
-      context: context::Context::default(),
+      context: framework::Context::default(),
       renderer: None,
       frame_no: 0,
     }
@@ -41,7 +38,7 @@ impl<T: Game> Engine<T> {
   }
 
   pub fn update(&mut self) {
-    self.context.gui_draw_list.clear();
+    self.context.gui.draw_list.clear();
     self.game.update(&mut self.context);
   }
 
@@ -50,7 +47,7 @@ impl<T: Game> Engine<T> {
       .renderer
       .as_ref()
       .expect("renderer not initialized")
-      .render(&self.context.gui_draw_list, self.frame_no);
+      .render(&self.context.gui.draw_list, self.frame_no);
     self.frame_no += 1;
   }
 

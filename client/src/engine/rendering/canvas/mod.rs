@@ -1,5 +1,6 @@
-use crate::engine::{context, rendering::canvas::vertex::Vertex};
+use crate::engine::rendering::canvas::{draw_list::DrawList, vertex::Vertex};
 pub mod vertex;
+pub mod draw_list;
 
 const MAX_VERTICES: u64 = 1024;
 const MAX_INDICES: u64 = 1024;
@@ -86,7 +87,7 @@ impl Renderer {
     queue: &wgpu::Queue,
     encoder: &mut wgpu::CommandEncoder,
     texture_view: &wgpu::TextureView,
-    draw_list: &context::DrawList,
+    draw_list: &DrawList,
   ) {
     if draw_list.is_empty() {
       return;
