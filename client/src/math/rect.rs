@@ -13,11 +13,6 @@ impl Rect {
         Self { x, y, w, h }
     }
 
-    pub fn contains(&self, pos: [f32; 2]) -> bool {
-        pos[0] >= self.x && pos[0] <= self.x + self.w
-            && pos[1] >= self.y && pos[1] <= self.y + self.h
-    }
-
     pub fn top_left(&self) -> Point {
       Point{x: self.x, y: self.y}
     }
