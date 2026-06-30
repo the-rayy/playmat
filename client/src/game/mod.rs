@@ -1,10 +1,19 @@
-use crate::engine;
+use crate::framework;
 
-#[derive(Default)]
-pub struct Game {}
+pub struct Game {
+  debug_button: framework::gui::Button,
+}
 
-impl engine::Game for Game {
-  fn update(&mut self, ctx: &mut engine::context::Context) {
-    ctx.gui_draw_list.debug_push();
+impl Game {
+  pub const fn new() -> Self {
+    Self {
+      debug_button: framework::gui::Button::new(crate::math::Rect::new(-0.5, -0.5, 1.0, 1.0)),
+    }
+  }
+}
+
+impl framework::Game for Game {
+  fn update(&mut self, ctx: &mut framework::Context) {
+    ctx.gui.draw_button(&self.debug_button);
   }
 }
