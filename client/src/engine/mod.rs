@@ -1,6 +1,6 @@
 mod event;
-mod platform;
 mod input;
+mod platform;
 pub mod rendering;
 
 use std::sync::Arc;
