@@ -57,6 +57,7 @@ impl From<winit::event::WindowEvent> for engine::Event {
   fn from(value: winit::event::WindowEvent) -> Self {
     match value {
       WindowEvent::Resized(_) => Self::WindowResized,
+      WindowEvent::CursorMoved { device_id: _, position } => Self::CursorMoved { x: position.x as i32, y: position.y as i32 },
       _ => Self::Noop,
     }
   }

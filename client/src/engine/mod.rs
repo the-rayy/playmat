@@ -59,6 +59,7 @@ impl<T: framework::Game> Engine<T> {
         .as_ref()
         .expect("renderer not initialized")
         .resize(),
+      Event::CursorMoved { x, y } => log::info!("cursor moved: {} {}", x, y),
     }
   }
 }
