@@ -1,6 +1,10 @@
 use std::sync::Arc;
 
-use winit::{application::ApplicationHandler, event::WindowEvent, window::Window};
+use winit::{
+  application::ApplicationHandler,
+  event::{ElementState, MouseButton, WindowEvent},
+  window::Window,
+};
 
 use crate::{
   engine::{self, Engine},
@@ -57,7 +61,41 @@ impl From<winit::event::WindowEvent> for engine::Event {
   fn from(value: winit::event::WindowEvent) -> Self {
     match value {
       WindowEvent::Resized(_) => Self::WindowResized,
-      WindowEvent::CursorMoved { device_id: _, position } => Self::CursorMoved { x: position.x as i32, y: position.y as i32 },
+      WindowEvent::CursorMoved {
+        device_id: _,
+        position,
+      } => Self::CursorMoved {
+        x: position.x as i32,
+        y: position.y as i32,
+      },
+      WindowEvent::MouseInput {
+        device_id: _,
+        state: ElementState::Pressed,
+        button: MouseButton::Left,
+      } => Self::MouseButtonPressed {
+        button: engine::MouseButton::Left,
+      },
+      WindowEvent::MouseInput {
+        device_id: _,
+        state: ElementState::Pressed,
+        button: MouseButton::Right,
+      } => Self::MouseButtonPressed {
+        button: engine::MouseButton::Right,
+      },
+      WindowEvent::MouseInput {
+        device_id: _,
+        state: ElementState::Released,
+        button: MouseButton::Left,
+      } => Self::MouseButtonReleased {
+        button: engine::MouseButton::Left,
+      },
+      WindowEvent::MouseInput {
+        device_id: _,
+        state: ElementState::Released,
+        button: MouseButton::Right,
+      } => Self::MouseButtonReleased {
+        button: engine::MouseButton::Right,
+      },
       _ => Self::Noop,
     }
   }

@@ -5,6 +5,7 @@ pub mod rendering;
 use std::sync::Arc;
 
 pub use event::Event;
+pub use event::MouseButton;
 pub use platform::logger;
 pub use platform::runtime;
 pub use platform::window;
@@ -60,6 +61,8 @@ impl<T: framework::Game> Engine<T> {
         .expect("renderer not initialized")
         .resize(),
       Event::CursorMoved { x, y } => log::info!("cursor moved: {} {}", x, y),
+      Event::MouseButtonPressed { button } => log::info!("mouse button pressed: {:?}", button),
+      Event::MouseButtonReleased { button } => log::info!("mouse button released: {:?}", button),
     }
   }
 }
