@@ -1,5 +1,6 @@
 mod event;
 mod platform;
+mod input;
 pub mod rendering;
 
 use std::sync::Arc;
@@ -18,6 +19,7 @@ pub struct Engine<T: framework::Game> {
   context: framework::Context,
 
   renderer: Option<rendering::Renderer>,
+  input: input::Input,
   frame_no: u64,
 }
 
@@ -31,6 +33,7 @@ impl<T: framework::Game> Engine<T> {
       context: framework::Context::default(),
       renderer: None,
       frame_no: 0,
+      input: input::Input::default(),
     }
   }
 
@@ -52,7 +55,7 @@ impl<T: framework::Game> Engine<T> {
     self.frame_no += 1;
   }
 
-  pub fn handle(&self, ev: Event) {
+  pub fn handle(&mut self, ev: Event) {
     match ev {
       Event::Noop => (),
       Event::WindowResized => self
@@ -60,7 +63,7 @@ impl<T: framework::Game> Engine<T> {
         .as_ref()
         .expect("renderer not initialized")
         .resize(),
-      Event::CursorMoved { x, y } => log::info!("cursor moved: {} {}", x, y),
+      Event::CursorMoved { x, y } => self.input.set_cursor_pos(x, y),
       Event::MouseButtonPressed { button } => log::info!("mouse button pressed: {:?}", button),
       Event::MouseButtonReleased { button } => log::info!("mouse button released: {:?}", button),
     }
