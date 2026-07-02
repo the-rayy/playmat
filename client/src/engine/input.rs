@@ -32,8 +32,8 @@ impl Input {
   pub fn end_of_frame(&mut self) {
     for state in self.mouse_buttons.values_mut() {
       match state {
-        ButtonState::Pressed => *state = ButtonState::Held,
-        ButtonState::Released => *state = ButtonState::NotHeld,
+        ButtonState::Pressed => *state = ButtonState::Down,
+        ButtonState::Released => *state = ButtonState::Up,
         _ => (),
       }
     }
@@ -54,8 +54,8 @@ pub enum MouseButton {
 
 #[derive(Debug, Eq, PartialEq)]
 pub enum ButtonState {
-  NotHeld,
+  Up,
   Pressed,
-  Held,
+  Down,
   Released,
 }
