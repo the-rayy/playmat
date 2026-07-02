@@ -6,7 +6,7 @@ pub mod rendering;
 use std::sync::Arc;
 
 pub use event::Event;
-pub use event::MouseButton;
+pub use input::MouseButton;
 pub use platform::logger;
 pub use platform::runtime;
 pub use platform::window;
@@ -44,6 +44,8 @@ impl<T: framework::Game> Engine<T> {
   pub fn update(&mut self) {
     self.context.gui.draw_list.clear();
     self.game.update(&mut self.context);
+
+    self.input.end_of_frame();
   }
 
   pub fn render(&mut self) {
@@ -53,6 +55,7 @@ impl<T: framework::Game> Engine<T> {
       .expect("renderer not initialized")
       .render(&self.context.gui.draw_list, self.frame_no);
     self.frame_no += 1;
+    log::info!("{:?}", self.input);
   }
 
   pub fn handle(&mut self, ev: Event) {
@@ -64,8 +67,8 @@ impl<T: framework::Game> Engine<T> {
         .expect("renderer not initialized")
         .resize(),
       Event::CursorMoved { x, y } => self.input.set_cursor_pos(x, y),
-      Event::MouseButtonPressed { button } => log::info!("mouse button pressed: {:?}", button),
-      Event::MouseButtonReleased { button } => log::info!("mouse button released: {:?}", button),
+      Event::MouseButtonPressed { button } => self.input.set_mouse_button(button),
+      Event::MouseButtonReleased { button } => self.input.reset_mouse_button(button),
     }
   }
 }
