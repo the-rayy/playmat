@@ -40,4 +40,8 @@ impl Rect {
       y: self.y + self.h,
     }
   }
+
+  pub fn contains(&self, p: &Point) -> bool {
+    self.x < p.x && p.x < self.x + self.w && self.y < p.y && p.y < self.y + self.h
+  }
 }

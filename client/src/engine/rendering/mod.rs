@@ -125,4 +125,8 @@ impl Renderer {
     };
     self.surface.configure(&self.device, &surface_config);
   }
+
+  pub fn get_screen_size(&self) -> (u32, u32) {
+    (self.window.inner_size().width, self.window.inner_size().height)
+  }
 }

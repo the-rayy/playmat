@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use crate::math::Point;
+
 #[derive(Default, Debug)]
 pub struct Input {
   cursor_pos: CursorPos,
@@ -11,6 +13,14 @@ impl Input {
   pub const fn set_cursor_pos(&mut self, x: i32, y: i32) {
     self.cursor_pos.x = x;
     self.cursor_pos.y = y;
+  }
+
+  pub fn get_cursor_pos(&self) -> &CursorPos {
+    &self.cursor_pos
+  }
+
+  pub fn get_mouse_button(&self, button: MouseButton) -> &ButtonState {
+    self.mouse_buttons.get(&button).unwrap_or(&ButtonState::Up)
   }
 
   pub fn set_mouse_button(&mut self, button: MouseButton) {
@@ -44,6 +54,15 @@ impl Input {
 pub struct CursorPos {
   pub x: i32,
   pub y: i32,
+}
+
+impl CursorPos {
+  pub fn into_screen_space(&self, w: u32, h: u32) -> Point {
+    Point {
+      x: 2_f32 * self.x as f32 / w as f32 - 1_f32,
+      y: 2_f32 * self.y as f32 / h as f32 - 1_f32,
+    }
+  }
 }
 
 #[derive(Debug, Eq, PartialEq, Hash)]

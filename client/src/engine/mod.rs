@@ -6,7 +6,10 @@ pub mod rendering;
 use std::sync::Arc;
 
 pub use event::Event;
+pub use input::CursorPos;
 pub use input::MouseButton;
+pub use input::Input;
+pub use input::ButtonState;
 pub use platform::logger;
 pub use platform::runtime;
 pub use platform::window;
@@ -38,10 +41,19 @@ impl<T: framework::Game> Engine<T> {
   }
 
   pub fn init_rendering(&mut self, window: Arc<Window>) {
-    self.renderer = Some(platform::runtime::get().block_on(rendering::Renderer::new(window)));
+    let renderer = platform::runtime::get().block_on(rendering::Renderer::new(window));
+    let (w, h) = renderer.get_screen_size();
+
+    self.context.gui.set_screen_dims(w, h);
+    self.renderer = Some(renderer);
   }
 
   pub fn update(&mut self) {
+    self
+      .context
+      .gui
+      .handle_input(&self.input);
+
     self.game.update(&mut self.context);
 
     self.input.end_of_frame();
@@ -60,11 +72,19 @@ impl<T: framework::Game> Engine<T> {
   pub fn handle(&mut self, ev: Event) {
     match ev {
       Event::Noop => (),
-      Event::WindowResized => self
-        .renderer
-        .as_ref()
-        .expect("renderer not initialized")
-        .resize(),
+      Event::WindowResized => {
+        self
+          .renderer
+          .as_ref()
+          .expect("renderer not initialized")
+          .resize();
+        let (w, h) = self
+          .renderer
+          .as_ref()
+          .expect("renderer not initialized")
+          .get_screen_size();
+        self.context.gui.set_screen_dims(w, h);
+      }
       Event::CursorMoved { x, y } => self.input.set_cursor_pos(x, y),
       Event::MouseButtonPressed { button } => self.input.set_mouse_button(button),
       Event::MouseButtonReleased { button } => self.input.reset_mouse_button(button),

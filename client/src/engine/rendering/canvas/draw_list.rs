@@ -7,17 +7,12 @@ pub struct DrawList {
 }
 
 impl DrawList {
-  pub fn clear(&mut self) {
-    self.vertices.clear();
-    self.indices.clear();
-  }
 
   pub const fn is_empty(&self) -> bool {
     self.indices.is_empty()
   }
 
-  pub fn push_rect(&mut self, rect: &Rect) {
-    let color = [0.2, 0.2, 0.6, 1.0];
+  pub fn push_rect(&mut self, rect: &Rect, color: [f32; 4]) {
     let base = self.vertices.len() as u16;
 
     self.vertices.extend_from_slice(&[
