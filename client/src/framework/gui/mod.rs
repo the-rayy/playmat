@@ -41,7 +41,7 @@ impl Context {
       let hover = b.rect.contains(
         &input
           .get_cursor_pos()
-          .into_screen_space(self.screen_width, self.screen_height),
+          .in_screen_space(self.screen_width, self.screen_height),
       );
 
       b.state = if hover

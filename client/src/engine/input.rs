@@ -57,7 +57,7 @@ pub struct CursorPos {
 }
 
 impl CursorPos {
-  pub fn into_screen_space(&self, w: u32, h: u32) -> Point {
+  pub fn in_screen_space(&self, w: u32, h: u32) -> Point {
     Point {
       x: 2_f32 * self.x as f32 / w as f32 - 1_f32,
       y: 2_f32 * self.y as f32 / h as f32 - 1_f32,
