@@ -42,7 +42,6 @@ impl<T: framework::Game> Engine<T> {
   }
 
   pub fn update(&mut self) {
-    self.context.gui.draw_list.clear();
     self.game.update(&mut self.context);
 
     self.input.end_of_frame();
@@ -53,7 +52,7 @@ impl<T: framework::Game> Engine<T> {
       .renderer
       .as_ref()
       .expect("renderer not initialized")
-      .render(&self.context.gui.draw_list, self.frame_no);
+      .render(&self.context.gui.get_draw_list(), self.frame_no);
     self.frame_no += 1;
     log::info!("{:?}", self.input);
   }
