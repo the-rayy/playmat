@@ -18,7 +18,10 @@ impl Context {
 
   pub fn get_draw_list(&self) -> DrawList {
     let mut draw_list = DrawList::default();
-    self.buttons.values().for_each(|b| draw_list.push_rect(&b.rect));
+    self
+      .buttons
+      .values()
+      .for_each(|b| draw_list.push_rect(&b.rect));
     draw_list
   }
 }
