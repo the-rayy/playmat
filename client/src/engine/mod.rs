@@ -6,10 +6,9 @@ pub mod rendering;
 use std::sync::Arc;
 
 pub use event::Event;
-pub use input::CursorPos;
-pub use input::MouseButton;
-pub use input::Input;
 pub use input::ButtonState;
+pub use input::Input;
+pub use input::MouseButton;
 pub use platform::logger;
 pub use platform::runtime;
 pub use platform::window;
@@ -49,10 +48,7 @@ impl<T: framework::Game> Engine<T> {
   }
 
   pub fn update(&mut self) {
-    self
-      .context
-      .gui
-      .handle_input(&self.input);
+    self.context.gui.handle_input(&self.input);
 
     self.game.update(&mut self.context);
 

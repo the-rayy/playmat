@@ -7,7 +7,6 @@ pub struct DrawList {
 }
 
 impl DrawList {
-
   pub const fn is_empty(&self) -> bool {
     self.indices.is_empty()
   }

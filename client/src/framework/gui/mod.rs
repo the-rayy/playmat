@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 pub use button::Button;
 
-use crate::engine::{ButtonState, CursorPos, Input, rendering::canvas::draw_list::DrawList};
+use crate::engine::{ButtonState, Input, rendering::canvas::draw_list::DrawList};
 
 #[derive(Default)]
 pub struct Context {
@@ -14,7 +14,7 @@ pub struct Context {
 }
 
 impl Context {
-  pub fn set_screen_dims(&mut self, w: u32, h: u32) {
+  pub const fn set_screen_dims(&mut self, w: u32, h: u32) {
     self.screen_width = w;
     self.screen_height = h;
   }

@@ -8,14 +8,17 @@ pub struct Button {
 
 impl Button {
   pub const fn new(rect: Rect) -> Self {
-    Self { rect, state: State::Neutral }
+    Self {
+      rect,
+      state: State::Neutral,
+    }
   }
 
-  pub fn color(&self) -> [f32; 4] {
+  pub const fn color(&self) -> [f32; 4] {
     match self.state {
-        State::Neutral => [1.0, 0.0, 0.0, 1.0],
-        State::Hovered => [0.0, 1.0, 0.0, 1.0],
-        State::Down => [0.0, 0.0, 1.0, 1.0],
+      State::Neutral => [1.0, 0.0, 0.0, 1.0],
+      State::Hovered => [0.0, 1.0, 0.0, 1.0],
+      State::Down => [0.0, 0.0, 1.0, 1.0],
     }
   }
 }

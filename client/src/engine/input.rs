@@ -15,7 +15,7 @@ impl Input {
     self.cursor_pos.y = y;
   }
 
-  pub fn get_cursor_pos(&self) -> &CursorPos {
+  pub const fn get_cursor_pos(&self) -> &CursorPos {
     &self.cursor_pos
   }
 
