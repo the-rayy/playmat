@@ -41,6 +41,10 @@ impl Context {
     self.buttons.insert(id, button);
   }
 
+  pub fn get_mut_button(&mut self, id: &String) -> &mut Button {
+    self.buttons.get_mut(id).unwrap()
+  }
+
   pub fn get_draw_list(&self) -> DrawList {
     let mut draw_list = DrawList::default();
     self

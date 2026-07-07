@@ -15,7 +15,10 @@ impl framework::Game for Game {
     if self.initialized {
       for ev in ctx.events() {
         match ev {
-          Event::Gui(gui::Event::ButtonClicked { id }) => log::info!("button {} clicked", id),
+          Event::Gui(gui::Event::ButtonClicked { id }) => {
+            let btn = ctx.gui.get_mut_button(&id);
+            btn.color = crate::math::Color::new(0.3, 0.8, 0.3, 1.0);
+          },
         }
       }
 
