@@ -29,104 +29,104 @@ impl Mesh {
     let vertices = vec![
       // front  (z+)  red
       Vertex {
-        position: [-0.5, -0.5, 0.5],
+        position: [-0.1, -0.1, 0.1],
         color: [0.9, 0.2, 0.2],
       },
       Vertex {
-        position: [0.5, -0.5, 0.5],
+        position: [0.1, -0.1, 0.1],
         color: [0.9, 0.2, 0.2],
       },
       Vertex {
-        position: [0.5, 0.5, 0.5],
+        position: [0.1, 0.1, 0.1],
         color: [0.9, 0.2, 0.2],
       },
       Vertex {
-        position: [-0.5, 0.5, 0.5],
+        position: [-0.1, 0.1, 0.1],
         color: [0.9, 0.2, 0.2],
       },
       // back   (z-)  blue
       Vertex {
-        position: [0.5, -0.5, -0.5],
+        position: [0.1, -0.1, -0.1],
         color: [0.2, 0.2, 0.9],
       },
       Vertex {
-        position: [-0.5, -0.5, -0.5],
+        position: [-0.1, -0.1, -0.1],
         color: [0.2, 0.2, 0.9],
       },
       Vertex {
-        position: [-0.5, 0.5, -0.5],
+        position: [-0.1, 0.1, -0.1],
         color: [0.2, 0.2, 0.9],
       },
       Vertex {
-        position: [0.5, 0.5, -0.5],
+        position: [0.1, 0.1, -0.1],
         color: [0.2, 0.2, 0.9],
       },
       // top    (y+)  green
       Vertex {
-        position: [-0.5, 0.5, 0.5],
+        position: [-0.1, 0.1, 0.1],
         color: [0.2, 0.8, 0.3],
       },
       Vertex {
-        position: [0.5, 0.5, 0.5],
+        position: [0.1, 0.1, 0.1],
         color: [0.2, 0.8, 0.3],
       },
       Vertex {
-        position: [0.5, 0.5, -0.5],
+        position: [0.1, 0.1, -0.1],
         color: [0.2, 0.8, 0.3],
       },
       Vertex {
-        position: [-0.5, 0.5, -0.5],
+        position: [-0.1, 0.1, -0.1],
         color: [0.2, 0.8, 0.3],
       },
       // bottom (y-)  yellow
       Vertex {
-        position: [-0.5, -0.5, -0.5],
+        position: [-0.1, -0.1, -0.1],
         color: [0.9, 0.8, 0.1],
       },
       Vertex {
-        position: [0.5, -0.5, -0.5],
+        position: [0.1, -0.1, -0.1],
         color: [0.9, 0.8, 0.1],
       },
       Vertex {
-        position: [0.5, -0.5, 0.5],
+        position: [0.1, -0.1, 0.1],
         color: [0.9, 0.8, 0.1],
       },
       Vertex {
-        position: [-0.5, -0.5, 0.5],
+        position: [-0.1, -0.1, 0.1],
         color: [0.9, 0.8, 0.1],
       },
       // right  (x+)  magenta
       Vertex {
-        position: [0.5, -0.5, 0.5],
+        position: [0.1, -0.1, 0.1],
         color: [0.8, 0.2, 0.8],
       },
       Vertex {
-        position: [0.5, -0.5, -0.5],
+        position: [0.1, -0.1, -0.1],
         color: [0.8, 0.2, 0.8],
       },
       Vertex {
-        position: [0.5, 0.5, -0.5],
+        position: [0.1, 0.1, -0.1],
         color: [0.8, 0.2, 0.8],
       },
       Vertex {
-        position: [0.5, 0.5, 0.5],
+        position: [0.1, 0.1, 0.1],
         color: [0.8, 0.2, 0.8],
       },
       // left   (x-)  cyan
       Vertex {
-        position: [-0.5, -0.5, -0.5],
+        position: [-0.1, -0.1, -0.1],
         color: [0.1, 0.8, 0.8],
       },
       Vertex {
-        position: [-0.5, -0.5, 0.5],
+        position: [-0.1, -0.1, 0.1],
         color: [0.1, 0.8, 0.8],
       },
       Vertex {
-        position: [-0.5, 0.5, 0.5],
+        position: [-0.1, 0.1, 0.1],
         color: [0.1, 0.8, 0.8],
       },
       Vertex {
-        position: [-0.5, 0.5, -0.5],
+        position: [-0.1, 0.1, -0.1],
         color: [0.1, 0.8, 0.8],
       },
     ];

@@ -28,7 +28,20 @@ fn vs_main(
         instance.model_matrix_3,
     );
     out.color = model.color;
-    out.clip_position = model_matrix * vec4<f32>(model.position, 1.0);
+
+    var pos = model_matrix * vec4<f32>(model.position, 1.0);
+
+    // Debug: push the model toward the top-left corner in clip space.
+    // Clip space ranges from -1 (left/bottom) to +1 (right/top) after perspective divide,
+    // so we shift x left and y up by shrinking the model and offsetting it.
+    let corner_scale = 1.0;   // shrink so it fits in the corner
+    let corner_offset = vec2<f32>(-0.8, 0.8); // top-left corner in NDC
+
+    pos.x = pos.x * corner_scale + corner_offset.x * pos.w;
+    pos.y = pos.y * corner_scale + corner_offset.y * pos.w;
+    pos.z = pos.z + 0.5;
+
+    out.clip_position = pos;
     return out;
 }
 
