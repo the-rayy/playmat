@@ -1,4 +1,4 @@
-use crate::framework;
+use crate::framework::{self, Event, gui};
 
 pub struct Game {
   initialized: bool,
@@ -14,7 +14,9 @@ impl framework::Game for Game {
   fn update(&mut self, ctx: &mut framework::Context) {
     if self.initialized {
       for ev in ctx.events() {
-        log::info!("received event: {ev:?}");
+        match ev {
+          Event::Gui(gui::Event::ButtonClicked { id }) => log::info!("button {} clicked", id),
+        }
       }
 
       return;

@@ -16,7 +16,6 @@ pub enum Event {
 pub struct Context {
   pub gui: gui::Context,
 
-  tx: mpsc::Sender<Event>,
   rx: mpsc::Receiver<Event>,
 }
 
@@ -24,8 +23,7 @@ impl Context {
   pub fn new() -> Self {
     let (tx, rx) = mpsc::channel::<Event>();
     Self {
-      gui: gui::Context::new(tx.clone()),
-      tx,
+      gui: gui::Context::new(tx),
       rx,
     }
   }
