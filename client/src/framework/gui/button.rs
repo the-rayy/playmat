@@ -8,10 +8,10 @@ pub struct Button {
 }
 
 impl Button {
-  pub fn new(rect: Rect) -> Self {
+  pub fn new(rect: Rect, color: Color) -> Self {
     Self {
       rect,
-      color: Color::new(0.5, 0.0, 0.0, 1.0),
+      color,
       state: State::Neutral,
     }
   }

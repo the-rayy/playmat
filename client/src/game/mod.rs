@@ -22,8 +22,35 @@ impl framework::Game for Game {
       return;
     }
 
-    let debug_button = framework::gui::Button::new(crate::math::Rect::new(-0.5, -0.5, 0.1, 0.1));
-    ctx.gui.add_button(String::from("debug"), debug_button);
+    let btn = framework::gui::Button::new(crate::math::Rect::new(-0.1, -0.1, 0.2, 0.2), crate::math::Color::new(0.5, 0.5, 0.5, 1.0));
+    ctx.gui.add_button(String::from("cc"), btn);
+
+    let btn = framework::gui::Button::new(crate::math::Rect::new(-0.1, 0.15, 0.2, 0.2), crate::math::Color::new(0.5, 0.5, 0.5, 1.0));
+    ctx.gui.add_button(String::from("tc"), btn);
+
+    let btn = framework::gui::Button::new(crate::math::Rect::new(-0.1, -0.35, 0.2, 0.2), crate::math::Color::new(0.5, 0.5, 0.5, 1.0));
+    ctx.gui.add_button(String::from("bc"), btn);
+
+
+    let btn = framework::gui::Button::new(crate::math::Rect::new(0.15, -0.1, 0.2, 0.2), crate::math::Color::new(0.5, 0.5, 0.5, 1.0));
+    ctx.gui.add_button(String::from("cr"), btn);
+
+    let btn = framework::gui::Button::new(crate::math::Rect::new(0.15, 0.15, 0.2, 0.2), crate::math::Color::new(0.5, 0.5, 0.5, 1.0));
+    ctx.gui.add_button(String::from("tr"), btn);
+
+    let btn = framework::gui::Button::new(crate::math::Rect::new(0.15, -0.35, 0.2, 0.2), crate::math::Color::new(0.5, 0.5, 0.5, 1.0));
+    ctx.gui.add_button(String::from("br"), btn);
+
+
+    let btn = framework::gui::Button::new(crate::math::Rect::new(-0.35, -0.1, 0.2, 0.2), crate::math::Color::new(0.5, 0.5, 0.5, 1.0));
+    ctx.gui.add_button(String::from("cl"), btn);
+
+    let btn = framework::gui::Button::new(crate::math::Rect::new(-0.35, 0.15, 0.2, 0.2), crate::math::Color::new(0.5, 0.5, 0.5, 1.0));
+    ctx.gui.add_button(String::from("tl"), btn);
+
+    let btn = framework::gui::Button::new(crate::math::Rect::new(-0.35, -0.35, 0.2, 0.2), crate::math::Color::new(0.5, 0.5, 0.5, 1.0));
+    ctx.gui.add_button(String::from("bl"), btn);
+
     self.initialized = true;
   }
 }
