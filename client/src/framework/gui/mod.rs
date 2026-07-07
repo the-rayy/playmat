@@ -1,19 +1,37 @@
 mod button;
 
-use std::collections::HashMap;
+use std::{collections::HashMap, sync::mpsc};
 
 pub use button::Button;
 
-use crate::engine::{ButtonState, Input, rendering::canvas::draw_list::DrawList};
+use crate::{
+  engine::{ButtonState, Input, rendering::canvas::draw_list::DrawList},
+  framework,
+};
 
-#[derive(Default)]
+#[derive(Debug)]
+pub enum Event {
+  ButtonClicked { id: String },
+}
+
 pub struct Context {
   screen_width: u32,
   screen_height: u32,
   buttons: HashMap<String, Button>,
+
+  tx: mpsc::Sender<framework::Event>,
 }
 
 impl Context {
+  pub fn new(tx: mpsc::Sender<framework::Event>) -> Self {
+    Self {
+      screen_width: 0,
+      screen_height: 0,
+      buttons: HashMap::default(),
+      tx,
+    }
+  }
+
   pub const fn set_screen_dims(&mut self, w: u32, h: u32) {
     self.screen_width = w;
     self.screen_height = h;
@@ -37,7 +55,7 @@ impl Context {
       return;
     }
 
-    self.buttons.values_mut().for_each(|b| {
+    self.buttons.iter_mut().for_each(|(id, b)| {
       let hover = b.rect.contains(
         &input
           .get_cursor_pos()
@@ -45,8 +63,14 @@ impl Context {
       );
 
       b.state = if hover
-        && input.get_mouse_button(crate::engine::MouseButton::Left) == &ButtonState::Down
+        && input.get_mouse_button(crate::engine::MouseButton::Left) == &ButtonState::Pressed
       {
+        let res = self.tx.send(framework::Event::Gui(Event::ButtonClicked {
+          id: id.clone(),
+        }));
+        log::info!("{:?}", res); //FIXME without logging res, send gets optimized away by compiler
+        //on wasm. weird
+
         button::State::Down
       } else if hover {
         button::State::Hovered
@@ -54,7 +78,5 @@ impl Context {
         button::State::Neutral
       };
     });
-
-    log::info!("{:?}", &self.buttons);
   }
 }

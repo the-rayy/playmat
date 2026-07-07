@@ -32,7 +32,7 @@ impl<T: framework::Game> Engine<T> {
 
     Self {
       game,
-      context: framework::Context::default(),
+      context: framework::Context::new(),
       renderer: None,
       frame_no: 0,
       input: input::Input::default(),
@@ -48,7 +48,7 @@ impl<T: framework::Game> Engine<T> {
   }
 
   pub fn update(&mut self) {
-    self.context.gui.handle_input(&self.input);
+    self.context.handle_input(&self.input);
 
     self.game.update(&mut self.context);
 
@@ -62,7 +62,6 @@ impl<T: framework::Game> Engine<T> {
       .expect("renderer not initialized")
       .render(&self.context.gui.get_draw_list(), self.frame_no);
     self.frame_no += 1;
-    log::info!("{:?}", self.input);
   }
 
   pub fn handle(&mut self, ev: Event) {

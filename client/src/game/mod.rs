@@ -13,6 +13,10 @@ impl Game {
 impl framework::Game for Game {
   fn update(&mut self, ctx: &mut framework::Context) {
     if self.initialized {
+      for ev in ctx.events() {
+        log::info!("received event: {ev:?}");
+      }
+
       return;
     }
 
