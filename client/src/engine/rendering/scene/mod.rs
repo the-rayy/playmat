@@ -76,7 +76,7 @@ impl Renderer {
         view: texture_view,
         resolve_target: None,
         ops: wgpu::Operations {
-          load: wgpu::LoadOp::Clear(wgpu::Color::BLUE),
+          load: wgpu::LoadOp::Clear(wgpu::Color{r: 0.03, g: 0.03, b: 0.03, a: 1.0}),
           store: wgpu::StoreOp::Store,
         },
         depth_slice: None,
