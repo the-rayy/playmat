@@ -18,6 +18,14 @@ impl Color {
   }
 }
 
+impl std::ops::Add<Color> for Color {
+    type Output = Color;
+
+    fn add(self, rhs: Color) -> Self::Output {
+        Color::new(self.r + rhs.r, self.g + rhs.g, self.b + rhs.b, self.a + rhs.a)
+    }
+}
+
 fn clamp01(x: f32) -> f32 {
   clamp(0.0, x, 1.0)
 }
