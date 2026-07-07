@@ -8,5 +8,11 @@ build:
 run_web: build_web
   python3 -m http.server 8080
 
+start_web: build_web
+  python3 -m http.server 8080 > /dev/null 2>&1 &
+
+stop_web:
+  lsof -ti:8080 | xargs kill
+
 build_web:
   wasm-pack build --target web
