@@ -1,4 +1,4 @@
-use crate::math::Rect;
+use crate::math::{Color, Rect};
 
 #[derive(Debug)]
 pub struct Button {
@@ -14,11 +14,11 @@ impl Button {
     }
   }
 
-  pub const fn color(&self) -> [f32; 4] {
+  pub fn color(&self) -> Color {
     match self.state {
-      State::Neutral => [1.0, 0.0, 0.0, 1.0],
-      State::Hovered => [0.0, 1.0, 0.0, 1.0],
-      State::Down => [0.0, 0.0, 1.0, 1.0],
+      State::Neutral => Color::new(1.0, 0.0, 0.0, 1.0),
+      State::Hovered => Color::new(0.0, 1.0, 0.0, 1.0),
+      State::Down => Color::new(0.0, 0.0, 1.0, 1.0),
     }
   }
 }

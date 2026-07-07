@@ -1,10 +1,10 @@
-use crate::math::Point;
+use crate::math::{Color, Point};
 
 #[repr(C)]
 #[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]
 pub struct Vertex {
   pub position: Point,
-  pub color: [f32; 4],
+  pub color: Color,
 }
 
 impl Vertex {

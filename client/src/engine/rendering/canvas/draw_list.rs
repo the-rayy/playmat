@@ -1,4 +1,4 @@
-use crate::{engine::rendering::canvas::vertex::Vertex, math::Rect};
+use crate::{engine::rendering::canvas::vertex::Vertex, math::{Color, Rect}};
 
 #[derive(Default)]
 pub struct DrawList {
@@ -11,7 +11,7 @@ impl DrawList {
     self.indices.is_empty()
   }
 
-  pub fn push_rect(&mut self, rect: &Rect, color: [f32; 4]) {
+  pub fn push_rect(&mut self, rect: &Rect, color: Color) {
     let base = self.vertices.len() as u16;
 
     self.vertices.extend_from_slice(&[
