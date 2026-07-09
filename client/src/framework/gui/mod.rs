@@ -42,7 +42,10 @@ impl Context {
   }
 
   pub fn get_mut_button(&mut self, id: &String) -> &mut Button {
-    self.buttons.get_mut(id).unwrap()
+    self
+      .buttons
+      .get_mut(id)
+      .expect("trying to get nonexistent button")
   }
 
   pub fn get_draw_list(&self) -> DrawList {

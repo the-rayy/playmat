@@ -14,16 +14,48 @@ const CELL_POSITIONS: [CellPosition; 9] = [
 
 const WIN_LINES: [[CellPosition; 3]; 8] = [
   // Rows
-  [CellPosition::TopLeft, CellPosition::TopMiddle, CellPosition::TopRight],
-  [CellPosition::CenterLeft, CellPosition::CenterMiddle, CellPosition::CenterRight],
-  [CellPosition::BottomLeft, CellPosition::BottomMiddle, CellPosition::BottomRight],
+  [
+    CellPosition::TopLeft,
+    CellPosition::TopMiddle,
+    CellPosition::TopRight,
+  ],
+  [
+    CellPosition::CenterLeft,
+    CellPosition::CenterMiddle,
+    CellPosition::CenterRight,
+  ],
+  [
+    CellPosition::BottomLeft,
+    CellPosition::BottomMiddle,
+    CellPosition::BottomRight,
+  ],
   // Columns
-  [CellPosition::TopLeft, CellPosition::CenterLeft, CellPosition::BottomLeft],
-  [CellPosition::TopMiddle, CellPosition::CenterMiddle, CellPosition::BottomMiddle],
-  [CellPosition::TopRight, CellPosition::CenterRight, CellPosition::BottomRight],
+  [
+    CellPosition::TopLeft,
+    CellPosition::CenterLeft,
+    CellPosition::BottomLeft,
+  ],
+  [
+    CellPosition::TopMiddle,
+    CellPosition::CenterMiddle,
+    CellPosition::BottomMiddle,
+  ],
+  [
+    CellPosition::TopRight,
+    CellPosition::CenterRight,
+    CellPosition::BottomRight,
+  ],
   // Diagonals
-  [CellPosition::TopLeft, CellPosition::CenterMiddle, CellPosition::BottomRight],
-  [CellPosition::TopRight, CellPosition::CenterMiddle, CellPosition::BottomLeft],
+  [
+    CellPosition::TopLeft,
+    CellPosition::CenterMiddle,
+    CellPosition::BottomRight,
+  ],
+  [
+    CellPosition::TopRight,
+    CellPosition::CenterMiddle,
+    CellPosition::BottomLeft,
+  ],
 ];
 
 fn grey() -> crate::math::Color {
@@ -159,32 +191,32 @@ enum CellPosition {
 
 impl CellPosition {
   /// Short id used both as the grid `Cell::id` and the gui button id.
-  fn id(self) -> &'static str {
+  const fn id(self) -> &'static str {
     match self {
-      CellPosition::TopLeft => "tl",
-      CellPosition::TopMiddle => "tm",
-      CellPosition::TopRight => "tr",
-      CellPosition::CenterLeft => "cl",
-      CellPosition::CenterMiddle => "cm",
-      CellPosition::CenterRight => "cr",
-      CellPosition::BottomLeft => "bl",
-      CellPosition::BottomMiddle => "bm",
-      CellPosition::BottomRight => "br",
+      Self::TopLeft => "tl",
+      Self::TopMiddle => "tm",
+      Self::TopRight => "tr",
+      Self::CenterLeft => "cl",
+      Self::CenterMiddle => "cm",
+      Self::CenterRight => "cr",
+      Self::BottomLeft => "bl",
+      Self::BottomMiddle => "bm",
+      Self::BottomRight => "br",
     }
   }
 
   /// Screen rect for this cell's button.
-  fn rect(self) -> crate::math::Rect {
+  const fn rect(self) -> crate::math::Rect {
     let (x, y) = match self {
-      CellPosition::TopLeft => (-0.35, 0.15),
-      CellPosition::TopMiddle => (-0.1, 0.15),
-      CellPosition::TopRight => (0.15, 0.15),
-      CellPosition::CenterLeft => (-0.35, -0.1),
-      CellPosition::CenterMiddle => (-0.1, -0.1),
-      CellPosition::CenterRight => (0.15, -0.1),
-      CellPosition::BottomLeft => (-0.35, -0.35),
-      CellPosition::BottomMiddle => (-0.1, -0.35),
-      CellPosition::BottomRight => (0.15, -0.35),
+      Self::TopLeft => (-0.35, 0.15),
+      Self::TopMiddle => (-0.1, 0.15),
+      Self::TopRight => (0.15, 0.15),
+      Self::CenterLeft => (-0.35, -0.1),
+      Self::CenterMiddle => (-0.1, -0.1),
+      Self::CenterRight => (0.15, -0.1),
+      Self::BottomLeft => (-0.35, -0.35),
+      Self::BottomMiddle => (-0.1, -0.35),
+      Self::BottomRight => (0.15, -0.35),
     };
     crate::math::Rect::new(x, y, 0.2, 0.2)
   }
@@ -200,16 +232,20 @@ enum CellState {
 impl CellState {
   fn color(self) -> crate::math::Color {
     match self {
-      CellState::Open => grey(),
-      CellState::Player1 => green(),
-      CellState::Player2 => red(),
+      Self::Open => grey(),
+      Self::Player1 => green(),
+      Self::Player2 => red(),
     }
   }
 }
 
 fn check_winner(grid: &[Cell]) -> Option<CellState> {
   let get = |pos: CellPosition| -> CellState {
-    grid.iter().find(|c| c.pos == pos).unwrap().state
+    grid
+      .iter()
+      .find(|c| c.pos == pos)
+      .expect("no more empty cells")
+      .state
   };
 
   WIN_LINES.iter().find_map(|line| {
