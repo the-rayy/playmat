@@ -11,19 +11,24 @@ impl Color {
   pub fn new(r: f32, g: f32, b: f32, a: f32) -> Self {
     Self {
       r: clamp01(r),
-      g: clamp01(g), 
-      b: clamp01(b), 
-      a: clamp01(a)
+      g: clamp01(g),
+      b: clamp01(b),
+      a: clamp01(a),
     }
   }
 }
 
-impl std::ops::Add<Color> for Color {
-    type Output = Color;
+impl std::ops::Add<Self> for Color {
+  type Output = Self;
 
-    fn add(self, rhs: Color) -> Self::Output {
-        Color::new(self.r + rhs.r, self.g + rhs.g, self.b + rhs.b, self.a + rhs.a)
-    }
+  fn add(self, rhs: Self) -> Self::Output {
+    Self::new(
+      self.r + rhs.r,
+      self.g + rhs.g,
+      self.b + rhs.b,
+      self.a + rhs.a,
+    )
+  }
 }
 
 fn clamp01(x: f32) -> f32 {
@@ -31,5 +36,11 @@ fn clamp01(x: f32) -> f32 {
 }
 
 fn clamp(min: f32, x: f32, max: f32) -> f32 {
-  if x < min { min } else if x > max { max } else { x }
+  if x < min {
+    min
+  } else if x > max {
+    max
+  } else {
+    x
+  }
 }

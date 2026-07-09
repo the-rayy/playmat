@@ -1,7 +1,7 @@
+mod color;
 mod point;
 mod rect;
-mod color;
 
+pub use color::Color;
 pub use point::Point;
 pub use rect::Rect;
-pub use color::Color;

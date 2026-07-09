@@ -1,4 +1,7 @@
-use crate::{engine::rendering::canvas::vertex::Vertex, math::{Color, Rect}};
+use crate::{
+  engine::rendering::canvas::vertex::Vertex,
+  math::{Color, Rect},
+};
 
 #[derive(Default)]
 pub struct DrawList {

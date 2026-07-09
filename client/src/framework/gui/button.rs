@@ -8,7 +8,7 @@ pub struct Button {
 }
 
 impl Button {
-  pub fn new(rect: Rect, color: Color) -> Self {
+  pub const fn new(rect: Rect, color: Color) -> Self {
     Self {
       rect,
       color,
@@ -18,9 +18,9 @@ impl Button {
 
   pub fn color(&self) -> Color {
     match self.state {
-      State::Neutral => self.color.clone(),
-      State::Hovered => self.color.clone() + Color::new(0.01, 0.01, 0.01, 0.0),
-      State::Down => self.color.clone() + Color::new(0.05, 0.05, 0.05, 0.0),
+      State::Neutral => self.color,
+      State::Hovered => self.color + Color::new(0.01, 0.01, 0.01, 0.0),
+      State::Down => self.color + Color::new(0.05, 0.05, 0.05, 0.0),
     }
   }
 }
