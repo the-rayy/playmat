@@ -1,186 +1,140 @@
-
 use crate::framework::{self, Event, gui};
+
+const CELL_POSITIONS: [CellPosition; 9] = [
+  CellPosition::TopLeft,
+  CellPosition::TopMiddle,
+  CellPosition::TopRight,
+  CellPosition::CenterLeft,
+  CellPosition::CenterMiddle,
+  CellPosition::CenterRight,
+  CellPosition::BottomLeft,
+  CellPosition::BottomMiddle,
+  CellPosition::BottomRight,
+];
+
+const WIN_LINES: [[CellPosition; 3]; 8] = [
+  // Rows
+  [CellPosition::TopLeft, CellPosition::TopMiddle, CellPosition::TopRight],
+  [CellPosition::CenterLeft, CellPosition::CenterMiddle, CellPosition::CenterRight],
+  [CellPosition::BottomLeft, CellPosition::BottomMiddle, CellPosition::BottomRight],
+  // Columns
+  [CellPosition::TopLeft, CellPosition::CenterLeft, CellPosition::BottomLeft],
+  [CellPosition::TopMiddle, CellPosition::CenterMiddle, CellPosition::BottomMiddle],
+  [CellPosition::TopRight, CellPosition::CenterRight, CellPosition::BottomRight],
+  // Diagonals
+  [CellPosition::TopLeft, CellPosition::CenterMiddle, CellPosition::BottomRight],
+  [CellPosition::TopRight, CellPosition::CenterMiddle, CellPosition::BottomLeft],
+];
+
+fn grey() -> crate::math::Color {
+  crate::math::Color::new(0.5, 0.5, 0.5, 1.0)
+}
+fn green() -> crate::math::Color {
+  crate::math::Color::new(0.3, 0.8, 0.3, 1.0)
+}
+fn red() -> crate::math::Color {
+  crate::math::Color::new(0.8, 0.3, 0.3, 1.0)
+}
+
+fn winner_button_id() -> String {
+  String::from("winner")
+}
 
 pub struct Game {
   initialized: bool,
-
   grid: Vec<Cell>,
 }
 
 impl Game {
   pub fn new() -> Self {
-    let grid = vec![
-      Cell {
-        id: "tl".to_string(),
-        pos: CellPosition::TopLeft,
+    let grid = CELL_POSITIONS
+      .iter()
+      .map(|&pos| Cell {
+        id: pos.id().to_string(),
+        pos,
         state: CellState::Open,
-      },
-      Cell {
-        id: "tm".to_string(),
-        pos: CellPosition::TopMiddle,
-        state: CellState::Open,
-      },
-      Cell {
-        id: "tr".to_string(),
-        pos: CellPosition::TopRight,
-        state: CellState::Open,
-      },
-      Cell {
-        id: "cl".to_string(),
-        pos: CellPosition::CenterLeft,
-        state: CellState::Open,
-      },
-      Cell {
-        id: "cm".to_string(),
-        pos: CellPosition::CenterMiddle,
-        state: CellState::Open,
-      },
-      Cell {
-        id: "cr".to_string(),
-        pos: CellPosition::CenterRight,
-        state: CellState::Open,
-      },
-      Cell {
-        id: "bl".to_string(),
-        pos: CellPosition::BottomLeft,
-        state: CellState::Open,
-      },
-      Cell {
-        id: "bm".to_string(),
-        pos: CellPosition::BottomMiddle,
-        state: CellState::Open,
-      },
-      Cell {
-        id: "br".to_string(),
-        pos: CellPosition::BottomRight,
-        state: CellState::Open,
-      },
-    ];
+      })
+      .collect();
+
     Self {
       initialized: false,
       grid,
     }
   }
+
+  fn set_cell_state(&mut self, id: &String, state: CellState) {
+    self
+      .grid
+      .iter_mut()
+      .find(|c| &c.id == id)
+      .expect("unknown cell id")
+      .state = state;
+  }
+
+  fn first_open_cell_id(&self) -> Option<String> {
+    self
+      .grid
+      .iter()
+      .find(|c| c.state == CellState::Open)
+      .map(|c| c.id.clone())
+  }
+
+  fn play_move(&mut self, ctx: &mut framework::Context, id: &String, state: CellState) {
+    self.set_cell_state(id, state);
+    ctx.gui.get_mut_button(id).color = state.color();
+
+    if let Some(winner) = check_winner(&self.grid) {
+      ctx.gui.get_mut_button(&winner_button_id()).color = winner.color();
+    }
+  }
+
+  fn is_game_over(&self) -> bool {
+    check_winner(&self.grid).is_some()
+  }
+
+  fn handle_click(&mut self, ctx: &mut framework::Context, id: &String) {
+    if self.is_game_over() {
+      return;
+    }
+
+    self.play_move(ctx, id, CellState::Player1);
+
+    if self.is_game_over() {
+      return;
+    }
+
+    if let Some(open_id) = self.first_open_cell_id() {
+      self.play_move(ctx, &open_id, CellState::Player2);
+    }
+  }
+
+  fn setup_ui(&self, ctx: &mut framework::Context) {
+    for &pos in CELL_POSITIONS.iter() {
+      let btn = framework::gui::Button::new(pos.rect(), grey());
+      ctx.gui.add_button(pos.id().to_string(), btn);
+    }
+
+    let winner_rect = crate::math::Rect::new(-0.4, -0.7, 0.8, 0.15);
+    let btn = framework::gui::Button::new(winner_rect, grey());
+    ctx.gui.add_button(winner_button_id(), btn);
+  }
 }
 
 impl framework::Game for Game {
   fn update(&mut self, ctx: &mut framework::Context) {
-    if self.initialized {
-      for ev in ctx.events() {
-        match ev {
-          Event::Gui(gui::Event::ButtonClicked { id }) => {
-            self
-              .grid
-              .iter_mut()
-              .find(|c| c.id == id)
-              .as_mut()
-              .unwrap()
-              .state = CellState::Player1;
-            let btn = ctx.gui.get_mut_button(&id);
-            btn.color = crate::math::Color::new(0.3, 0.8, 0.3, 1.0);
-
-            if let Some(winner) = check_winner(&self.grid) {
-              let winner_btn_id = String::from("winner");
-              let btn = ctx.gui.get_mut_button(&winner_btn_id);
-              btn.color = match winner {
-                CellState::Open => crate::math::Color::new(0.5, 0.5, 0.5, 1.0),
-                CellState::Player1 => crate::math::Color::new(0.3, 0.8, 0.3, 1.0),
-                CellState::Player2 => crate::math::Color::new(0.8, 0.3, 0.3, 1.0),
-              }
-            } else {
-              let id = self
-                .grid
-                .iter().find(|c| c.state == CellState::Open)
-                .unwrap()
-                .id
-                .clone();
-              self
-                .grid
-                .iter_mut()
-                .find(|c| c.id == id)
-                .as_mut()
-                .unwrap()
-                .state = CellState::Player2;
-              let btn = ctx.gui.get_mut_button(&id);
-              btn.color = crate::math::Color::new(0.8, 0.3, 0.3, 1.0);
-              if let Some(winner) = check_winner(&self.grid) {
-                let winner_btn_id = String::from("winner");
-                let btn = ctx.gui.get_mut_button(&winner_btn_id);
-                btn.color = match winner {
-                  CellState::Open => crate::math::Color::new(0.5, 0.5, 0.5, 1.0),
-                  CellState::Player1 => crate::math::Color::new(0.3, 0.8, 0.3, 1.0),
-                  CellState::Player2 => crate::math::Color::new(0.8, 0.3, 0.3, 1.0),
-                }
-              }
-            }
-          }
-        }
-      }
-
+    if !self.initialized {
+      self.setup_ui(ctx);
+      self.initialized = true;
       return;
     }
 
-    let btn = framework::gui::Button::new(
-      crate::math::Rect::new(-0.1, -0.1, 0.2, 0.2),
-      crate::math::Color::new(0.5, 0.5, 0.5, 1.0),
-    );
-    ctx.gui.add_button(String::from("cm"), btn);
-
-    let btn = framework::gui::Button::new(
-      crate::math::Rect::new(-0.1, 0.15, 0.2, 0.2),
-      crate::math::Color::new(0.5, 0.5, 0.5, 1.0),
-    );
-    ctx.gui.add_button(String::from("tm"), btn);
-
-    let btn = framework::gui::Button::new(
-      crate::math::Rect::new(-0.1, -0.35, 0.2, 0.2),
-      crate::math::Color::new(0.5, 0.5, 0.5, 1.0),
-    );
-    ctx.gui.add_button(String::from("bm"), btn);
-
-    let btn = framework::gui::Button::new(
-      crate::math::Rect::new(0.15, -0.1, 0.2, 0.2),
-      crate::math::Color::new(0.5, 0.5, 0.5, 1.0),
-    );
-    ctx.gui.add_button(String::from("cr"), btn);
-
-    let btn = framework::gui::Button::new(
-      crate::math::Rect::new(0.15, 0.15, 0.2, 0.2),
-      crate::math::Color::new(0.5, 0.5, 0.5, 1.0),
-    );
-    ctx.gui.add_button(String::from("tr"), btn);
-
-    let btn = framework::gui::Button::new(
-      crate::math::Rect::new(0.15, -0.35, 0.2, 0.2),
-      crate::math::Color::new(0.5, 0.5, 0.5, 1.0),
-    );
-    ctx.gui.add_button(String::from("br"), btn);
-
-    let btn = framework::gui::Button::new(
-      crate::math::Rect::new(-0.35, -0.1, 0.2, 0.2),
-      crate::math::Color::new(0.5, 0.5, 0.5, 1.0),
-    );
-    ctx.gui.add_button(String::from("cl"), btn);
-
-    let btn = framework::gui::Button::new(
-      crate::math::Rect::new(-0.35, 0.15, 0.2, 0.2),
-      crate::math::Color::new(0.5, 0.5, 0.5, 1.0),
-    );
-    ctx.gui.add_button(String::from("tl"), btn);
-
-    let btn = framework::gui::Button::new(
-      crate::math::Rect::new(-0.35, -0.35, 0.2, 0.2),
-      crate::math::Color::new(0.5, 0.5, 0.5, 1.0),
-    );
-    ctx.gui.add_button(String::from("bl"), btn);
-
-    let btn = framework::gui::Button::new(
-      crate::math::Rect::new(-0.4, -0.7, 0.8, 0.15),
-      crate::math::Color::new(0.5, 0.5, 0.5, 1.0),
-    );
-    ctx.gui.add_button(String::from("winner"), btn);
-
-    self.initialized = true;
+    for ev in ctx.events() {
+      match ev {
+        Event::Gui(gui::Event::ButtonClicked { id }) => {
+          self.handle_click(ctx, &id);
+        }
+      }
+    }
   }
 }
 
@@ -203,77 +157,67 @@ enum CellPosition {
   BottomRight,
 }
 
-#[derive(Eq, PartialEq, Debug)]
+impl CellPosition {
+  /// Short id used both as the grid `Cell::id` and the gui button id.
+  fn id(self) -> &'static str {
+    match self {
+      CellPosition::TopLeft => "tl",
+      CellPosition::TopMiddle => "tm",
+      CellPosition::TopRight => "tr",
+      CellPosition::CenterLeft => "cl",
+      CellPosition::CenterMiddle => "cm",
+      CellPosition::CenterRight => "cr",
+      CellPosition::BottomLeft => "bl",
+      CellPosition::BottomMiddle => "bm",
+      CellPosition::BottomRight => "br",
+    }
+  }
+
+  /// Screen rect for this cell's button.
+  fn rect(self) -> crate::math::Rect {
+    let (x, y) = match self {
+      CellPosition::TopLeft => (-0.35, 0.15),
+      CellPosition::TopMiddle => (-0.1, 0.15),
+      CellPosition::TopRight => (0.15, 0.15),
+      CellPosition::CenterLeft => (-0.35, -0.1),
+      CellPosition::CenterMiddle => (-0.1, -0.1),
+      CellPosition::CenterRight => (0.15, -0.1),
+      CellPosition::BottomLeft => (-0.35, -0.35),
+      CellPosition::BottomMiddle => (-0.1, -0.35),
+      CellPosition::BottomRight => (0.15, -0.35),
+    };
+    crate::math::Rect::new(x, y, 0.2, 0.2)
+  }
+}
+
+#[derive(Eq, PartialEq, Clone, Copy, Debug)]
 enum CellState {
   Open,
   Player1,
   Player2,
 }
 
-fn check_winner(grid: &Vec<Cell>) -> Option<CellState> {
-  // Helper to get cell state by CellPosition
-  let get =
-    |pos: CellPosition| -> &CellState { &grid.iter().find(|c| c.pos == pos).unwrap().state };
-
-  let lines: [[CellPosition; 3]; 8] = [
-    // Rows
-    [
-      CellPosition::TopLeft,
-      CellPosition::TopMiddle,
-      CellPosition::TopRight,
-    ],
-    [
-      CellPosition::CenterLeft,
-      CellPosition::CenterMiddle,
-      CellPosition::CenterRight,
-    ],
-    [
-      CellPosition::BottomLeft,
-      CellPosition::BottomMiddle,
-      CellPosition::BottomRight,
-    ],
-    // Columns
-    [
-      CellPosition::TopLeft,
-      CellPosition::CenterLeft,
-      CellPosition::BottomLeft,
-    ],
-    [
-      CellPosition::TopMiddle,
-      CellPosition::CenterMiddle,
-      CellPosition::BottomMiddle,
-    ],
-    [
-      CellPosition::TopRight,
-      CellPosition::CenterRight,
-      CellPosition::BottomRight,
-    ],
-    // Diagonals
-    [
-      CellPosition::TopLeft,
-      CellPosition::CenterMiddle,
-      CellPosition::BottomRight,
-    ],
-    [
-      CellPosition::TopRight,
-      CellPosition::CenterMiddle,
-      CellPosition::BottomLeft,
-    ],
-  ];
-
-  for line in lines.iter() {
-    let a = get(line[0]);
-    let b = get(line[1]);
-    let c = get(line[2]);
-
-    if a == b && b == c {
-      match a {
-        CellState::Player1 => return Some(CellState::Player1),
-        CellState::Player2 => return Some(CellState::Player2),
-        CellState::Open => {}
-      }
+impl CellState {
+  fn color(self) -> crate::math::Color {
+    match self {
+      CellState::Open => grey(),
+      CellState::Player1 => green(),
+      CellState::Player2 => red(),
     }
   }
+}
 
-  None
+fn check_winner(grid: &[Cell]) -> Option<CellState> {
+  let get = |pos: CellPosition| -> CellState {
+    grid.iter().find(|c| c.pos == pos).unwrap().state
+  };
+
+  WIN_LINES.iter().find_map(|line| {
+    let [a, b, c] = line.map(get);
+    if a != CellState::Open && a == b && b == c {
+      Some(a)
+    } else {
+      None
+    }
+  })
 }
