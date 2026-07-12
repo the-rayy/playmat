@@ -14,19 +14,19 @@ protocol = { path = "../protocol" }
 log = { workspace = true }
 env_logger = { workspace = true }
 winit = "0.30.13"
-reqwest = "0.13.3"
+reqwest = "0.13.4"
 reqwest-websocket = "0.6.0"
 futures-util = { workspace = true }
-bytemuck = "1.25.0"
+bytemuck = "1.25.1"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }
-wgpu = "29.0.3"
+wgpu = "30.0.0"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-wasm-bindgen = "0.2.121"
-wasm-bindgen-futures = "0.4.71"
+wasm-bindgen = "0.2.126"
+wasm-bindgen-futures = "0.4.76"
 console_error_panic_hook = "0.1.7"
 console_log = "1.0.0"
 tokio = { workspace = true, features = ["macros", "rt"]}
-wgpu = { version = "29.0.1", features = ["webgl"] }
+wgpu = { version = "30.0.0", features = ["webgl"] }

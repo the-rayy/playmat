@@ -27,6 +27,7 @@ impl Renderer {
         power_preference: wgpu::PowerPreference::default(),
         compatible_surface: Some(&surface),
         force_fallback_adapter: false,
+        apply_limit_buckets: true,
       })
       .await
       .expect("Unable to request adapter");
@@ -102,7 +103,7 @@ impl Renderer {
 
     self.queue.submit([encoder.finish()]);
     self.window.pre_present_notify();
-    output.present();
+    self.queue.present(output);
   }
 
   pub fn resize(&self) {
@@ -122,6 +123,7 @@ impl Renderer {
       height: self.window.inner_size().height,
       desired_maximum_frame_latency: 2,
       present_mode: wgpu::PresentMode::AutoVsync,
+      color_space: wgpu::SurfaceColorSpace::Auto,
     };
     self.surface.configure(&self.device, &surface_config);
   }

@@ -30,7 +30,7 @@ impl Renderer {
       vertex: wgpu::VertexState {
         module: &shader,
         entry_point: Some("vs_main"),
-        buffers: &[vertex::Vertex::buffer_layout()],
+        buffers: &[Some(vertex::Vertex::buffer_layout())],
         compilation_options: wgpu::PipelineCompilationOptions::default(),
       },
       fragment: Some(wgpu::FragmentState {

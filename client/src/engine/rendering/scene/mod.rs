@@ -26,8 +26,8 @@ impl Renderer {
         module: &shader,
         entry_point: Some("vs_main"),
         buffers: &[
-          vertex::Vertex::buffer_layout(),
-          instance::Instance::buffer_layout(),
+          Some(vertex::Vertex::buffer_layout()),
+          Some(instance::Instance::buffer_layout()),
         ],
         compilation_options: wgpu::PipelineCompilationOptions::default(),
       },
