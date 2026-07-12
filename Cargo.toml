@@ -100,8 +100,8 @@ while_float = "warn"
 
 [workspace.dependencies]
 tokio = "1.52.3"
-log = "0.4.29"
-env_logger = "0.11.10"
+log = "0.4.33"
+env_logger = "0.11.11"
 thiserror = "2.0.18"
 futures-util = "0.3.32"
-time = { version = "0.3.47", features = ["serde"] }
+time = { version = "0.3.53", features = ["serde"] }
