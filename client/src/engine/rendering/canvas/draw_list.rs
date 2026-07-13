@@ -1,6 +1,6 @@
 use crate::{
   engine::rendering::canvas::vertex::Vertex,
-  math::{Color, Rect},
+  math::{Color, Point, Rect},
 };
 
 #[derive(Default)]
@@ -21,18 +21,22 @@ impl DrawList {
       Vertex {
         position: rect.top_left(),
         color,
+        uv: Point::ZERO,
       },
       Vertex {
         position: rect.top_right(),
         color,
+        uv: Point::ZERO,
       },
       Vertex {
         position: rect.bottom_right(),
         color,
+        uv: Point::ZERO
       },
       Vertex {
         position: rect.bottom_left(),
         color,
+        uv: Point::ZERO
       },
     ]);
 

@@ -5,6 +5,7 @@ use crate::math::{Color, Point};
 pub struct Vertex {
   pub position: Point,
   pub color: Color,
+  pub uv: Point,
 }
 
 impl Vertex {
@@ -23,6 +24,11 @@ impl Vertex {
           shader_location: 1,
           format: wgpu::VertexFormat::Float32x4,
         },
+        wgpu::VertexAttribute {
+          offset: std::mem::size_of::<[f32; 6]>() as wgpu::BufferAddress,
+          shader_location: 2,
+          format: wgpu::VertexFormat::Float32x2,
+        }
       ],
     }
   }
