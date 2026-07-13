@@ -3,7 +3,15 @@ pub struct Texture {
 }
 
 impl Texture {
-  pub fn new() -> Self {
+  pub fn new_white() -> Self {
+    Self {
+      data: [
+        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+      ],
+    }
+  }
+
+  pub fn new_checkerboard() -> Self {
     Self {
       data: [
         255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 255, 255, 0, 255,
@@ -36,7 +44,7 @@ impl Texture {
     }
   }
 
-  pub fn sampler_descriptor(&self) -> wgpu::SamplerDescriptor {
+  pub fn sampler_descriptor(&self) -> wgpu::SamplerDescriptor<'static> {
     wgpu::SamplerDescriptor {
       label: "foo".into(),
       address_mode_u: wgpu::AddressMode::ClampToEdge,

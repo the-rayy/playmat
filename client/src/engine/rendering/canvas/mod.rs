@@ -1,4 +1,4 @@
-use crate::engine::rendering::canvas::{draw_list::DrawList, vertex::Vertex};
+use crate::engine::rendering::{TexturedBindGroup, canvas::{draw_list::DrawList, vertex::Vertex}};
 pub mod draw_list;
 pub mod vertex;
 
@@ -9,10 +9,11 @@ pub struct Renderer {
   pipeline: wgpu::RenderPipeline,
   vertex_buffer: wgpu::Buffer,
   index_buffer: wgpu::Buffer,
+  white_tbg: TexturedBindGroup,
 }
 
 impl Renderer {
-  pub fn new(device: &wgpu::Device, surface_format: wgpu::TextureFormat) -> Self {
+  pub fn new(device: &wgpu::Device, surface_format: wgpu::TextureFormat, tbg: TexturedBindGroup) -> Self {
     let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
       label: Some("Canvas shader"),
       source: wgpu::ShaderSource::Wgsl(include_str!("shaders/default.wgsl").into()),
@@ -20,7 +21,7 @@ impl Renderer {
 
     let render_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
       label: Some("Canvas Render pipeline layout"),
-      bind_group_layouts: &[],
+      bind_group_layouts: &[Some(&tbg.layout)],
       immediate_size: 0,
     });
 
@@ -79,6 +80,7 @@ impl Renderer {
       pipeline,
       vertex_buffer,
       index_buffer,
+      white_tbg: tbg,
     }
   }
 
@@ -121,6 +123,7 @@ impl Renderer {
       bytemuck::cast_slice(&draw_list.indices),
     );
 
+    renderpass.set_bind_group(0, &self.white_tbg.bind_group, &[]);
     renderpass.set_pipeline(&self.pipeline);
     renderpass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
     renderpass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
