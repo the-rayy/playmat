@@ -8,6 +8,11 @@ pub mod canvas;
 mod scene;
 pub mod texture;
 
+pub struct TexturedBindGroup {
+  pub layout: wgpu::BindGroupLayout,
+  pub bind_group: wgpu::BindGroup,
+}
+
 pub struct Renderer {
   window: Arc<winit::window::Window>,
   device: wgpu::Device,
@@ -68,14 +73,15 @@ impl Renderer {
     state.configure_surface();
 
     let debug_texture = Texture::new();
-    state.load_texture(&debug_texture);
+    let _tsg = state.load_texture(&debug_texture);
 
     state
   }
 
-  pub fn load_texture(&self, texture: &Texture) {
+  pub fn load_texture(&self, texture: &Texture) -> TexturedBindGroup {
     let desc = texture.descriptor();
     let size = texture.size();
+    let sampler_desc = texture.sampler_descriptor();
     let tex = self.device.create_texture(&desc);
 
     self.queue.write_texture(
@@ -88,11 +94,54 @@ impl Renderer {
       texture.data(),
       wgpu::TexelCopyBufferLayout {
         offset: 0,
-        bytes_per_row: Some(4*size.width),
-        rows_per_image: Some(1*size.height),
+        bytes_per_row: Some(4 * size.width),
+        rows_per_image: Some(1 * size.height),
       },
       size,
     );
+
+    let sampler = self.device.create_sampler(&sampler_desc);
+    let texture_view = tex.create_view(&wgpu::TextureViewDescriptor::default());
+    let layout = self
+      .device
+      .create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+        entries: &[
+          wgpu::BindGroupLayoutEntry {
+            binding: 0,
+            visibility: wgpu::ShaderStages::FRAGMENT,
+            ty: wgpu::BindingType::Texture {
+              multisampled: false,
+              view_dimension: wgpu::TextureViewDimension::D2,
+              sample_type: wgpu::TextureSampleType::Float { filterable: true },
+            },
+            count: None,
+          },
+          wgpu::BindGroupLayoutEntry {
+            binding: 1,
+            visibility: wgpu::ShaderStages::FRAGMENT,
+            ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
+            count: None,
+          },
+        ],
+        label: Some("texture_bind_group_layout"),
+      });
+
+    let bind_group = self.device.create_bind_group(&wgpu::BindGroupDescriptor {
+      layout: &layout,
+      entries: &[
+        wgpu::BindGroupEntry {
+          binding: 0,
+          resource: wgpu::BindingResource::TextureView(&texture_view),
+        },
+        wgpu::BindGroupEntry {
+          binding: 1,
+          resource: wgpu::BindingResource::Sampler(&sampler),
+        },
+      ],
+      label: Some("diffuse_bind_group"),
+    });
+
+    TexturedBindGroup { layout, bind_group }
   }
 
   #[expect(clippy::panic, reason = "device lost")]

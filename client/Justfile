@@ -15,4 +15,4 @@ stop_web:
   lsof -ti:8080 | xargs kill
 
 build_web:
-  wasm-pack build --target web
+  wasm-pack build --debug --target web
