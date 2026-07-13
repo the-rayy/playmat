@@ -2,8 +2,11 @@ use std::sync::Arc;
 
 use wgpu::ExperimentalFeatures;
 
+use crate::engine::rendering::texture::Texture;
+
 pub mod canvas;
 mod scene;
+pub mod texture;
 
 pub struct Renderer {
   window: Arc<winit::window::Window>,
@@ -64,7 +67,32 @@ impl Renderer {
 
     state.configure_surface();
 
+    let debug_texture = Texture::new();
+    state.load_texture(&debug_texture);
+
     state
+  }
+
+  pub fn load_texture(&self, texture: &Texture) {
+    let desc = texture.descriptor();
+    let size = texture.size();
+    let tex = self.device.create_texture(&desc);
+
+    self.queue.write_texture(
+      wgpu::TexelCopyTextureInfo {
+        texture: &tex,
+        mip_level: 0,
+        origin: wgpu::Origin3d::ZERO,
+        aspect: wgpu::TextureAspect::All,
+      },
+      texture.data(),
+      wgpu::TexelCopyBufferLayout {
+        offset: 0,
+        bytes_per_row: Some(4*size.width),
+        rows_per_image: Some(1*size.height),
+      },
+      size,
+    );
   }
 
   #[expect(clippy::panic, reason = "device lost")]
