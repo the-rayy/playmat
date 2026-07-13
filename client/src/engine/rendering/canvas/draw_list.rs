@@ -26,17 +26,17 @@ impl DrawList {
       Vertex {
         position: rect.top_right(),
         color,
-        uv: Point::ZERO,
+        uv: Point{x: 1.0, y: 0.0},
       },
       Vertex {
         position: rect.bottom_right(),
         color,
-        uv: Point::ZERO
+        uv: Point::UNIT
       },
       Vertex {
         position: rect.bottom_left(),
         color,
-        uv: Point::ZERO
+        uv: Point{x: 0.0, y: 1.0}
       },
     ]);
 

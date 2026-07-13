@@ -7,4 +7,5 @@ pub struct Point {
 
 impl Point {
   pub const ZERO: Point = Point { x: 0.0, y: 0.0 };
+  pub const UNIT: Point = Point { x: 1.0, y: 1.0 };
 }

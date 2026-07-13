@@ -57,7 +57,7 @@ impl Renderer {
       .first()
       .expect("no available surface formats");
 
-    let debug_texture = Texture::new_white();
+    let debug_texture = Texture::new_checkerboard();
     let tsg = load_texture(&device, &queue, &debug_texture);
 
     let renderer_scene = scene::Renderer::new(&device, surface_format);
