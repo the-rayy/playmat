@@ -1,6 +1,10 @@
 use std::collections::HashMap;
 
-use crate::engine::rendering::{TexturedBindGroup, canvas::{draw_list::DrawList, vertex::Vertex}, texture::TextureKey};
+use crate::engine::rendering::{
+  TexturedBindGroup,
+  canvas::{draw_list::DrawList, vertex::Vertex},
+  texture::TextureKey,
+};
 pub mod draw_list;
 pub mod vertex;
 
@@ -16,7 +20,12 @@ pub struct Renderer {
 }
 
 impl Renderer {
-  pub fn new(device: &wgpu::Device, surface_format: wgpu::TextureFormat, bind_group_layout: wgpu::BindGroupLayout, default_texture: wgpu::BindGroup) -> Self {
+  pub fn new(
+    device: &wgpu::Device,
+    surface_format: wgpu::TextureFormat,
+    bind_group_layout: wgpu::BindGroupLayout,
+    default_texture: wgpu::BindGroup,
+  ) -> Self {
     let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
       label: Some("Canvas shader"),
       source: wgpu::ShaderSource::Wgsl(include_str!("shaders/default.wgsl").into()),
@@ -116,21 +125,26 @@ impl Renderer {
       multiview_mask: None,
     });
 
-    queue.write_buffer(
-      &self.vertex_buffer,
-      0,
-      bytemuck::cast_slice(&draw_list.vertices),
-    );
-    queue.write_buffer(
-      &self.index_buffer,
-      0,
-      bytemuck::cast_slice(&draw_list.indices),
-    );
+    let flat = draw_list.flatten();
 
-    renderpass.set_bind_group(0, &self.default_texture, &[]);
+    queue.write_buffer(&self.vertex_buffer, 0, bytemuck::cast_slice(&flat.vertices));
+    queue.write_buffer(&self.index_buffer, 0, bytemuck::cast_slice(&flat.indices));
+
     renderpass.set_pipeline(&self.pipeline);
     renderpass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
     renderpass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
-    renderpass.draw_indexed(0..draw_list.indices.len() as u32, 0, 0..1);
+
+    for draw in &flat.draws {
+      let bind_group = textures
+        .get(&draw.texture_key)
+        .unwrap_or(&self.default_texture);
+
+      renderpass.set_bind_group(0, bind_group, &[]);
+      renderpass.draw_indexed(
+        draw.index_start..(draw.index_start + draw.index_count),
+        0,
+        0..1,
+      );
+    }
   }
 }

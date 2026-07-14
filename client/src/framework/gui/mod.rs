@@ -5,7 +5,7 @@ use std::{collections::HashMap, sync::mpsc};
 pub use button::Button;
 
 use crate::{
-  engine::{ButtonState, Input, rendering::canvas::draw_list::DrawList},
+  engine::{ButtonState, Input, rendering::{canvas::draw_list::DrawList, texture::TextureKey}},
   framework,
 };
 
@@ -53,7 +53,7 @@ impl Context {
     self
       .buttons
       .values()
-      .for_each(|b| draw_list.push_rect(&b.rect, b.color()));
+      .for_each(|b| draw_list.push_rect(&b.rect, b.color(), b.texture_key()));
     draw_list
   }
 

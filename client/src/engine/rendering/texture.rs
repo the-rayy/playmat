@@ -1,5 +1,5 @@
-#[derive(Eq, PartialEq, Debug, Hash)]
-pub struct TextureKey(String);
+#[derive(Eq, PartialEq, Debug, Hash, Clone)]
+pub struct TextureKey(pub String);
 
 pub struct Texture {
   data: [u8; 2 * 2 * 4],

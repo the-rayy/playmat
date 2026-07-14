@@ -1,4 +1,4 @@
-use crate::framework::{self, Event, gui};
+use crate::{engine::rendering::texture::TextureKey, framework::{self, Event, gui}};
 
 const CELL_POSITIONS: [CellPosition; 9] = [
   CellPosition::TopLeft,
@@ -142,12 +142,12 @@ impl Game {
 
   fn setup_ui(&self, ctx: &mut framework::Context) {
     for &pos in CELL_POSITIONS.iter() {
-      let btn = framework::gui::Button::new(pos.rect(), grey());
+      let btn = framework::gui::Button::new(pos.rect(), grey(), TextureKey("foo".to_string()));
       ctx.gui.add_button(pos.id().to_string(), btn);
     }
 
     let winner_rect = crate::math::Rect::new(-0.4, -0.7, 0.8, 0.15);
-    let btn = framework::gui::Button::new(winner_rect, grey());
+    let btn = framework::gui::Button::new(winner_rect, grey(), TextureKey("bar".to_string()));
     ctx.gui.add_button(winner_button_id(), btn);
   }
 }
