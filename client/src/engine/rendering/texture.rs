@@ -6,21 +6,24 @@ pub struct Texture {
 }
 
 impl Texture {
-  pub fn new_white() -> Self {
-    Self {
-      data: [
-        255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-      ],
-    }
-  }
+  pub const WHITE: Self = Self {
+    data: [
+      255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
+    ],
+  };
 
-  pub fn new_checkerboard() -> Self {
-    Self {
-      data: [
-        255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 255, 255, 0, 255,
-      ],
-    }
-  }
+
+  pub const BLACK: Self = Self {
+    data: [
+      0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255,
+    ],
+  };
+
+  pub const CHECKERBOARD: Self = Self {
+    data: [
+      255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 255, 255, 0, 255,
+    ],
+  };
 
   pub fn data(&self) -> &[u8] {
     &self.data

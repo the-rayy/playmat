@@ -82,7 +82,7 @@ impl Renderer {
       label: Some("texture_bind_group_layout"),
     });
 
-    let default_texture = load_texture(&device, &queue, &Texture::new_checkerboard(), &textures_bind_group_layout);
+    let default_texture = load_texture(&device, &queue, &Texture::CHECKERBOARD, &textures_bind_group_layout);
 
     let renderer_scene = scene::Renderer::new(&device, surface_format);
     let renderer_canvas =

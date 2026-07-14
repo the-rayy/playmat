@@ -14,6 +14,8 @@ pub use platform::runtime;
 pub use platform::window;
 use winit::window::Window;
 
+use crate::engine::rendering::texture::Texture;
+use crate::engine::rendering::texture::TextureKey;
 use crate::framework;
 
 pub struct Engine<T: framework::Game> {
@@ -40,8 +42,12 @@ impl<T: framework::Game> Engine<T> {
   }
 
   pub fn init_rendering(&mut self, window: Arc<Window>) {
-    let renderer = platform::runtime::get().block_on(rendering::Renderer::new(window));
+    let mut renderer = platform::runtime::get().block_on(rendering::Renderer::new(window));
     let (w, h) = renderer.get_screen_size();
+
+    //debug
+    renderer.load_texture(TextureKey("foo".to_string()), &Texture::WHITE);
+    renderer.load_texture(TextureKey("bar".to_string()), &Texture::BLACK);
 
     self.context.gui.set_screen_dims(w, h);
     self.renderer = Some(renderer);
