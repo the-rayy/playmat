@@ -13,9 +13,9 @@ impl Texture {
   };
 
 
-  pub const BLACK: Self = Self {
+  pub const BLUE_TINT: Self = Self {
     data: [
-      0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255, 0, 0, 0, 255,
+      0, 0, 255, 50, 0, 0, 255, 50, 0, 0, 255, 50, 0, 0, 255, 50,
     ],
   };
 

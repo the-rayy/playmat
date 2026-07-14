@@ -47,7 +47,7 @@ impl<T: framework::Game> Engine<T> {
 
     //debug
     renderer.load_texture(TextureKey("foo".to_string()), &Texture::WHITE);
-    renderer.load_texture(TextureKey("bar".to_string()), &Texture::BLACK);
+    renderer.load_texture(TextureKey("bar".to_string()), &Texture::BLUE_TINT);
 
     self.context.gui.set_screen_dims(w, h);
     self.renderer = Some(renderer);
