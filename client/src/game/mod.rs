@@ -1,4 +1,7 @@
-use crate::{engine::rendering::texture::TextureKey, framework::{self, Event, gui}};
+use crate::{
+  engine::rendering::texture::TextureKey,
+  framework::{self, Event, gui},
+};
 
 const CELL_POSITIONS: [CellPosition; 9] = [
   CellPosition::TopLeft,

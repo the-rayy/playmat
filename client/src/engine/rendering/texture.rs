@@ -12,11 +12,8 @@ impl Texture {
     ],
   };
 
-
   pub const BLUE_TINT: Self = Self {
-    data: [
-      0, 0, 255, 50, 0, 0, 255, 50, 0, 0, 255, 50, 0, 0, 255, 50,
-    ],
+    data: [0, 0, 255, 50, 0, 0, 255, 50, 0, 0, 255, 50, 0, 0, 255, 50],
   };
 
   pub const CHECKERBOARD: Self = Self {
@@ -25,7 +22,7 @@ impl Texture {
     ],
   };
 
-  pub fn data(&self) -> &[u8] {
+  pub const fn data(&self) -> &[u8] {
     &self.data
   }
 
@@ -42,7 +39,7 @@ impl Texture {
     }
   }
 
-  pub fn size(&self) -> wgpu::Extent3d {
+  pub const fn size(&self) -> wgpu::Extent3d {
     wgpu::Extent3d {
       width: 2,
       height: 2,

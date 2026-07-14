@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use crate::engine::rendering::{
-  TexturedBindGroup,
   canvas::{draw_list::DrawList, vertex::Vertex},
   texture::TextureKey,
 };

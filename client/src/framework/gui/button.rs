@@ -1,4 +1,7 @@
-use crate::{engine::rendering::texture::TextureKey, math::{Color, Rect}};
+use crate::{
+  engine::rendering::texture::TextureKey,
+  math::{Color, Rect},
+};
 
 #[derive(Debug)]
 pub struct Button {

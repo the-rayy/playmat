@@ -6,6 +6,6 @@ pub struct Point {
 }
 
 impl Point {
-  pub const ZERO: Point = Point { x: 0.0, y: 0.0 };
-  pub const UNIT: Point = Point { x: 1.0, y: 1.0 };
+  pub const ZERO: Self = Self { x: 0.0, y: 0.0 };
+  pub const UNIT: Self = Self { x: 1.0, y: 1.0 };
 }

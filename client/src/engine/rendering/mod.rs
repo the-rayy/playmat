@@ -8,11 +8,6 @@ pub mod canvas;
 mod scene;
 pub mod texture;
 
-pub struct TexturedBindGroup {
-  pub layout: wgpu::BindGroupLayout,
-  pub bind_group: wgpu::BindGroup,
-}
-
 pub struct Renderer {
   window: Arc<winit::window::Window>,
   device: wgpu::Device,
@@ -60,33 +55,43 @@ impl Renderer {
       .first()
       .expect("no available surface formats");
 
-    let textures_bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-      entries: &[
-        wgpu::BindGroupLayoutEntry {
-          binding: 0,
-          visibility: wgpu::ShaderStages::FRAGMENT,
-          ty: wgpu::BindingType::Texture {
-            multisampled: false,
-            view_dimension: wgpu::TextureViewDimension::D2,
-            sample_type: wgpu::TextureSampleType::Float { filterable: true },
+    let textures_bind_group_layout =
+      device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+        entries: &[
+          wgpu::BindGroupLayoutEntry {
+            binding: 0,
+            visibility: wgpu::ShaderStages::FRAGMENT,
+            ty: wgpu::BindingType::Texture {
+              multisampled: false,
+              view_dimension: wgpu::TextureViewDimension::D2,
+              sample_type: wgpu::TextureSampleType::Float { filterable: true },
+            },
+            count: None,
           },
-          count: None,
-        },
-        wgpu::BindGroupLayoutEntry {
-          binding: 1,
-          visibility: wgpu::ShaderStages::FRAGMENT,
-          ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
-          count: None,
-        },
-      ],
-      label: Some("texture_bind_group_layout"),
-    });
+          wgpu::BindGroupLayoutEntry {
+            binding: 1,
+            visibility: wgpu::ShaderStages::FRAGMENT,
+            ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
+            count: None,
+          },
+        ],
+        label: Some("texture_bind_group_layout"),
+      });
 
-    let default_texture = load_texture(&device, &queue, &Texture::CHECKERBOARD, &textures_bind_group_layout);
+    let default_texture = load_texture(
+      &device,
+      &queue,
+      &Texture::CHECKERBOARD,
+      &textures_bind_group_layout,
+    );
 
     let renderer_scene = scene::Renderer::new(&device, surface_format);
-    let renderer_canvas =
-      canvas::Renderer::new(&device, surface_format, textures_bind_group_layout.clone(), default_texture);
+    let renderer_canvas = canvas::Renderer::new(
+      &device,
+      surface_format,
+      textures_bind_group_layout.clone(),
+      default_texture,
+    );
 
     let state = Self {
       window,
@@ -178,7 +183,12 @@ impl Renderer {
   }
 
   pub fn load_texture(&mut self, key: TextureKey, texture: &Texture) {
-    let bind_group = load_texture(&self.device, &self.queue, texture, &self.textures_bind_group_layout);
+    let bind_group = load_texture(
+      &self.device,
+      &self.queue,
+      texture,
+      &self.textures_bind_group_layout,
+    );
     self.textures.insert(key, bind_group);
   }
 }
@@ -205,7 +215,7 @@ pub fn load_texture(
     wgpu::TexelCopyBufferLayout {
       offset: 0,
       bytes_per_row: Some(4 * size.width),
-      rows_per_image: Some(1 * size.height),
+      rows_per_image: Some(size.height),
     },
     size,
   );
