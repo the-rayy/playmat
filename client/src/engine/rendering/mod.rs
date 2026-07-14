@@ -1,8 +1,8 @@
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use wgpu::ExperimentalFeatures;
 
-use crate::engine::rendering::texture::Texture;
+use crate::engine::rendering::texture::{Texture, TextureKey};
 
 pub mod canvas;
 mod scene;
@@ -19,6 +19,9 @@ pub struct Renderer {
   queue: wgpu::Queue,
   surface: wgpu::Surface<'static>,
   surface_format: wgpu::TextureFormat,
+  textures_bind_group_layout: wgpu::BindGroupLayout,
+
+  textures: HashMap<TextureKey, wgpu::BindGroup>,
 
   renderer_scene: scene::Renderer,
   renderer_canvas: canvas::Renderer,
@@ -57,11 +60,33 @@ impl Renderer {
       .first()
       .expect("no available surface formats");
 
-    let debug_texture = Texture::new_checkerboard();
-    let tsg = load_texture(&device, &queue, &debug_texture);
+    let textures_bind_group_layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
+      entries: &[
+        wgpu::BindGroupLayoutEntry {
+          binding: 0,
+          visibility: wgpu::ShaderStages::FRAGMENT,
+          ty: wgpu::BindingType::Texture {
+            multisampled: false,
+            view_dimension: wgpu::TextureViewDimension::D2,
+            sample_type: wgpu::TextureSampleType::Float { filterable: true },
+          },
+          count: None,
+        },
+        wgpu::BindGroupLayoutEntry {
+          binding: 1,
+          visibility: wgpu::ShaderStages::FRAGMENT,
+          ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
+          count: None,
+        },
+      ],
+      label: Some("texture_bind_group_layout"),
+    });
+
+    let default_texture = load_texture(&device, &queue, &Texture::new_checkerboard(), &textures_bind_group_layout);
 
     let renderer_scene = scene::Renderer::new(&device, surface_format);
-    let renderer_canvas = canvas::Renderer::new(&device, surface_format, tsg);
+    let renderer_canvas =
+      canvas::Renderer::new(&device, surface_format, textures_bind_group_layout.clone(), default_texture);
 
     let state = Self {
       window,
@@ -69,6 +94,8 @@ impl Renderer {
       queue,
       surface,
       surface_format,
+      textures_bind_group_layout,
+      textures: HashMap::default(),
       renderer_scene,
       renderer_canvas,
     };
@@ -108,9 +135,13 @@ impl Renderer {
     self
       .renderer_scene
       .render(&self.device, &mut encoder, &texture_view, frame_no);
-    self
-      .renderer_canvas
-      .render(&self.queue, &mut encoder, &texture_view, draw_list);
+    self.renderer_canvas.render(
+      &self.queue,
+      &mut encoder,
+      &texture_view,
+      draw_list,
+      &self.textures,
+    );
 
     self.queue.submit([encoder.finish()]);
     self.window.pre_present_notify();
@@ -145,13 +176,19 @@ impl Renderer {
       self.window.inner_size().height,
     )
   }
+
+  pub fn load_texture(&mut self, key: TextureKey, texture: &Texture) {
+    let bind_group = load_texture(&self.device, &self.queue, texture, &self.textures_bind_group_layout);
+    self.textures.insert(key, bind_group);
+  }
 }
 
 pub fn load_texture(
   device: &wgpu::Device,
   queue: &wgpu::Queue,
   texture: &Texture,
-) -> TexturedBindGroup {
+  bind_group_layout: &wgpu::BindGroupLayout,
+) -> wgpu::BindGroup {
   let desc = texture.descriptor();
   let size = texture.size();
   let sampler_desc = texture.sampler_descriptor();
@@ -175,30 +212,8 @@ pub fn load_texture(
 
   let sampler = device.create_sampler(&sampler_desc);
   let texture_view = tex.create_view(&wgpu::TextureViewDescriptor::default());
-  let layout = device.create_bind_group_layout(&wgpu::BindGroupLayoutDescriptor {
-    entries: &[
-      wgpu::BindGroupLayoutEntry {
-        binding: 0,
-        visibility: wgpu::ShaderStages::FRAGMENT,
-        ty: wgpu::BindingType::Texture {
-          multisampled: false,
-          view_dimension: wgpu::TextureViewDimension::D2,
-          sample_type: wgpu::TextureSampleType::Float { filterable: true },
-        },
-        count: None,
-      },
-      wgpu::BindGroupLayoutEntry {
-        binding: 1,
-        visibility: wgpu::ShaderStages::FRAGMENT,
-        ty: wgpu::BindingType::Sampler(wgpu::SamplerBindingType::Filtering),
-        count: None,
-      },
-    ],
-    label: Some("texture_bind_group_layout"),
-  });
-
-  let bind_group = device.create_bind_group(&wgpu::BindGroupDescriptor {
-    layout: &layout,
+  device.create_bind_group(&wgpu::BindGroupDescriptor {
+    layout: bind_group_layout,
     entries: &[
       wgpu::BindGroupEntry {
         binding: 0,
@@ -210,7 +225,5 @@ pub fn load_texture(
       },
     ],
     label: Some("diffuse_bind_group"),
-  });
-
-  TexturedBindGroup { layout, bind_group }
+  })
 }
