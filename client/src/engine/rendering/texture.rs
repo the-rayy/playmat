@@ -2,28 +2,22 @@
 pub struct TextureKey(pub String);
 
 pub struct Texture {
-  data: [u8; 2 * 2 * 4],
+  pixels: Vec<u8>,
+  height: u32,
+  width: u32,
 }
 
 impl Texture {
-  pub const WHITE: Self = Self {
-    data: [
-      255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255,
-    ],
-  };
+  pub const fn new(pixels: Vec<u8>, height: u32, width: u32) -> Self {
+    Self {
+      pixels,
+      height,
+      width,
+    }
+  }
 
-  pub const BLUE_TINT: Self = Self {
-    data: [0, 0, 255, 50, 0, 0, 255, 50, 0, 0, 255, 50, 0, 0, 255, 50],
-  };
-
-  pub const CHECKERBOARD: Self = Self {
-    data: [
-      255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255, 255, 255, 0, 255,
-    ],
-  };
-
-  pub const fn data(&self) -> &[u8] {
-    &self.data
+  pub fn pixels(&self) -> &[u8] {
+    &self.pixels
   }
 
   pub fn descriptor(&self) -> wgpu::TextureDescriptor<'static> {
@@ -41,8 +35,8 @@ impl Texture {
 
   pub const fn size(&self) -> wgpu::Extent3d {
     wgpu::Extent3d {
-      width: 2,
-      height: 2,
+      width: self.width,
+      height: self.height,
       depth_or_array_layers: 1,
     }
   }

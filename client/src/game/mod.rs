@@ -116,10 +116,10 @@ impl Game {
 
   fn play_move(&mut self, ctx: &mut framework::Context, id: &String, state: CellState) {
     self.set_cell_state(id, state);
-    ctx.gui.get_mut_button(id).color = state.color();
+    ctx.gui.get_mut_button(id).texture_key = state.tex();
 
     if let Some(winner) = check_winner(&self.grid) {
-      ctx.gui.get_mut_button(&winner_button_id()).color = winner.color();
+      ctx.gui.get_mut_button(&winner_button_id()).texture_key = winner.tex();
     }
   }
 
@@ -143,9 +143,30 @@ impl Game {
     }
   }
 
+  fn tex_key_white() -> TextureKey {
+    TextureKey("white".to_string())
+  }
+  fn tex_key_circle() -> TextureKey {
+    TextureKey("circle".to_string())
+  }
+  fn tex_key_cross() -> TextureKey {
+    TextureKey("cross".to_string())
+  }
+
   fn setup_ui(&self, ctx: &mut framework::Context) {
+    ctx
+      .assets
+      .load_texture_png(Self::tex_key_white(), include_bytes!("assets/tx_white.png"));
+    ctx.assets.load_texture_png(
+      Self::tex_key_circle(),
+      include_bytes!("assets/tx_circle.png"),
+    );
+    ctx
+      .assets
+      .load_texture_png(Self::tex_key_cross(), include_bytes!("assets/tx_cross.png"));
+
     for &pos in CELL_POSITIONS.iter() {
-      let btn = framework::gui::Button::new(pos.rect(), grey(), TextureKey("foo".to_string()));
+      let btn = framework::gui::Button::new(pos.rect(), grey(), Self::tex_key_white());
       ctx.gui.add_button(pos.id().to_string(), btn);
     }
 
@@ -233,11 +254,11 @@ enum CellState {
 }
 
 impl CellState {
-  fn color(self) -> crate::math::Color {
+  fn tex(self) -> TextureKey {
     match self {
-      Self::Open => grey(),
-      Self::Player1 => green(),
-      Self::Player2 => red(),
+      Self::Open => Game::tex_key_white(),
+      Self::Player1 => Game::tex_key_cross(),
+      Self::Player2 => Game::tex_key_circle(),
     }
   }
 }

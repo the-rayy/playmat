@@ -2,6 +2,7 @@ use std::sync::mpsc::{self, TryRecvError};
 
 use crate::engine::Input;
 
+pub mod assets;
 pub mod gui;
 
 pub trait Game {
@@ -15,6 +16,7 @@ pub enum Event {
 
 pub struct Context {
   pub gui: gui::Context,
+  pub assets: assets::Context,
 
   rx: mpsc::Receiver<Event>,
 }
@@ -24,6 +26,7 @@ impl Context {
     let (tx, rx) = mpsc::channel::<Event>();
     Self {
       gui: gui::Context::new(tx),
+      assets: assets::Context::default(),
       rx,
     }
   }

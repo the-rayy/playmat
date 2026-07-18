@@ -81,7 +81,7 @@ impl Renderer {
     let default_texture = load_texture(
       &device,
       &queue,
-      &Texture::CHECKERBOARD,
+      &Texture::new(vec![255, 255, 255, 255], 1, 1),
       &textures_bind_group_layout,
     );
 
@@ -211,7 +211,7 @@ pub fn load_texture(
       origin: wgpu::Origin3d::ZERO,
       aspect: wgpu::TextureAspect::All,
     },
-    texture.data(),
+    texture.pixels(),
     wgpu::TexelCopyBufferLayout {
       offset: 0,
       bytes_per_row: Some(4 * size.width),
