@@ -64,12 +64,6 @@ const WIN_LINES: [[CellPosition; 3]; 8] = [
 fn grey() -> crate::math::Color {
   crate::math::Color::new(0.5, 0.5, 0.5, 1.0)
 }
-fn green() -> crate::math::Color {
-  crate::math::Color::new(0.3, 0.8, 0.3, 1.0)
-}
-fn red() -> crate::math::Color {
-  crate::math::Color::new(0.8, 0.3, 0.3, 1.0)
-}
 
 fn winner_button_id() -> String {
   String::from("winner")
@@ -156,14 +150,19 @@ impl Game {
   fn setup_ui(&self, ctx: &mut framework::Context) {
     ctx
       .assets
-      .load_texture_png(Self::tex_key_white(), include_bytes!("assets/tx_white.png"));
-    ctx.assets.load_texture_png(
-      Self::tex_key_circle(),
-      include_bytes!("assets/tx_circle.png"),
-    );
+      .load_texture(Self::tex_key_white(), include_bytes!("assets/tx_white.png"))
+      .expect("could not load white texture");
     ctx
       .assets
-      .load_texture_png(Self::tex_key_cross(), include_bytes!("assets/tx_cross.png"));
+      .load_texture(
+        Self::tex_key_circle(),
+        include_bytes!("assets/tx_circle.png"),
+      )
+      .expect("could not load circle texture");
+    ctx
+      .assets
+      .load_texture(Self::tex_key_cross(), include_bytes!("assets/tx_cross.png"))
+      .expect("could not load cross texture");
 
     for &pos in CELL_POSITIONS.iter() {
       let btn = framework::gui::Button::new(pos.rect(), grey(), Self::tex_key_white());

@@ -54,7 +54,7 @@ impl<T: framework::Game> Engine<T> {
       self
         .renderer
         .as_mut()
-        .unwrap()
+        .expect("renderer not initialized")
         .load_texture(key.clone(), tex);
     }
 
