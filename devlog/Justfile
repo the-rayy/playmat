@@ -3,3 +3,7 @@ build:
 
 serve:
   mdbook watch --open
+
+deploy:
+  ssh root@bemindless.app -f 'mkdir -p projects/playmat/devlog'
+  scp -r book root@bemindless.app:projects/playmat/devlog/
