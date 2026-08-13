@@ -2,8 +2,6 @@
 resolver = "3"
 members = [
   "client",
-  "server",
-  "protocol",
 ]
 
 [workspace.lints.clippy]
