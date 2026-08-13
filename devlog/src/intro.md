@@ -8,6 +8,7 @@ Rust game engine made specifically for turn based games. Mostly for board and ca
 - Client-server achitecture for online gaming.
 - Client running both natively and in web browser.
 - Apart from the above, no tightly defined architecture. It will emerge in time.
+- Try to make a game. Build missing engine features. Make the game. Repeat.
 
 ## Why build an engine at all
 Learning. Tinkerink. Taking pride in doing something myself, from the ground up. Putting fun back in coding.
