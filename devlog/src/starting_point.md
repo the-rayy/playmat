@@ -11,7 +11,7 @@ Three main modules:
 2. Framework - glue layer between Engine and Game. Allows to drive the engine using higher-level concepts.
 3. Game - tic-tac-toe game implementation.
 
-Game loop is managed by wininit, but I am trying to abstract it as much as it makes sense. The whole engine should be as much independent from external dependencies as I can manage to do it. 
+Game loop is managed by winit, but I am trying to abstract it as much as it makes sense. The whole engine should be as much independent from external dependencies as I can manage to do it. 
 
 ## Features
 - Rendering
