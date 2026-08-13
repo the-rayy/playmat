@@ -3,9 +3,7 @@ name: playmat
 on:
   push:
     paths:
-      - server/**
       - client/**
-      - protocol/**
       - Cargo.toml
       - Cargo.lock
       - .github/workflows/playmat.yml
