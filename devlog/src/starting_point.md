@@ -26,4 +26,6 @@ Game loop is managed by winit, but I am trying to abstract it as much as it make
   - One widget available now: button
   - Widget can be textured
   - Widget can be hit-tested
+- Asset Manager
+  - Can load png textures from bytes
 - Some math for coordinate translation etc.
