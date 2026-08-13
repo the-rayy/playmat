@@ -1,3 +1,10 @@
 # Summary
 
-- [Chapter 1](./chapter_1.md)
+[Intro](./intro.md)
+[Starting point](./starting_point.md)
+
+# Tic-tac-toe, single player
+
+[The goal]()
+
+- [First item, probably text rendering]()
