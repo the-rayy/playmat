@@ -10,7 +10,6 @@ crate-type = ["cdylib", "rlib"]
 workspace = true
 
 [dependencies]
-protocol = { path = "../protocol" }
 log = { workspace = true }
 env_logger = { workspace = true }
 winit = "0.30.13"

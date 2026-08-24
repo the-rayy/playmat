@@ -1,8 +1,12 @@
 build:
   mdbook build
+  cp -r ../client/pkg book/001_ttt_v1/pkg
 
 serve:
-  mdbook watch --open
+  mdbook serve . -p 3000 -n 0.0.0.0
+
+pyserve:
+  cd book && python3 -m http.server 8080
 
 deploy:
   ssh root@bemindless.app -f 'mkdir -p projects/playmat/devlog'

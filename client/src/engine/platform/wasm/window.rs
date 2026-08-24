@@ -5,7 +5,7 @@ use winit::{
 
 pub fn attributes() -> WindowAttributes {
   let mut window_attributes = Window::default_attributes();
-  let size = winit::dpi::Size::Physical(PhysicalSize::new(1920, 1080));
+  let size = winit::dpi::Size::Physical(PhysicalSize::new(960, 540));
   window_attributes = window_attributes.with_inner_size(size);
 
   use wasm_bindgen::JsCast;

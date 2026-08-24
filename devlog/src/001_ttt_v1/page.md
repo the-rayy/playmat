@@ -18,3 +18,12 @@ Local only, one player, no networking, boots directly to game, enemy picks first
 
 ## Next
 - Text rendering (show winner, text on 'restart' button)
+
+## Live demo
+<canvas id="canvas"></canvas>
+<script type="module">
+    import init from "./pkg/client.js";
+    init().then(() => {
+        console.log("WASM Loaded");
+    });
+</script>
