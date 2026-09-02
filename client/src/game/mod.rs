@@ -148,6 +148,7 @@ impl Game {
   }
 
   fn setup_ui(&self, ctx: &mut framework::Context) {
+    ctx.assets.foo();
     ctx
       .assets
       .load_texture(Self::tex_key_white(), include_bytes!("assets/tx_white.png"))

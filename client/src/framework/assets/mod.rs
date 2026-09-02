@@ -25,6 +25,15 @@ impl Context {
     Ok(())
   }
 
+  pub fn foo(&self) {
+    let font = include_bytes!("Kenney Pixel.ttf") as &[u8];
+    let font = fontdue::Font::from_bytes(font, fontdue::FontSettings::default()).unwrap();
+    let (met, bmp) = font.rasterize('A', 200.0);
+    image::save_buffer("foo.png", &bmp, met.width as u32, met.height as u32, image::ExtendedColorType::L8).unwrap();
+
+
+  }
+
   pub const fn get(&self) -> &HashMap<TextureKey, Texture> {
     &self.textures
   }
