@@ -14,7 +14,7 @@ Local only, one player, no networking, boots directly to game, enemy picks first
 - GUI is retained
 - Game creates GUI widgets
 - GUI manager stores and manages the widgets
-- Button as first GUI widget. Three states, textured.
+- Button as first GUI widget. Four states, textured.
 
 ## Next
 - Text rendering (show winner, text on 'restart' button)
