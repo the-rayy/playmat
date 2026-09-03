@@ -29,7 +29,7 @@ impl Context {
   }
 
   pub fn load_font(&mut self, key: TextureKey, data: &[u8]) -> Result<(), String> {
-    let charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    let charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz _!";
     let font = fontdue::Font::from_bytes(data, fontdue::FontSettings::default()).unwrap();
     let (data, meta) = fonts::rasterize_atlas(charset, &font);
     let tex = Texture::new(data, meta.height as u32, meta.width as u32);
@@ -40,6 +40,10 @@ impl Context {
 
   pub const fn get(&self) -> &HashMap<TextureKey, Texture> {
     &self.textures
+  }
+
+  pub const fn get_fonts(&self) -> &HashMap<TextureKey, HashMap<char, math::Rect>> {
+    &self.fonts
   }
 
   pub fn get_font_glyph_uv(&self, key: &TextureKey, c: char) -> &math::Rect {

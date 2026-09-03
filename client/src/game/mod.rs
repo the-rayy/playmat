@@ -1,6 +1,6 @@
 use crate::{
   engine::rendering::texture::TextureKey,
-  framework::{self, Event, gui::{self, Quad}}, math::Rect,
+  framework::{self, Event, gui::{self, Label, Quad}}, math::Rect,
 };
 
 const CELL_POSITIONS: [CellPosition; 9] = [
@@ -187,9 +187,14 @@ impl Game {
     let btn = framework::gui::Button::new(winner_rect, grey(), TextureKey("bar".to_string()));
     ctx.gui.add_button(winner_button_id(), btn);
 
-    let foo_uv = ctx.assets.get_font_glyph_uv(&Self::tex_key_font(), 'r');
-    let foo = Quad::new(Rect::new(-0.1, 0.7, 0.10, 0.15), foo_uv.clone(), white(), Self::tex_key_font());
-    ctx.gui.add_quad(String::from("foo"), foo);
+    let label_quads = Label::new(String::from("Hello_world!"), Rect::new(-0.5, 0.7, 0.10, 0.15), white(), Self::tex_key_font()).quads(ctx.assets.get_fonts());
+    for (i, q) in label_quads.into_iter().enumerate() { 
+      ctx.gui.add_quad(format!("label_{}", i), q);
+    }
+    //
+    // let foo_uv = ctx.assets.get_font_glyph_uv(&Self::tex_key_font(), 'r');
+    // let foo = Quad::new(Rect::new(-0.1, 0.7, 0.10, 0.15), foo_uv.clone(), white(), Self::tex_key_font());
+    // ctx.gui.add_quad(String::from("foo"), foo);
   }
 }
 

@@ -1,10 +1,12 @@
 mod button;
 mod quad;
+mod label;
 
 use std::{collections::HashMap, sync::mpsc};
 
 pub use button::Button;
 pub use quad::Quad;
+pub use label::Label;
 
 use crate::{
   engine::{ButtonState, Input, rendering::canvas::draw_list::DrawList},
