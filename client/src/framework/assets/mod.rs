@@ -2,7 +2,7 @@ use std::{collections::HashMap, io::Cursor};
 
 use image::ImageReader;
 
-use crate::engine::rendering::texture::{Texture, TextureKey};
+use crate::{engine::rendering::texture::{Texture, TextureKey}, math};
 
 #[derive(Default)]
 pub struct Context {
@@ -32,18 +32,22 @@ impl Context {
 
     let rasterized = charset
       .chars()
-      .map(|c| font.rasterize(c, 200.0))
-      .collect::<Vec<(fontdue::Metrics, Vec<u8>)>>();
+      .map(|c| {
+        let (met, glyph) = font.rasterize(c, 200.0);
+        (c, met, glyph)
+      })
+      .collect::<Vec<(char, fontdue::Metrics, Vec<u8>)>>();
 
-    let total_width = rasterized.iter().map(|(met, _)| met.width).sum::<usize>();
-    let height = rasterized.iter().map(|(met, _)| met.height).max().unwrap();
+    let total_width = rasterized.iter().map(|(_, met, _)| met.width).sum::<usize>();
+    let height = rasterized.iter().map(|(_, met, _)| met.height).max().unwrap();
 
     let mut bmp = Vec::new();
     bmp.resize(total_width * height, 0_u8);
+    let mut meta = HashMap::<char, math::Rect>::new();
 
     let mut x_offset = 0;
 
-    for (met, glyph) in &rasterized {
+    for (c, met, glyph) in &rasterized {
       let w = met.width;
       let h = met.height;
 
@@ -56,6 +60,7 @@ impl Context {
         }
       }
 
+      meta.insert(*c, math::Rect::new(x_offset as f32, 0.0, w as f32, h as f32));
       x_offset += w;
     }
 
