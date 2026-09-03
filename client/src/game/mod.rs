@@ -146,9 +146,11 @@ impl Game {
   fn tex_key_cross() -> TextureKey {
     TextureKey("cross".to_string())
   }
+  fn tex_key_font() -> TextureKey {
+    TextureKey("font".to_string())
+  }
 
   fn setup_ui(&self, ctx: &mut framework::Context) {
-    ctx.assets.foo();
     ctx
       .assets
       .load_texture(Self::tex_key_white(), include_bytes!("assets/tx_white.png"))
@@ -164,6 +166,13 @@ impl Game {
       .assets
       .load_texture(Self::tex_key_cross(), include_bytes!("assets/tx_cross.png"))
       .expect("could not load cross texture");
+    ctx
+      .assets
+      .load_font(
+        Self::tex_key_font(),
+        include_bytes!("assets/Kenney Rocket.ttf"),
+      )
+      .expect("could not load font");
 
     for &pos in CELL_POSITIONS.iter() {
       let btn = framework::gui::Button::new(pos.rect(), grey(), Self::tex_key_white());
