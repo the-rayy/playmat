@@ -41,4 +41,8 @@ impl Context {
   pub const fn get(&self) -> &HashMap<TextureKey, Texture> {
     &self.textures
   }
+
+  pub fn get_font_glyph_uv(&self, key: &TextureKey, c: char) -> &math::Rect {
+    self.fonts.get(key).unwrap().get(&c).unwrap()
+  }
 }

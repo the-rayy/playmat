@@ -187,7 +187,8 @@ impl Game {
     let btn = framework::gui::Button::new(winner_rect, grey(), TextureKey("bar".to_string()));
     ctx.gui.add_button(winner_button_id(), btn);
 
-    let foo = Quad::new(Rect::new(-0.1, 0.7, 0.15, 0.15), Rect::unit(), white(), Self::tex_key_font());
+    let foo_uv = ctx.assets.get_font_glyph_uv(&Self::tex_key_font(), 'r');
+    let foo = Quad::new(Rect::new(-0.1, 0.7, 0.10, 0.15), foo_uv.clone(), white(), Self::tex_key_font());
     ctx.gui.add_quad(String::from("foo"), foo);
   }
 }

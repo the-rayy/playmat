@@ -48,7 +48,7 @@ pub fn rasterize_atlas(charset: &str, font: &fontdue::Font) -> (Vec<u8>, Meta) {
 
     meta.insert(
       *c,
-      math::Rect::new(x_offset as f32, 0.0, w as f32, h as f32),
+      math::Rect::new(x_offset as f32 / total_width as f32, 0.0, w as f32 / total_width as f32, h as f32 / height as f32),
     );
     x_offset += w;
   }

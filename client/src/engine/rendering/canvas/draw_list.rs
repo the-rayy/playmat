@@ -36,22 +36,22 @@ impl DrawList {
       Vertex {
         position: rect.top_left(),
         color,
-        uv: uv.top_left(),
+        uv: uv.bottom_left(),
       },
       Vertex {
         position: rect.top_right(),
         color,
-        uv: uv.top_right(),
+        uv: uv.bottom_right(),
       },
       Vertex {
         position: rect.bottom_right(),
         color,
-        uv: uv.bottom_right(),
+        uv: uv.top_right(),
       },
       Vertex {
         position: rect.bottom_left(),
         color,
-        uv: uv.bottom_left(),
+        uv: uv.top_left(),
       },
     ]);
 
