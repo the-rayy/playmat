@@ -191,10 +191,6 @@ impl Game {
     for (i, q) in label_quads.into_iter().enumerate() { 
       ctx.gui.add_quad(format!("label_{}", i), q);
     }
-    //
-    // let foo_uv = ctx.assets.get_font_glyph_uv(&Self::tex_key_font(), 'r');
-    // let foo = Quad::new(Rect::new(-0.1, 0.7, 0.10, 0.15), foo_uv.clone(), white(), Self::tex_key_font());
-    // ctx.gui.add_quad(String::from("foo"), foo);
   }
 }
 
