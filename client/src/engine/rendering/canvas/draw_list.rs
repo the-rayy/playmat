@@ -31,27 +31,27 @@ impl DrawList {
     self.primitives.is_empty()
   }
 
-  pub fn push_rect(&mut self, rect: &Rect, color: Color, texture_key: TextureKey) {
+  pub fn push_rect(&mut self, rect: &Rect, uv: &Rect, color: Color, texture_key: TextureKey) {
     let vertices = Vec::from([
       Vertex {
         position: rect.top_left(),
         color,
-        uv: Point::ZERO,
+        uv: uv.top_left(),
       },
       Vertex {
         position: rect.top_right(),
         color,
-        uv: Point { x: 1.0, y: 0.0 },
+        uv: uv.top_right(),
       },
       Vertex {
         position: rect.bottom_right(),
         color,
-        uv: Point::UNIT,
+        uv: uv.bottom_right(),
       },
       Vertex {
         position: rect.bottom_left(),
         color,
-        uv: Point { x: 0.0, y: 1.0 },
+        uv: uv.bottom_left(),
       },
     ]);
 
