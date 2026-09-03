@@ -1,6 +1,6 @@
 use crate::{
   engine::rendering::texture::TextureKey,
-  framework::{self, Event, gui},
+  framework::{self, Event, gui::{self, Quad}}, math::Rect,
 };
 
 const CELL_POSITIONS: [CellPosition; 9] = [
@@ -60,6 +60,10 @@ const WIN_LINES: [[CellPosition; 3]; 8] = [
     CellPosition::BottomLeft,
   ],
 ];
+
+fn white() -> crate::math::Color {
+  crate::math::Color::new(1.0, 1.0, 1.0, 1.0)
+}
 
 fn grey() -> crate::math::Color {
   crate::math::Color::new(0.5, 0.5, 0.5, 1.0)
@@ -182,6 +186,9 @@ impl Game {
     let winner_rect = crate::math::Rect::new(-0.4, -0.7, 0.8, 0.15);
     let btn = framework::gui::Button::new(winner_rect, grey(), TextureKey("bar".to_string()));
     ctx.gui.add_button(winner_button_id(), btn);
+
+    let foo = Quad::new(Rect::new(-0.1, 0.7, 0.15, 0.15), Rect::unit(), white(), Self::tex_key_font());
+    ctx.gui.add_quad(String::from("foo"), foo);
   }
 }
 

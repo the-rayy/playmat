@@ -1,12 +1,15 @@
 mod button;
+mod quad;
 
 use std::{collections::HashMap, sync::mpsc};
 
 pub use button::Button;
+pub use quad::Quad;
 
 use crate::{
   engine::{ButtonState, Input, rendering::canvas::draw_list::DrawList},
-  framework, math::Rect,
+  framework,
+  math::Rect,
 };
 
 #[derive(Debug)]
@@ -18,6 +21,7 @@ pub struct Context {
   screen_width: u32,
   screen_height: u32,
   buttons: HashMap<String, Button>,
+  quads: HashMap<String, Quad>,
 
   tx: mpsc::Sender<framework::Event>,
 }
@@ -28,6 +32,7 @@ impl Context {
       screen_width: 0,
       screen_height: 0,
       buttons: HashMap::default(),
+      quads: HashMap::default(),
       tx,
     }
   }
@@ -39,6 +44,10 @@ impl Context {
 
   pub fn add_button(&mut self, id: String, button: Button) {
     self.buttons.insert(id, button);
+  }
+
+  pub fn add_quad(&mut self, id: String, quad: Quad) {
+    self.quads.insert(id, quad);
   }
 
   pub fn get_mut_button(&mut self, id: &String) -> &mut Button {
@@ -54,6 +63,10 @@ impl Context {
       .buttons
       .values()
       .for_each(|b| draw_list.push_rect(&b.rect, &Rect::unit(), b.color(), b.texture_key()));
+    self
+      .quads
+      .values()
+      .for_each(|q| draw_list.push_rect(&q.rect, &q.uv, q.color(), q.texture_key()));
     draw_list
   }
 
