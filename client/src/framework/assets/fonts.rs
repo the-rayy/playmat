@@ -12,7 +12,7 @@ pub fn rasterize_atlas(charset: &str, font: &fontdue::Font) -> (Vec<u8>, Meta) {
   let rasterized = charset
     .chars()
     .map(|c| {
-      let (met, glyph) = font.rasterize(c, 128.0);
+      let (met, glyph) = font.rasterize(c, 32.0);
       (c, met, glyph)
     })
     .collect::<Vec<(char, fontdue::Metrics, Vec<u8>)>>();
