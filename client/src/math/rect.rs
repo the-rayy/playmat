@@ -13,7 +13,9 @@ impl Rect {
     Self { x, y, w, h }
   }
 
-  pub const fn unit() -> Self { Self::new(0.0, 0.0, 1.0, 1.0) }
+  pub const fn unit() -> Self {
+    Self::new(0.0, 0.0, 1.0, 1.0)
+  }
 
   pub const fn top_left(&self) -> Point {
     Point {

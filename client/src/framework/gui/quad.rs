@@ -21,14 +21,11 @@ impl Quad {
     }
   }
 
-  pub fn color(&self) -> Color {
-      self.color
-    
+  pub const fn color(&self) -> Color {
+    self.color
   }
 
   pub fn texture_key(&self) -> TextureKey {
     self.texture_key.clone()
   }
 }
-
-

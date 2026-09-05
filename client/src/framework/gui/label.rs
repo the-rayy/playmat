@@ -32,18 +32,17 @@ impl Label {
       .map(|(i, c)| {
         Quad::new(
           Rect {
-            x: self.rect.x + (1.1 * self.rect.w * i as f32),
+            x: (1.1 * self.rect.w).mul_add(i as f32, self.rect.x),
             y: self.rect.y,
             w: self.rect.w,
             h: self.rect.h,
           },
-          fonts
+          *fonts
             .get(&self.texture_key)
             .unwrap()
             .get(&c)
-            .unwrap()
-            .clone(),
-          self.color.clone(),
+            .unwrap(),
+          self.color,
           self.texture_key.clone(),
         )
       })

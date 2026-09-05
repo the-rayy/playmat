@@ -1,6 +1,10 @@
 use crate::{
   engine::rendering::texture::TextureKey,
-  framework::{self, Event, gui::{self, Label, Quad}}, math::Rect,
+  framework::{
+    self, Event,
+    gui::{self, Label},
+  },
+  math::Rect,
 };
 
 const CELL_POSITIONS: [CellPosition; 9] = [
@@ -116,8 +120,30 @@ impl Game {
     self.set_cell_state(id, state);
     ctx.gui.get_mut_button(id).texture_key = state.tex();
 
-    if let Some(winner) = check_winner(&self.grid) {
-      ctx.gui.get_mut_button(&winner_button_id()).texture_key = winner.tex();
+    if check_winner(&self.grid) == Some(CellState::Player1) {
+      let label_quads = Label::new(
+        String::from("P1 won"),
+        Rect::new(-0.3, -0.7, 0.10, 0.15),
+        white(),
+        Self::tex_key_font(),
+      )
+      .quads(ctx.assets.get_fonts());
+      for (i, q) in label_quads.into_iter().enumerate() {
+        ctx.gui.add_quad(format!("label_{}", i), q);
+      }
+    }
+
+    if check_winner(&self.grid) == Some(CellState::Player2) {
+      let label_quads = Label::new(
+        String::from("P2 won"),
+        Rect::new(-0.3, -0.7, 0.10, 0.15),
+        white(),
+        Self::tex_key_font(),
+      )
+      .quads(ctx.assets.get_fonts());
+      for (i, q) in label_quads.into_iter().enumerate() {
+        ctx.gui.add_quad(format!("label_{}", i), q);
+      }
     }
   }
 
@@ -181,15 +207,6 @@ impl Game {
     for &pos in CELL_POSITIONS.iter() {
       let btn = framework::gui::Button::new(pos.rect(), grey(), Self::tex_key_white());
       ctx.gui.add_button(pos.id().to_string(), btn);
-    }
-
-    let winner_rect = crate::math::Rect::new(-0.4, -0.7, 0.8, 0.15);
-    let btn = framework::gui::Button::new(winner_rect, grey(), TextureKey("bar".to_string()));
-    ctx.gui.add_button(winner_button_id(), btn);
-
-    let label_quads = Label::new(String::from("Hello_world!"), Rect::new(-0.5, 0.7, 0.10, 0.15), white(), Self::tex_key_font()).quads(ctx.assets.get_fonts());
-    for (i, q) in label_quads.into_iter().enumerate() { 
-      ctx.gui.add_quad(format!("label_{}", i), q);
     }
   }
 }

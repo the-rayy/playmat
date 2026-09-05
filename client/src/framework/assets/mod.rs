@@ -2,14 +2,17 @@ use std::{collections::HashMap, io::Cursor};
 
 use image::ImageReader;
 
-use crate::{engine::rendering::texture::{Texture, TextureKey}, math};
+use crate::{
+  engine::rendering::texture::{Texture, TextureKey},
+  math,
+};
 
 mod fonts;
 
 #[derive(Default)]
 pub struct Context {
   textures: HashMap<TextureKey, Texture>,
-  fonts: HashMap<TextureKey, HashMap<char, math::Rect>>
+  fonts: HashMap<TextureKey, HashMap<char, math::Rect>>,
 }
 
 impl Context {
@@ -29,7 +32,7 @@ impl Context {
   }
 
   pub fn load_font(&mut self, key: TextureKey, data: &[u8]) -> Result<(), String> {
-    let charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz _!";
+    let charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz _!12";
     let font = fontdue::Font::from_bytes(data, fontdue::FontSettings::default()).unwrap();
     let (data, meta) = fonts::rasterize_atlas(charset, &font);
     let tex = Texture::new(data, meta.height as u32, meta.width as u32);
@@ -47,6 +50,6 @@ impl Context {
   }
 
   pub fn get_font_glyph_uv(&self, key: &TextureKey, c: char) -> &math::Rect {
-    self.fonts.get(key).unwrap().get(&c).unwrap()
+    &self.fonts[key][&c]
   }
 }

@@ -27,8 +27,7 @@ pub fn rasterize_atlas(charset: &str, font: &fontdue::Font) -> (Vec<u8>, Meta) {
     .max()
     .unwrap();
 
-  let mut bmp = Vec::new();
-  bmp.resize(total_width * height, 0_u8);
+  let mut bmp = vec![0; total_width * height];
   let mut meta = HashMap::<char, math::Rect>::new();
 
   let mut x_offset = 0;
@@ -48,12 +47,20 @@ pub fn rasterize_atlas(charset: &str, font: &fontdue::Font) -> (Vec<u8>, Meta) {
 
     meta.insert(
       *c,
-      math::Rect::new(x_offset as f32 / total_width as f32, 0.0, w as f32 / total_width as f32, h as f32 / height as f32),
+      math::Rect::new(
+        x_offset as f32 / total_width as f32,
+        0.0,
+        w as f32 / total_width as f32,
+        h as f32 / height as f32,
+      ),
     );
     x_offset += w;
   }
 
-  let bmp = bmp.into_iter().map(|x| [255, 255, 255 ,x]).flatten().collect();
+  let bmp = bmp
+    .into_iter()
+    .flat_map(|x| [255, 255, 255, x])
+    .collect();
 
   let meta = Meta {
     locations: meta,

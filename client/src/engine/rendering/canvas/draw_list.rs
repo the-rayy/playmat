@@ -1,6 +1,6 @@
 use crate::{
   engine::rendering::{canvas::vertex::Vertex, texture::TextureKey},
-  math::{Color, Point, Rect},
+  math::{Color, Rect},
 };
 
 #[derive(Default)]
