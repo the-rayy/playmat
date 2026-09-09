@@ -25,4 +25,4 @@ jobs:
         run: cargo install mdbook
 
       - name: Test
-        run: just devlog/build
+        run: just devlog/test

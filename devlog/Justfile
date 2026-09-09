@@ -1,3 +1,6 @@
+test:
+  mdbook build
+
 build:
   mdbook build
   cp -r ../client/pkg book/001_ttt_v1/pkg
