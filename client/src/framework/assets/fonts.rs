@@ -25,7 +25,7 @@ pub fn rasterize_atlas(charset: &str, font: &fontdue::Font) -> (Vec<u8>, Meta) {
     .iter()
     .map(|(_, met, _)| met.height)
     .max()
-    .unwrap();
+    .expect("rasterized height should always have some max");
 
   let mut bmp = vec![0; total_width * height];
   let mut meta = HashMap::<char, math::Rect>::new();
@@ -41,7 +41,8 @@ pub fn rasterize_atlas(charset: &str, font: &fontdue::Font) -> (Vec<u8>, Meta) {
         let src = x + y * w;
         let dst = x_offset + x + y * total_width;
 
-        bmp[dst] = glyph[src];
+        *bmp.get_mut(dst).expect("dest pixel out of bounds") =
+          *glyph.get(src).expect("glyph pixel out of bounds");
       }
     }
 

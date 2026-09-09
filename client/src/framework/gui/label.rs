@@ -37,7 +37,11 @@ impl Label {
             w: self.rect.w,
             h: self.rect.h,
           },
-          *fonts.get(&self.texture_key).unwrap().get(&c).unwrap(),
+          *fonts
+            .get(&self.texture_key)
+            .expect("texture not loaded")
+            .get(&c)
+            .expect("char not in charset"),
           self.color,
           self.texture_key.clone(),
         )

@@ -33,7 +33,8 @@ impl Context {
 
   pub fn load_font(&mut self, key: TextureKey, data: &[u8]) -> Result<(), String> {
     let charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz _!12";
-    let font = fontdue::Font::from_bytes(data, fontdue::FontSettings::default()).unwrap();
+    let font = fontdue::Font::from_bytes(data, fontdue::FontSettings::default())
+      .map_err(|e| e.to_string())?;
     let (data, meta) = fonts::rasterize_atlas(charset, &font);
     let tex = Texture::new(data, meta.height as u32, meta.width as u32);
     self.textures.insert(key.clone(), tex);
@@ -47,9 +48,5 @@ impl Context {
 
   pub const fn get_fonts(&self) -> &HashMap<TextureKey, HashMap<char, math::Rect>> {
     &self.fonts
-  }
-
-  pub fn get_font_glyph_uv(&self, key: &TextureKey, c: char) -> &math::Rect {
-    &self.fonts[key][&c]
   }
 }

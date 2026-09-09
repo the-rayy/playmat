@@ -73,10 +73,6 @@ fn grey() -> crate::math::Color {
   crate::math::Color::new(0.5, 0.5, 0.5, 1.0)
 }
 
-fn winner_button_id() -> String {
-  String::from("winner")
-}
-
 pub struct Game {
   initialized: bool,
   grid: Vec<Cell>,
