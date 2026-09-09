@@ -8,6 +8,10 @@ Local only, one player, no networking, boots directly to game, enemy picks first
 - GUI system (buttons, hit-testing)
 - Asset manager (textures, embedded into binary)
 - Texture drawing in canvas renderer
+- Fonts
+  - Load from ttf file (external dependency :( )
+  - Rasterize to texture
+  - Quad and Label GUI elements to show text
 
 ## Decisions
 - GUI is stateless
@@ -15,9 +19,13 @@ Local only, one player, no networking, boots directly to game, enemy picks first
 - Game creates GUI widgets
 - GUI manager stores and manages the widgets
 - Button as first GUI widget. Four states, textured.
+- Fonts
+  - Font atlas is one, wide texture. Low character height to make the texture load on browser (max 2048px width)
+  - Hardcoded charset
+  - Assuming every character has the same width
 
 ## Next
-- Text rendering (show winner, text on 'restart' button)
+- Refactoring. Splitting `client` into separate crates
 
 ## Live demo
 <canvas id="canvas"></canvas>

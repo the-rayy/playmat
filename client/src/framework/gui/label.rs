@@ -37,11 +37,7 @@ impl Label {
             w: self.rect.w,
             h: self.rect.h,
           },
-          *fonts
-            .get(&self.texture_key)
-            .unwrap()
-            .get(&c)
-            .unwrap(),
+          *fonts.get(&self.texture_key).unwrap().get(&c).unwrap(),
           self.color,
           self.texture_key.clone(),
         )

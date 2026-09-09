@@ -57,10 +57,7 @@ pub fn rasterize_atlas(charset: &str, font: &fontdue::Font) -> (Vec<u8>, Meta) {
     x_offset += w;
   }
 
-  let bmp = bmp
-    .into_iter()
-    .flat_map(|x| [255, 255, 255, x])
-    .collect();
+  let bmp = bmp.into_iter().flat_map(|x| [255, 255, 255, x]).collect();
 
   let meta = Meta {
     locations: meta,
