@@ -4,7 +4,6 @@ use crate::{
     self, Event,
     gui::{self, Label},
   },
-  math::Rect,
 };
 
 const CELL_POSITIONS: [CellPosition; 9] = [
@@ -65,12 +64,12 @@ const WIN_LINES: [[CellPosition; 3]; 8] = [
   ],
 ];
 
-fn white() -> crate::math::Color {
-  crate::math::Color::new(1.0, 1.0, 1.0, 1.0)
+fn white() -> math::Color {
+  math::Color::new(1.0, 1.0, 1.0, 1.0)
 }
 
-fn grey() -> crate::math::Color {
-  crate::math::Color::new(0.5, 0.5, 0.5, 1.0)
+fn grey() -> math::Color {
+  math::Color::new(0.5, 0.5, 0.5, 1.0)
 }
 
 pub struct Game {
@@ -119,7 +118,7 @@ impl Game {
     if check_winner(&self.grid) == Some(CellState::Player1) {
       let label_quads = Label::new(
         String::from("P1 won"),
-        Rect::new(-0.3, -0.7, 0.10, 0.15),
+        math::Rect::new(-0.3, -0.7, 0.10, 0.15),
         white(),
         Self::tex_key_font(),
       )
@@ -132,7 +131,7 @@ impl Game {
     if check_winner(&self.grid) == Some(CellState::Player2) {
       let label_quads = Label::new(
         String::from("P2 won"),
-        Rect::new(-0.3, -0.7, 0.10, 0.15),
+        math::Rect::new(-0.3, -0.7, 0.10, 0.15),
         white(),
         Self::tex_key_font(),
       )
@@ -261,7 +260,7 @@ impl CellPosition {
   }
 
   /// Screen rect for this cell's button.
-  const fn rect(self) -> crate::math::Rect {
+  const fn rect(self) -> math::Rect {
     let (x, y) = match self {
       Self::TopLeft => (-0.35, 0.15),
       Self::TopMiddle => (-0.1, 0.15),
@@ -273,7 +272,7 @@ impl CellPosition {
       Self::BottomMiddle => (-0.1, -0.35),
       Self::BottomRight => (0.15, -0.35),
     };
-    crate::math::Rect::new(x, y, 0.2, 0.2)
+    math::Rect::new(x, y, 0.2, 0.2)
   }
 }
 

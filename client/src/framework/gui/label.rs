@@ -1,21 +1,22 @@
 use std::collections::HashMap;
 
-use crate::{
-  engine::rendering::texture::TextureKey,
-  framework::gui::Quad,
-  math::{self, Color, Rect},
-};
+use crate::{engine::rendering::texture::TextureKey, framework::gui::Quad};
 
 #[derive(Debug)]
 pub struct Label {
   pub label: String,
-  pub rect: Rect,
-  pub color: Color,
+  pub rect: math::Rect,
+  pub color: math::Color,
   pub texture_key: TextureKey,
 }
 
 impl Label {
-  pub const fn new(s: String, rect: Rect, color: Color, texture_key: TextureKey) -> Self {
+  pub const fn new(
+    s: String,
+    rect: math::Rect,
+    color: math::Color,
+    texture_key: TextureKey,
+  ) -> Self {
     Self {
       label: s,
       rect,
@@ -31,7 +32,7 @@ impl Label {
       .enumerate()
       .map(|(i, c)| {
         Quad::new(
-          Rect {
+          math::Rect {
             x: (1.1 * self.rect.w).mul_add(i as f32, self.rect.x),
             y: self.rect.y,
             w: self.rect.w,

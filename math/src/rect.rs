@@ -1,4 +1,4 @@
-use crate::math::Point;
+use crate::Point;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Rect {

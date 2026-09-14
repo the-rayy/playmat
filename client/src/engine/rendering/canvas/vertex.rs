@@ -1,4 +1,4 @@
-use crate::math::{Color, Point};
+use math::{Color, Point};
 
 #[repr(C)]
 #[derive(Copy, Clone, bytemuck::Pod, bytemuck::Zeroable)]

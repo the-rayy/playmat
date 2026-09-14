@@ -1,7 +1,5 @@
 use std::collections::HashMap;
 
-use crate::math;
-
 pub struct Meta {
   pub locations: HashMap<char, math::Rect>,
   pub width: usize,

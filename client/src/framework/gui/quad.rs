@@ -1,18 +1,20 @@
-use crate::{
-  engine::rendering::texture::TextureKey,
-  math::{Color, Rect},
-};
+use crate::engine::rendering::texture::TextureKey;
 
 #[derive(Debug)]
 pub struct Quad {
-  pub rect: Rect,
-  pub uv: Rect,
-  pub color: Color,
+  pub rect: math::Rect,
+  pub uv: math::Rect,
+  pub color: math::Color,
   pub texture_key: TextureKey,
 }
 
 impl Quad {
-  pub const fn new(rect: Rect, uv: Rect, color: Color, texture_key: TextureKey) -> Self {
+  pub const fn new(
+    rect: math::Rect,
+    uv: math::Rect,
+    color: math::Color,
+    texture_key: TextureKey,
+  ) -> Self {
     Self {
       rect,
       uv,
@@ -21,7 +23,7 @@ impl Quad {
     }
   }
 
-  pub const fn color(&self) -> Color {
+  pub const fn color(&self) -> math::Color {
     self.color
   }
 

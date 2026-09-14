@@ -1,7 +1,4 @@
-use crate::{
-  engine::rendering::{canvas::vertex::Vertex, texture::TextureKey},
-  math::{Color, Rect},
-};
+use crate::engine::rendering::{canvas::vertex::Vertex, texture::TextureKey};
 
 #[derive(Default)]
 pub struct DrawList {
@@ -31,7 +28,13 @@ impl DrawList {
     self.primitives.is_empty()
   }
 
-  pub fn push_rect(&mut self, rect: &Rect, uv: &Rect, color: Color, texture_key: TextureKey) {
+  pub fn push_rect(
+    &mut self,
+    rect: &math::Rect,
+    uv: &math::Rect,
+    color: math::Color,
+    texture_key: TextureKey,
+  ) {
     let vertices = Vec::from([
       Vertex {
         position: rect.top_left(),

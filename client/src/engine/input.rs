@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::math::Point;
+use math::Point;
 
 #[derive(Default, Debug)]
 pub struct Input {

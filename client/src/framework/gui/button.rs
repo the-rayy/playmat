@@ -1,18 +1,15 @@
-use crate::{
-  engine::rendering::texture::TextureKey,
-  math::{Color, Rect},
-};
+use crate::engine::rendering::texture::TextureKey;
 
 #[derive(Debug)]
 pub struct Button {
-  pub rect: Rect,
-  pub color: Color,
+  pub rect: math::Rect,
+  pub color: math::Color,
   pub texture_key: TextureKey,
   pub state: State,
 }
 
 impl Button {
-  pub const fn new(rect: Rect, color: Color, texture_key: TextureKey) -> Self {
+  pub const fn new(rect: math::Rect, color: math::Color, texture_key: TextureKey) -> Self {
     Self {
       rect,
       color,
@@ -21,11 +18,11 @@ impl Button {
     }
   }
 
-  pub fn color(&self) -> Color {
+  pub fn color(&self) -> math::Color {
     match self.state {
       State::Neutral => self.color,
-      State::Hovered => self.color + Color::new(0.01, 0.01, 0.01, 0.0),
-      State::Down => self.color + Color::new(0.05, 0.05, 0.05, 0.0),
+      State::Hovered => self.color + math::Color::new(0.01, 0.01, 0.01, 0.0),
+      State::Down => self.color + math::Color::new(0.05, 0.05, 0.05, 0.0),
     }
   }
 
