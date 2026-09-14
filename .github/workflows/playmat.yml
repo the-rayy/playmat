@@ -4,6 +4,8 @@ on:
   push:
     paths:
       - client/**
+      - math/**
+      - engine/**
       - Cargo.toml
       - Cargo.lock
       - .github/workflows/playmat.yml
