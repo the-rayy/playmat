@@ -2,7 +2,7 @@
 resolver = "3"
 members = [
   "client",
-  "math",
+  "math", "engine",
 ]
 
 [workspace.lints.clippy]

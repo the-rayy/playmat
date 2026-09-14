@@ -1,4 +1,4 @@
-use crate::engine::rendering::{canvas::vertex::Vertex, texture::TextureKey};
+use crate::rendering::{canvas::vertex::Vertex, texture::TextureKey};
 
 #[derive(Default)]
 pub struct DrawList {

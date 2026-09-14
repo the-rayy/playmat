@@ -1,8 +1,9 @@
 use std::sync::mpsc::{self, TryRecvError};
 
-use crate::engine::Input;
+use ::engine::input::Input;
 
 pub mod assets;
+pub mod engine;
 pub mod gui;
 
 pub trait Game {

@@ -1,9 +1,8 @@
-use crate::{
-  engine::rendering::texture::TextureKey,
-  framework::{
-    self, Event,
-    gui::{self, Label},
-  },
+use engine::rendering::texture::TextureKey;
+
+use crate::framework::{
+  self, Event,
+  gui::{self, Label},
 };
 
 const CELL_POSITIONS: [CellPosition; 9] = [

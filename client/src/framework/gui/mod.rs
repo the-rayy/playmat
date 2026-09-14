@@ -5,13 +5,14 @@ mod quad;
 use std::{collections::HashMap, sync::mpsc};
 
 pub use button::Button;
+use engine::{
+  input::{ButtonState, Input, MouseButton},
+  rendering::canvas::draw_list::DrawList,
+};
 pub use label::Label;
 pub use quad::Quad;
 
-use crate::{
-  engine::{ButtonState, Input, rendering::canvas::draw_list::DrawList},
-  framework,
-};
+use crate::framework;
 
 #[derive(Debug)]
 pub enum Event {
@@ -83,9 +84,7 @@ impl Context {
           .in_screen_space(self.screen_width, self.screen_height),
       );
 
-      b.state = if hover
-        && input.get_mouse_button(crate::engine::MouseButton::Left) == &ButtonState::Pressed
-      {
+      b.state = if hover && input.get_mouse_button(MouseButton::Left) == &ButtonState::Pressed {
         let res = self.tx.send(framework::Event::Gui(Event::ButtonClicked {
           id: id.clone(),
         }));

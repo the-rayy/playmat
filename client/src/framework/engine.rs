@@ -1,46 +1,35 @@
-mod event;
-mod input;
-mod platform;
-pub mod rendering;
-
+use engine::event::Event;
 use std::sync::Arc;
-
-pub use event::Event;
-pub use input::ButtonState;
-pub use input::Input;
-pub use input::MouseButton;
-pub use platform::logger;
-pub use platform::runtime;
-pub use platform::window;
 use winit::window::Window;
 
-use crate::framework;
+use crate::framework::Game;
 
-pub struct Engine<T: framework::Game> {
+pub struct Engine<T: Game> {
   game: T,
-  context: framework::Context,
+  context: crate::framework::Context,
 
-  renderer: Option<rendering::Renderer>,
-  input: input::Input,
+  renderer: Option<engine::rendering::Renderer>,
+  input: engine::input::Input,
   frame_no: u64,
 }
 
-impl<T: framework::Game> Engine<T> {
+impl<T: Game> Engine<T> {
   pub fn new(game: T) -> Self {
-    runtime::init();
-    logger::init();
+    engine::platform::runtime::init();
+    engine::platform::logger::init();
 
     Self {
       game,
-      context: framework::Context::new(),
+      context: crate::framework::Context::new(),
       renderer: None,
       frame_no: 0,
-      input: input::Input::default(),
+      input: engine::input::Input::default(),
     }
   }
 
   pub fn init_rendering(&mut self, window: Arc<Window>) {
-    let renderer = platform::runtime::get().block_on(rendering::Renderer::new(window));
+    let renderer =
+      engine::platform::runtime::get().block_on(engine::rendering::Renderer::new(window));
     let (w, h) = renderer.get_screen_size();
 
     self.context.gui.set_screen_dims(w, h);

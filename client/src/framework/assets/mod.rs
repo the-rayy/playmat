@@ -2,7 +2,7 @@ use std::{collections::HashMap, io::Cursor};
 
 use image::ImageReader;
 
-use crate::engine::rendering::texture::{Texture, TextureKey};
+use engine::rendering::texture::{Texture, TextureKey};
 
 mod fonts;
 

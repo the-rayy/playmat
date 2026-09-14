@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
-use crate::{engine::rendering::texture::TextureKey, framework::gui::Quad};
+use crate::framework::gui::Quad;
+use engine::rendering::texture::TextureKey;
 
 #[derive(Debug)]
 pub struct Label {
