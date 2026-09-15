@@ -14,12 +14,7 @@ math = { path = "../math" }
 log = { workspace = true }
 env_logger = { workspace = true }
 winit = "0.30.13"
-reqwest = "0.13.4"
-reqwest-websocket = "0.6.0"
-futures-util = { workspace = true }
 bytemuck = "1.25.1"
-image = { version = "0.25", default-features = false, features = ["png"] }
-fontdue = "0.9.4"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }
