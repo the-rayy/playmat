@@ -12,8 +12,6 @@ use engine::{
 pub use label::Label;
 pub use quad::Quad;
 
-use crate::framework;
-
 #[derive(Debug)]
 pub enum Event {
   ButtonClicked { id: String },
@@ -25,11 +23,11 @@ pub struct Context {
   buttons: HashMap<String, Button>,
   quads: HashMap<String, Quad>,
 
-  tx: mpsc::Sender<framework::Event>,
+  tx: mpsc::Sender<crate::Event>,
 }
 
 impl Context {
-  pub fn new(tx: mpsc::Sender<framework::Event>) -> Self {
+  pub fn new(tx: mpsc::Sender<crate::Event>) -> Self {
     Self {
       screen_width: 0,
       screen_height: 0,
@@ -85,9 +83,9 @@ impl Context {
       );
 
       b.state = if hover && input.get_mouse_button(MouseButton::Left) == &ButtonState::Pressed {
-        let res = self.tx.send(framework::Event::Gui(Event::ButtonClicked {
-          id: id.clone(),
-        }));
+        let res = self
+          .tx
+          .send(crate::Event::Gui(Event::ButtonClicked { id: id.clone() }));
         log::info!("{:?}", res); //FIXME without logging res, send gets optimized away by compiler
         //on wasm. weird
 

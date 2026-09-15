@@ -1,5 +1,5 @@
 [package]
-name = "client"
+name = "framework"
 version = "0.1.0"
 edition = "2024"
 
@@ -12,7 +12,6 @@ workspace = true
 [dependencies]
 math = { path = "../math" }
 engine = { path = "../engine" }
-framework = { path = "../framework" }
 log = { workspace = true }
 env_logger = { workspace = true }
 winit = "0.30.13"

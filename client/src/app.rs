@@ -1,12 +1,8 @@
 use std::sync::Arc;
 
-use winit::{
-  application::ApplicationHandler,
-  event::WindowEvent,
-  window::Window,
-};
+use winit::{application::ApplicationHandler, event::WindowEvent, window::Window};
 
-use crate::framework::{self, Game};
+use framework::{self, Game};
 
 pub struct App<T: Game> {
   window: Option<Arc<Window>>,

@@ -2,11 +2,11 @@ use engine::event::Event;
 use std::sync::Arc;
 use winit::window::Window;
 
-use crate::framework::Game;
+use crate::Game;
 
 pub struct Engine<T: Game> {
   game: T,
-  context: crate::framework::Context,
+  context: crate::Context,
 
   renderer: Option<engine::rendering::Renderer>,
   input: engine::input::Input,
@@ -20,7 +20,7 @@ impl<T: Game> Engine<T> {
 
     Self {
       game,
-      context: crate::framework::Context::new(),
+      context: crate::Context::new(),
       renderer: None,
       frame_no: 0,
       input: engine::input::Input::default(),

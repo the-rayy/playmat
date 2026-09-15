@@ -22,6 +22,12 @@ pub struct Context {
   rx: mpsc::Receiver<Event>,
 }
 
+impl Default for Context {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Context {
   pub fn new() -> Self {
     let (tx, rx) = mpsc::channel::<Event>();

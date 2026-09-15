@@ -1,6 +1,6 @@
 use engine::rendering::texture::TextureKey;
 
-use crate::framework::{
+use framework::{
   self, Event,
   gui::{self, Label},
 };

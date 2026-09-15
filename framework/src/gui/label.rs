@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::framework::gui::Quad;
+use crate::gui::Quad;
 use engine::rendering::texture::TextureKey;
 
 #[derive(Debug)]
