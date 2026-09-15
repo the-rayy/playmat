@@ -1,5 +1,5 @@
 [package]
-name = "client"
+name = "tictactoe"
 version = "0.1.0"
 edition = "2024"
 
@@ -10,9 +10,9 @@ crate-type = ["cdylib", "rlib"]
 workspace = true
 
 [dependencies]
-math = { path = "../math" }
-engine = { path = "../engine" }
-framework = { path = "../framework" }
+math = { path = "../../math" }
+engine = { path = "../../engine" }
+framework = { path = "../../framework" }
 log = { workspace = true }
 env_logger = { workspace = true }
 winit = "0.30.13"

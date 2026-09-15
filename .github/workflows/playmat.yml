@@ -3,7 +3,7 @@ name: playmat
 on:
   push:
     paths:
-      - client/**
+      - games/**
       - math/**
       - engine/**
       - framework/**

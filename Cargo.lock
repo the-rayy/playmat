@@ -374,30 +374,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "client"
-version = "0.1.0"
-dependencies = [
- "bytemuck",
- "console_error_panic_hook",
- "console_log",
- "engine",
- "env_logger",
- "fontdue",
- "framework",
- "futures-util",
- "image",
- "log",
- "math",
- "reqwest",
- "reqwest-websocket",
- "tokio",
- "wasm-bindgen",
- "wasm-bindgen-futures",
- "wgpu",
- "winit",
-]
-
-[[package]]
 name = "cmake"
 version = "0.1.58"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2964,6 +2940,30 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "tictactoe"
+version = "0.1.0"
+dependencies = [
+ "bytemuck",
+ "console_error_panic_hook",
+ "console_log",
+ "engine",
+ "env_logger",
+ "fontdue",
+ "framework",
+ "futures-util",
+ "image",
+ "log",
+ "math",
+ "reqwest",
+ "reqwest-websocket",
+ "tokio",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "wgpu",
+ "winit",
 ]
 
 [[package]]
