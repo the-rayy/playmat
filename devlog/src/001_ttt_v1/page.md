@@ -26,6 +26,10 @@ Local only, one player, no networking, boots directly to game, enemy picks first
 
 ## Next
 - Refactoring. Splitting `client` into separate crates
+- Refactoring. Move `fontdue` and `image` dependencies to the engine. Textures and fonts should be loaded by the engine, not by framework
+- Refactoring. Move `winit` to the engine. Framework should not know anything about window building
+- Refactoring. Remove `engine` dependency from the game. It should know only `framework`
+- Refactoring. Remove `winit` dependency from the game. It should be somehow passed from the engine (through framework)
 
 ## Live demo
 <canvas id="canvas"></canvas>
