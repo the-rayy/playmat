@@ -1,4 +1,4 @@
-use engine::rendering::texture::TextureKey;
+use engine::rendering::texture::Id;
 
 use framework::{
   self, Event,
@@ -74,6 +74,10 @@ fn grey() -> math::Color {
 pub struct Game {
   initialized: bool,
   grid: Vec<Cell>,
+  tex_white: Option<Id>,
+  tex_circle: Option<Id>,
+  tex_cross: Option<Id>,
+  tex_font: Option<Id>,
 }
 
 impl Game {
@@ -90,6 +94,10 @@ impl Game {
     Self {
       initialized: false,
       grid,
+      tex_white: None,
+      tex_circle: None,
+      tex_cross: None,
+      tex_font: None,
     }
   }
 
@@ -110,16 +118,25 @@ impl Game {
       .map(|c| c.id.clone())
   }
 
+  const fn tex_for_state(&self, state: CellState) -> Id {
+    match state {
+      CellState::Open => self.tex_white.expect("white texture not loaded"),
+      CellState::Player1 => self.tex_cross.expect("cross texture not loaded"),
+      CellState::Player2 => self.tex_circle.expect("circle texture not loaded"),
+    }
+  }
+
   fn play_move(&mut self, ctx: &mut framework::Context, id: &String, state: CellState) {
     self.set_cell_state(id, state);
-    ctx.gui.get_mut_button(id).texture_key = state.tex();
+    let tex_key = self.tex_for_state(state);
+    ctx.gui.get_mut_button(id).texture_key = tex_key;
 
     if check_winner(&self.grid) == Some(CellState::Player1) {
       let label_quads = Label::new(
         String::from("P1 won"),
         math::Rect::new(-0.3, -0.7, 0.10, 0.15),
         white(),
-        Self::tex_key_font(),
+        self.tex_font.expect("font not loaded"),
       )
       .quads(ctx.assets.get_fonts());
       for (i, q) in label_quads.into_iter().enumerate() {
@@ -132,7 +149,7 @@ impl Game {
         String::from("P2 won"),
         math::Rect::new(-0.3, -0.7, 0.10, 0.15),
         white(),
-        Self::tex_key_font(),
+        self.tex_font.expect("font not loaded"),
       )
       .quads(ctx.assets.get_fonts());
       for (i, q) in label_quads.into_iter().enumerate() {
@@ -161,47 +178,33 @@ impl Game {
     }
   }
 
-  fn tex_key_white() -> TextureKey {
-    TextureKey("white".to_string())
-  }
-  fn tex_key_circle() -> TextureKey {
-    TextureKey("circle".to_string())
-  }
-  fn tex_key_cross() -> TextureKey {
-    TextureKey("cross".to_string())
-  }
-  fn tex_key_font() -> TextureKey {
-    TextureKey("font".to_string())
-  }
-
-  fn setup_ui(&self, ctx: &mut framework::Context) {
-    ctx
+  fn setup_ui(&mut self, ctx: &mut framework::Context) {
+    let tex_white = ctx
       .assets
-      .load_texture(Self::tex_key_white(), include_bytes!("assets/tx_white.png"))
+      .load_texture(include_bytes!("assets/tx_white.png"))
       .expect("could not load white texture");
-    ctx
+    let tex_circle = ctx
       .assets
-      .load_texture(
-        Self::tex_key_circle(),
-        include_bytes!("assets/tx_circle.png"),
-      )
+      .load_texture(include_bytes!("assets/tx_circle.png"))
       .expect("could not load circle texture");
-    ctx
+    let tex_cross = ctx
       .assets
-      .load_texture(Self::tex_key_cross(), include_bytes!("assets/tx_cross.png"))
+      .load_texture(include_bytes!("assets/tx_cross.png"))
       .expect("could not load cross texture");
-    ctx
+    let tex_font = ctx
       .assets
-      .load_font(
-        Self::tex_key_font(),
-        include_bytes!("assets/Kenney Rocket.ttf"),
-      )
+      .load_font(include_bytes!("assets/Kenney Rocket.ttf"))
       .expect("could not load font");
 
     for &pos in CELL_POSITIONS.iter() {
-      let btn = framework::gui::Button::new(pos.rect(), grey(), Self::tex_key_white());
+      let btn = framework::gui::Button::new(pos.rect(), grey(), tex_white);
       ctx.gui.add_button(pos.id().to_string(), btn);
     }
+
+    self.tex_white = Some(tex_white);
+    self.tex_circle = Some(tex_circle);
+    self.tex_cross = Some(tex_cross);
+    self.tex_font = Some(tex_font);
   }
 }
 
@@ -280,16 +283,6 @@ enum CellState {
   Open,
   Player1,
   Player2,
-}
-
-impl CellState {
-  fn tex(self) -> TextureKey {
-    match self {
-      Self::Open => Game::tex_key_white(),
-      Self::Player1 => Game::tex_key_cross(),
-      Self::Player2 => Game::tex_key_circle(),
-    }
-  }
 }
 
 fn check_winner(grid: &[Cell]) -> Option<CellState> {

@@ -1,23 +1,18 @@
 use std::collections::HashMap;
 
 use crate::gui::Quad;
-use engine::rendering::texture::TextureKey;
+use engine::rendering::texture::Id;
 
 #[derive(Debug)]
 pub struct Label {
   pub label: String,
   pub rect: math::Rect,
   pub color: math::Color,
-  pub texture_key: TextureKey,
+  pub texture_key: Id,
 }
 
 impl Label {
-  pub const fn new(
-    s: String,
-    rect: math::Rect,
-    color: math::Color,
-    texture_key: TextureKey,
-  ) -> Self {
+  pub const fn new(s: String, rect: math::Rect, color: math::Color, texture_key: Id) -> Self {
     Self {
       label: s,
       rect,
@@ -26,7 +21,7 @@ impl Label {
     }
   }
 
-  pub fn quads(&self, fonts: &HashMap<TextureKey, HashMap<char, math::Rect>>) -> Vec<Quad> {
+  pub fn quads(&self, fonts: &HashMap<Id, HashMap<char, math::Rect>>) -> Vec<Quad> {
     self
       .label
       .chars()
@@ -45,7 +40,7 @@ impl Label {
             .get(&c)
             .expect("char not in charset"),
           self.color,
-          self.texture_key.clone(),
+          self.texture_key,
         )
       })
       .collect()

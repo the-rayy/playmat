@@ -1,15 +1,15 @@
-use engine::rendering::texture::TextureKey;
+use engine::rendering::texture::Id;
 
 #[derive(Debug)]
 pub struct Button {
   pub rect: math::Rect,
   pub color: math::Color,
-  pub texture_key: TextureKey,
+  pub texture_key: Id,
   pub state: State,
 }
 
 impl Button {
-  pub const fn new(rect: math::Rect, color: math::Color, texture_key: TextureKey) -> Self {
+  pub const fn new(rect: math::Rect, color: math::Color, texture_key: Id) -> Self {
     Self {
       rect,
       color,
@@ -26,8 +26,8 @@ impl Button {
     }
   }
 
-  pub fn texture_key(&self) -> TextureKey {
-    self.texture_key.clone()
+  pub const fn texture_key(&self) -> Id {
+    self.texture_key
   }
 }
 

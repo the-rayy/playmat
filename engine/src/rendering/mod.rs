@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::Arc};
 
 use wgpu::ExperimentalFeatures;
 
-use crate::rendering::texture::{Texture, TextureKey};
+use crate::rendering::texture::{Id, Texture};
 
 pub mod canvas;
 mod scene;
@@ -16,7 +16,7 @@ pub struct Renderer {
   surface_format: wgpu::TextureFormat,
   textures_bind_group_layout: wgpu::BindGroupLayout,
 
-  textures: HashMap<TextureKey, wgpu::BindGroup>,
+  textures: HashMap<Id, wgpu::BindGroup>,
 
   renderer_scene: scene::Renderer,
   renderer_canvas: canvas::Renderer,
@@ -182,18 +182,18 @@ impl Renderer {
     )
   }
 
-  pub fn load_texture(&mut self, key: TextureKey, texture: &Texture) {
+  pub fn load_texture(&mut self, texture: &Texture) {
     let bind_group = load_texture(
       &self.device,
       &self.queue,
       texture,
       &self.textures_bind_group_layout,
     );
-    self.textures.insert(key, bind_group);
+    self.textures.insert(*texture.id(), bind_group);
   }
 }
 
-pub fn load_texture(
+fn load_texture(
   device: &wgpu::Device,
   queue: &wgpu::Queue,
   texture: &Texture,

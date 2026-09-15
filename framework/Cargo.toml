@@ -14,5 +14,4 @@ math = { path = "../math" }
 engine = { path = "../engine" }
 log = { workspace = true }
 winit = "0.30.13"
-image = { version = "0.25", default-features = false, features = ["png"] }
 fontdue = "0.9.4"

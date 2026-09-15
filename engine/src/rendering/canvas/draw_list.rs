@@ -1,4 +1,4 @@
-use crate::rendering::{canvas::vertex::Vertex, texture::TextureKey};
+use crate::rendering::{canvas::vertex::Vertex, texture::Id};
 
 #[derive(Default)]
 pub struct DrawList {
@@ -8,7 +8,7 @@ pub struct DrawList {
 pub struct Primitive {
   pub vertices: Vec<Vertex>,
   pub indices: Vec<u16>,
-  pub texture_key: TextureKey,
+  pub texture_key: Id,
 }
 
 pub struct FlatDrawList {
@@ -18,7 +18,7 @@ pub struct FlatDrawList {
 }
 
 pub struct DrawCall {
-  pub texture_key: TextureKey,
+  pub texture_key: Id,
   pub index_start: u32,
   pub index_count: u32,
 }
@@ -33,7 +33,7 @@ impl DrawList {
     rect: &math::Rect,
     uv: &math::Rect,
     color: math::Color,
-    texture_key: TextureKey,
+    texture_key: Id,
   ) {
     let vertices = Vec::from([
       Vertex {
@@ -82,7 +82,7 @@ impl DrawList {
       indices.extend(primitive.indices.iter().map(|i| i + base_vertex));
 
       draws.push(DrawCall {
-        texture_key: primitive.texture_key.clone(),
+        texture_key: primitive.texture_key,
         index_start,
         index_count: primitive.indices.len() as u32,
       });

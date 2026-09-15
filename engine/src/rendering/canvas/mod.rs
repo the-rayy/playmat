@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::rendering::{
   canvas::{draw_list::DrawList, vertex::Vertex},
-  texture::TextureKey,
+  texture::Id,
 };
 pub mod draw_list;
 pub mod vertex;
@@ -101,7 +101,7 @@ impl Renderer {
     encoder: &mut wgpu::CommandEncoder,
     texture_view: &wgpu::TextureView,
     draw_list: &DrawList,
-    textures: &HashMap<TextureKey, wgpu::BindGroup>,
+    textures: &HashMap<Id, wgpu::BindGroup>,
   ) {
     if draw_list.is_empty() {
       return;

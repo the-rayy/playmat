@@ -39,12 +39,12 @@ impl<T: Game> Engine<T> {
   pub fn update(&mut self) {
     self.context.handle_input(&self.input);
 
-    for (key, tex) in self.context.assets.get() {
+    for tex in self.context.assets.get() {
       self
         .renderer
         .as_mut()
         .expect("renderer not initialized")
-        .load_texture(key.clone(), tex);
+        .load_texture(tex);
     }
 
     self.game.update(&mut self.context);
