@@ -1,8 +1,8 @@
 use std::sync::mpsc::{self, TryRecvError};
 
 use ::engine::input::Input;
+use ::engine::assets;
 
-pub mod assets;
 pub mod engine;
 pub mod gui;
 

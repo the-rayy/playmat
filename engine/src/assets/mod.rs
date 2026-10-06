@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use engine::rendering::texture::{Id, Texture};
+use crate::rendering::texture::{Id, Texture};
 
 mod fonts;
 

@@ -13,6 +13,7 @@ env_logger = { workspace = true }
 winit = "0.30.13"
 bytemuck = { workspace = true }
 image = { version = "0.25", default-features = false, features = ["png"] }
+fontdue = "0.9.4"
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
 tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }
