@@ -1,4 +1,4 @@
-use engine::rendering::texture::Id;
+use crate::rendering::texture::Id;
 
 #[derive(Debug)]
 pub struct Quad {

@@ -5,7 +5,7 @@ mod quad;
 use std::{collections::HashMap, sync::mpsc};
 
 pub use button::Button;
-use engine::{
+use crate::{
   input::{ButtonState, Input, MouseButton},
   rendering::canvas::draw_list::DrawList,
 };
@@ -23,11 +23,11 @@ pub struct Context {
   buttons: HashMap<String, Button>,
   quads: HashMap<String, Quad>,
 
-  tx: mpsc::Sender<crate::Event>,
+  tx: mpsc::Sender<crate::EngineEvent>,
 }
 
 impl Context {
-  pub fn new(tx: mpsc::Sender<crate::Event>) -> Self {
+  pub fn new(tx: mpsc::Sender<crate::EngineEvent>) -> Self {
     Self {
       screen_width: 0,
       screen_height: 0,
@@ -85,7 +85,7 @@ impl Context {
       b.state = if hover && input.get_mouse_button(MouseButton::Left) == &ButtonState::Pressed {
         let res = self
           .tx
-          .send(crate::Event::Gui(Event::ButtonClicked { id: id.clone() }));
+          .send(crate::EngineEvent::Gui(Event::ButtonClicked { id: id.clone() }));
         log::info!("{:?}", res); //FIXME without logging res, send gets optimized away by compiler
         //on wasm. weird
 

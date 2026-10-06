@@ -2,17 +2,13 @@ use std::sync::mpsc::{self, TryRecvError};
 
 use ::engine::input::Input;
 use ::engine::assets;
+pub use ::engine::gui;
+pub use ::engine::EngineEvent as Event;
 
 pub mod engine;
-pub mod gui;
 
 pub trait Game {
   fn update(&mut self, ctx: &mut Context);
-}
-
-#[derive(Debug)]
-pub enum Event {
-  Gui(gui::Event),
 }
 
 pub struct Context {
