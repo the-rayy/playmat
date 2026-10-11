@@ -1,0 +1,149 @@
+use std::collections::HashMap;
+
+use crate::engine::rendering::{
+  canvas::{draw_list::DrawList, vertex::Vertex},
+  texture::TextureKey,
+};
+pub mod draw_list;
+pub mod vertex;
+
+const MAX_VERTICES: u64 = 1024;
+const MAX_INDICES: u64 = 1024;
+
+pub struct Renderer {
+  pipeline: wgpu::RenderPipeline,
+  vertex_buffer: wgpu::Buffer,
+  index_buffer: wgpu::Buffer,
+
+  default_texture: wgpu::BindGroup,
+}
+
+impl Renderer {
+  pub fn new(
+    device: &wgpu::Device,
+    surface_format: wgpu::TextureFormat,
+    bind_group_layout: wgpu::BindGroupLayout,
+    default_texture: wgpu::BindGroup,
+  ) -> Self {
+    let shader = device.create_shader_module(wgpu::ShaderModuleDescriptor {
+      label: Some("Canvas shader"),
+      source: wgpu::ShaderSource::Wgsl(include_str!("shaders/default.wgsl").into()),
+    });
+
+    let render_pipeline_layout = device.create_pipeline_layout(&wgpu::PipelineLayoutDescriptor {
+      label: Some("Canvas Render pipeline layout"),
+      bind_group_layouts: &[Some(&bind_group_layout)],
+      immediate_size: 0,
+    });
+
+    let pipeline = device.create_render_pipeline(&wgpu::RenderPipelineDescriptor {
+      label: Some("Canvas render pipeline"),
+      layout: Some(&render_pipeline_layout),
+      vertex: wgpu::VertexState {
+        module: &shader,
+        entry_point: Some("vs_main"),
+        buffers: &[Some(vertex::Vertex::buffer_layout())],
+        compilation_options: wgpu::PipelineCompilationOptions::default(),
+      },
+      fragment: Some(wgpu::FragmentState {
+        module: &shader,
+        entry_point: Some("fs_main"),
+        targets: &[Some(wgpu::ColorTargetState {
+          format: surface_format,
+          blend: Some(wgpu::BlendState::ALPHA_BLENDING),
+          write_mask: wgpu::ColorWrites::ALL,
+        })],
+        compilation_options: wgpu::PipelineCompilationOptions::default(),
+      }),
+      primitive: wgpu::PrimitiveState {
+        topology: wgpu::PrimitiveTopology::TriangleList,
+        strip_index_format: None,
+        front_face: wgpu::FrontFace::Ccw,
+        cull_mode: None,
+        polygon_mode: wgpu::PolygonMode::Fill,
+        unclipped_depth: false,
+        conservative: false,
+      },
+      depth_stencil: None,
+      multisample: wgpu::MultisampleState {
+        count: 1,
+        mask: !0,
+        alpha_to_coverage_enabled: false,
+      },
+      multiview_mask: None,
+      cache: None,
+    });
+
+    let vertex_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+      label: Some("gui vertex"),
+      usage: wgpu::BufferUsages::COPY_DST | wgpu::BufferUsages::VERTEX,
+      size: MAX_VERTICES * std::mem::size_of::<Vertex>() as u64,
+      mapped_at_creation: false,
+    });
+    let index_buffer = device.create_buffer(&wgpu::BufferDescriptor {
+      label: Some("gui index"),
+      size: MAX_INDICES * std::mem::size_of::<u16>() as u64,
+      usage: wgpu::BufferUsages::COPY_DST | wgpu::BufferUsages::INDEX,
+      mapped_at_creation: false,
+    });
+
+    Self {
+      pipeline,
+      vertex_buffer,
+      index_buffer,
+      default_texture,
+    }
+  }
+
+  pub fn render(
+    &self,
+    queue: &wgpu::Queue,
+    encoder: &mut wgpu::CommandEncoder,
+    texture_view: &wgpu::TextureView,
+    draw_list: &DrawList,
+    textures: &HashMap<TextureKey, wgpu::BindGroup>,
+  ) {
+    if draw_list.is_empty() {
+      return;
+    }
+
+    let mut renderpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
+      label: None,
+      color_attachments: &[Some(wgpu::RenderPassColorAttachment {
+        view: texture_view,
+        resolve_target: None,
+        ops: wgpu::Operations {
+          load: wgpu::LoadOp::Load,
+          store: wgpu::StoreOp::Store,
+        },
+        depth_slice: None,
+      })],
+      depth_stencil_attachment: None,
+      timestamp_writes: None,
+      occlusion_query_set: None,
+      multiview_mask: None,
+    });
+
+    let flat = draw_list.flatten();
+
+    queue.write_buffer(&self.vertex_buffer, 0, bytemuck::cast_slice(&flat.vertices));
+    queue.write_buffer(&self.index_buffer, 0, bytemuck::cast_slice(&flat.indices));
+
+    renderpass.set_pipeline(&self.pipeline);
+    renderpass.set_vertex_buffer(0, self.vertex_buffer.slice(..));
+    renderpass.set_index_buffer(self.index_buffer.slice(..), wgpu::IndexFormat::Uint16);
+
+    for draw in &flat.draws {
+      let bind_group = textures
+        .get(&draw.texture_key)
+        .unwrap_or(&self.default_texture);
+
+      renderpass.set_bind_group(0, bind_group, &[]);
+      renderpass.draw_indexed(
+        draw.index_start..(draw.index_start + draw.index_count),
+        0,
+        0..1,
+      );
+    }
+  }
+}

@@ -3,10 +3,7 @@ name: playmat
 on:
   push:
     paths:
-      - games/**
-      - math/**
-      - engine/**
-      - framework/**
+      - client/**
       - Cargo.toml
       - Cargo.lock
       - .github/workflows/playmat.yml
