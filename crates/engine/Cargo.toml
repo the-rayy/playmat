@@ -8,3 +8,17 @@ workspace = true
 
 [dependencies]
 bytemuck = {version = "1.25.2", features = ["derive"]}
+winit = "0.30.13"
+env_logger = "0.11.11"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }
+wgpu = "30.0.1"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+# wasm-bindgen = "0.2.126"
+# wasm-bindgen-futures = "0.4.76"
+# console_error_panic_hook = "0.1.7"
+# console_log = "1.0.0"
+tokio = { workspace = true, features = ["macros", "rt"]}
+wgpu = { version = "30.0.1", features = ["webgl"] }
