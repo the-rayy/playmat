@@ -99,7 +99,7 @@ while_float = "warn"
 
 [workspace.dependencies]
 tokio = "1.53.2"
-# log = "0.4.33"
+log = "0.4.34"
 # thiserror = "2.0.18"
 # futures-util = "0.3.32"
 # time = { version = "0.3.53", features = ["serde"] }
