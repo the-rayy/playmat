@@ -1,4 +1,6 @@
 pub mod assets; //TODO change to pub(crate)
+pub mod event; //TODO change to pub(crate)
+pub mod gui; //TODO change to pub(crate)
 pub mod input; //TODO change to pub(crate)
 pub mod math;
 pub mod platform; //TODO change to pub(crate)

@@ -9,11 +9,6 @@ pub trait Game {
   fn update(&mut self, ctx: &mut Context);
 }
 
-#[derive(Debug)]
-pub enum Event {
-  Gui(gui::Event),
-}
-
 pub struct Context {
   pub gui: gui::Context,
   pub assets: assets::Context,
