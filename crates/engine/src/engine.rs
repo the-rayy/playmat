@@ -66,7 +66,7 @@ impl<T: framework::Game> Engine<T> {
     self.frame_no += 1;
   }
 
-  pub fn handle2(&mut self, ev: WindowEvent) {
+  pub fn handle(&mut self, ev: WindowEvent) {
     match ev {
       WindowEvent::Resized(_) => {
         self
