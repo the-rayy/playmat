@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::Arc};
 
 use wgpu::ExperimentalFeatures;
 
-use crate::engine::rendering::texture::{Texture, TextureKey};
+use crate::rendering::texture::{Texture, TextureKey};
 
 pub mod canvas;
 mod scene;

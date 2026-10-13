@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::engine::rendering::{
+use crate::rendering::{
   canvas::{draw_list::DrawList, vertex::Vertex},
   texture::TextureKey,
 };
