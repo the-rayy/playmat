@@ -5,3 +5,4 @@ edition = "2024"
 
 [dependencies]
 playmat-engine = { workspace = true }
+wasm-bindgen = { workspace = true }
