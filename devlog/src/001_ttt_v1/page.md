@@ -30,7 +30,7 @@ Local only, one player, no networking, boots directly to game, enemy picks first
 ## Live demo
 <canvas id="canvas"></canvas>
 <script type="module">
-    import init from "./pkg/client.js";
+    import init from "./pkg/tictactoe.js";
     init().then(() => {
         console.log("WASM Loaded");
     });
