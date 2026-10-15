@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
 use crate::{
-  engine::rendering::texture::TextureKey,
-  framework::gui::Quad,
+  gui::Quad,
   math::{self, Color, Rect},
+  rendering::texture::TextureKey,
 };
 
 #[derive(Debug)]

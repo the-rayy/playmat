@@ -1,7 +1,8 @@
 [workspace]
 resolver = "3"
 members = [
-  "client",
+  "crates/*",
+  "games/*",
 ]
 
 [workspace.lints.clippy]
@@ -97,9 +98,10 @@ useless_let_if_seq = "warn"
 while_float = "warn"
 
 [workspace.dependencies]
-tokio = "1.52.3"
-log = "0.4.33"
-env_logger = "0.11.11"
-thiserror = "2.0.18"
-futures-util = "0.3.32"
-time = { version = "0.3.53", features = ["serde"] }
+playmat-engine = {path = "crates/engine" }
+wasm-bindgen = "0.2.129"
+tokio = "1.53.2"
+log = "0.4.34"
+# thiserror = "2.0.18"
+# futures-util = "0.3.32"
+# time = { version = "0.3.53", features = ["serde"] }

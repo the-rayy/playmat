@@ -1,17 +1,10 @@
-mod event;
-mod input;
-mod platform;
-pub mod rendering;
-
 use std::sync::Arc;
 
-pub use event::Event;
-pub use input::ButtonState;
-pub use input::Input;
-pub use input::MouseButton;
-pub use platform::logger;
-pub use platform::runtime;
-pub use platform::window;
+pub use crate::input::MouseButton;
+pub use crate::platform::logger;
+pub use crate::platform::runtime;
+use winit::event::ElementState;
+use winit::event::WindowEvent;
 use winit::window::Window;
 
 use crate::framework;
@@ -20,8 +13,8 @@ pub struct Engine<T: framework::Game> {
   game: T,
   context: framework::Context,
 
-  renderer: Option<rendering::Renderer>,
-  input: input::Input,
+  renderer: Option<crate::rendering::Renderer>,
+  input: crate::input::Input,
   frame_no: u64,
 }
 
@@ -35,12 +28,13 @@ impl<T: framework::Game> Engine<T> {
       context: framework::Context::new(),
       renderer: None,
       frame_no: 0,
-      input: input::Input::default(),
+      input: crate::input::Input::default(),
     }
   }
 
   pub fn init_rendering(&mut self, window: Arc<Window>) {
-    let renderer = platform::runtime::get().block_on(rendering::Renderer::new(window));
+    let renderer =
+      crate::platform::runtime::get().block_on(crate::rendering::Renderer::new(window));
     let (w, h) = renderer.get_screen_size();
 
     self.context.gui.set_screen_dims(w, h);
@@ -72,10 +66,9 @@ impl<T: framework::Game> Engine<T> {
     self.frame_no += 1;
   }
 
-  pub fn handle(&mut self, ev: Event) {
+  pub fn handle(&mut self, ev: WindowEvent) {
     match ev {
-      Event::Noop => (),
-      Event::WindowResized => {
+      WindowEvent::Resized(_) => {
         self
           .renderer
           .as_ref()
@@ -88,9 +81,33 @@ impl<T: framework::Game> Engine<T> {
           .get_screen_size();
         self.context.gui.set_screen_dims(w, h);
       }
-      Event::CursorMoved { x, y } => self.input.set_cursor_pos(x, y),
-      Event::MouseButtonPressed { button } => self.input.set_mouse_button(button),
-      Event::MouseButtonReleased { button } => self.input.reset_mouse_button(button),
+      WindowEvent::CursorMoved {
+        device_id: _,
+        position,
+      } => self
+        .input
+        .set_cursor_pos(position.x as i32, position.y as i32),
+      WindowEvent::MouseInput {
+        device_id: _,
+        state: ElementState::Pressed,
+        button: winit::event::MouseButton::Left,
+      } => self.input.set_mouse_button(MouseButton::Left),
+      WindowEvent::MouseInput {
+        device_id: _,
+        state: ElementState::Pressed,
+        button: winit::event::MouseButton::Right,
+      } => self.input.set_mouse_button(MouseButton::Right),
+      WindowEvent::MouseInput {
+        device_id: _,
+        state: ElementState::Released,
+        button: winit::event::MouseButton::Left,
+      } => self.input.reset_mouse_button(MouseButton::Left),
+      WindowEvent::MouseInput {
+        device_id: _,
+        state: ElementState::Released,
+        button: winit::event::MouseButton::Right,
+      } => self.input.reset_mouse_button(MouseButton::Right),
+      _ => (),
     }
   }
 }

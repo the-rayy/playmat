@@ -1,10 +1,10 @@
-use crate::{
-  engine::rendering::texture::TextureKey,
-  framework::{
-    self, Event,
-    gui::{self, Label},
-  },
-  math::Rect,
+use playmat_engine::{
+  self,
+  event::Event,
+  framework::Context,
+  gui::{self, Button, Label},
+  math,
+  rendering::texture::TextureKey,
 };
 
 const CELL_POSITIONS: [CellPosition; 9] = [
@@ -65,12 +65,12 @@ const WIN_LINES: [[CellPosition; 3]; 8] = [
   ],
 ];
 
-fn white() -> crate::math::Color {
-  crate::math::Color::new(1.0, 1.0, 1.0, 1.0)
+fn white() -> math::Color {
+  math::Color::new(1.0, 1.0, 1.0, 1.0)
 }
 
-fn grey() -> crate::math::Color {
-  crate::math::Color::new(0.5, 0.5, 0.5, 1.0)
+fn grey() -> math::Color {
+  math::Color::new(0.5, 0.5, 0.5, 1.0)
 }
 
 pub struct Game {
@@ -112,14 +112,14 @@ impl Game {
       .map(|c| c.id.clone())
   }
 
-  fn play_move(&mut self, ctx: &mut framework::Context, id: &String, state: CellState) {
+  fn play_move(&mut self, ctx: &mut Context, id: &String, state: CellState) {
     self.set_cell_state(id, state);
     ctx.gui.get_mut_button(id).texture_key = state.tex();
 
     if check_winner(&self.grid) == Some(CellState::Player1) {
       let label_quads = Label::new(
         String::from("P1 won"),
-        Rect::new(-0.3, -0.7, 0.10, 0.15),
+        math::Rect::new(-0.3, -0.7, 0.10, 0.15),
         white(),
         Self::tex_key_font(),
       )
@@ -132,7 +132,7 @@ impl Game {
     if check_winner(&self.grid) == Some(CellState::Player2) {
       let label_quads = Label::new(
         String::from("P2 won"),
-        Rect::new(-0.3, -0.7, 0.10, 0.15),
+        math::Rect::new(-0.3, -0.7, 0.10, 0.15),
         white(),
         Self::tex_key_font(),
       )
@@ -147,7 +147,7 @@ impl Game {
     check_winner(&self.grid).is_some()
   }
 
-  fn handle_click(&mut self, ctx: &mut framework::Context, id: &String) {
+  fn handle_click(&mut self, ctx: &mut Context, id: &String) {
     if self.is_game_over() {
       return;
     }
@@ -176,7 +176,7 @@ impl Game {
     TextureKey("font".to_string())
   }
 
-  fn setup_ui(&self, ctx: &mut framework::Context) {
+  fn setup_ui(&self, ctx: &mut Context) {
     ctx
       .assets
       .load_texture(Self::tex_key_white(), include_bytes!("assets/tx_white.png"))
@@ -201,14 +201,14 @@ impl Game {
       .expect("could not load font");
 
     for &pos in CELL_POSITIONS.iter() {
-      let btn = framework::gui::Button::new(pos.rect(), grey(), Self::tex_key_white());
+      let btn = Button::new(pos.rect(), grey(), Self::tex_key_white());
       ctx.gui.add_button(pos.id().to_string(), btn);
     }
   }
 }
 
-impl framework::Game for Game {
-  fn update(&mut self, ctx: &mut framework::Context) {
+impl playmat_engine::framework::Game for Game {
+  fn update(&mut self, ctx: &mut Context) {
     if !self.initialized {
       self.setup_ui(ctx);
       self.initialized = true;
@@ -261,7 +261,7 @@ impl CellPosition {
   }
 
   /// Screen rect for this cell's button.
-  const fn rect(self) -> crate::math::Rect {
+  const fn rect(self) -> math::Rect {
     let (x, y) = match self {
       Self::TopLeft => (-0.35, 0.15),
       Self::TopMiddle => (-0.1, 0.15),
@@ -273,7 +273,7 @@ impl CellPosition {
       Self::BottomMiddle => (-0.1, -0.35),
       Self::BottomRight => (0.15, -0.35),
     };
-    crate::math::Rect::new(x, y, 0.2, 0.2)
+    math::Rect::new(x, y, 0.2, 0.2)
   }
 }
 

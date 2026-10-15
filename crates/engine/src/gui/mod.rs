@@ -9,9 +9,9 @@ pub use label::Label;
 pub use quad::Quad;
 
 use crate::{
-  engine::{ButtonState, Input, rendering::canvas::draw_list::DrawList},
-  framework,
+  input::{ButtonState, Input, MouseButton},
   math::Rect,
+  rendering::canvas::draw_list::DrawList,
 };
 
 #[derive(Debug)]
@@ -25,11 +25,11 @@ pub struct Context {
   buttons: HashMap<String, Button>,
   quads: HashMap<String, Quad>,
 
-  tx: mpsc::Sender<framework::Event>,
+  tx: mpsc::Sender<crate::event::Event>,
 }
 
 impl Context {
-  pub fn new(tx: mpsc::Sender<framework::Event>) -> Self {
+  pub fn new(tx: mpsc::Sender<crate::event::Event>) -> Self {
     Self {
       screen_width: 0,
       screen_height: 0,
@@ -84,10 +84,8 @@ impl Context {
           .in_screen_space(self.screen_width, self.screen_height),
       );
 
-      b.state = if hover
-        && input.get_mouse_button(crate::engine::MouseButton::Left) == &ButtonState::Pressed
-      {
-        let res = self.tx.send(framework::Event::Gui(Event::ButtonClicked {
+      b.state = if hover && input.get_mouse_button(MouseButton::Left) == &ButtonState::Pressed {
+        let res = self.tx.send(crate::event::Event::Gui(Event::ButtonClicked {
           id: id.clone(),
         }));
         log::info!("{:?}", res); //FIXME without logging res, send gets optimized away by compiler

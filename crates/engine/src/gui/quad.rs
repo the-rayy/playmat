@@ -1,6 +1,6 @@
 use crate::{
-  engine::rendering::texture::TextureKey,
   math::{Color, Rect},
+  rendering::texture::TextureKey,
 };
 
 #[derive(Debug)]

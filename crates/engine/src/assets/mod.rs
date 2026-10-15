@@ -3,8 +3,8 @@ use std::{collections::HashMap, io::Cursor};
 use image::ImageReader;
 
 use crate::{
-  engine::rendering::texture::{Texture, TextureKey},
   math,
+  rendering::texture::{Texture, TextureKey},
 };
 
 mod fonts;

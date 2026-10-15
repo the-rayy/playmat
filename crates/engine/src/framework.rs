@@ -1,32 +1,24 @@
 use std::sync::mpsc::{self, TryRecvError};
 
-use crate::engine::Input;
-
-pub mod assets;
-pub mod gui;
+use crate::input::Input;
 
 pub trait Game {
   fn update(&mut self, ctx: &mut Context);
 }
 
-#[derive(Debug)]
-pub enum Event {
-  Gui(gui::Event),
-}
-
 pub struct Context {
-  pub gui: gui::Context,
-  pub assets: assets::Context,
+  pub gui: crate::gui::Context,
+  pub assets: crate::assets::Context,
 
-  rx: mpsc::Receiver<Event>,
+  rx: mpsc::Receiver<crate::event::Event>,
 }
 
 impl Context {
   pub fn new() -> Self {
-    let (tx, rx) = mpsc::channel::<Event>();
+    let (tx, rx) = mpsc::channel::<crate::event::Event>();
     Self {
-      gui: gui::Context::new(tx),
-      assets: assets::Context::default(),
+      gui: crate::gui::Context::new(tx),
+      assets: crate::assets::Context::default(),
       rx,
     }
   }
@@ -35,7 +27,7 @@ impl Context {
     self.gui.handle_input(input);
   }
 
-  pub fn events(&self) -> Vec<Event> {
+  pub fn events(&self) -> Vec<crate::event::Event> {
     let mut items = Vec::new();
     loop {
       match self.rx.try_recv() {
@@ -45,5 +37,11 @@ impl Context {
       }
     }
     items
+  }
+}
+
+impl Default for Context {
+  fn default() -> Self {
+    Self::new()
   }
 }

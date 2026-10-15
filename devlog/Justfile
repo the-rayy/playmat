@@ -3,7 +3,7 @@ test:
 
 build:
   mdbook build
-  cp -r ../client/pkg book/001_ttt_v1/pkg
+  cp -r ../games/tictactoe/pkg book/001_ttt_v1/pkg
 
 serve:
   mdbook serve . -p 3000 -n 0.0.0.0
