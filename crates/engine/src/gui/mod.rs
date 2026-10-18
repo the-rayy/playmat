@@ -52,6 +52,11 @@ impl Context {
     self.quads.insert(id, quad);
   }
 
+  pub fn reset(&mut self) {
+    self.buttons.clear();
+    self.quads.clear();
+  }
+
   pub fn get_mut_button(&mut self, id: &String) -> &mut Button {
     self
       .buttons

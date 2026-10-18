@@ -3,7 +3,7 @@ use playmat_engine::{
   event::Event,
   framework::Context,
   gui::{self, Button, Label},
-  math,
+  math::{self, Rect},
   rendering::texture::TextureKey,
 };
 
@@ -67,6 +67,10 @@ const WIN_LINES: [[CellPosition; 3]; 8] = [
 
 fn white() -> math::Color {
   math::Color::new(1.0, 1.0, 1.0, 1.0)
+}
+
+fn black() -> math::Color {
+  math::Color::new(0.0, 0.0, 0.0, 1.0)
 }
 
 fn grey() -> math::Color {
@@ -152,6 +156,12 @@ impl Game {
       return;
     }
 
+    if id == "start" {
+      ctx.gui.reset();
+      self.setup_ui(ctx);
+      return;
+    }
+
     self.play_move(ctx, id, CellState::Player1);
 
     if self.is_game_over() {
@@ -174,6 +184,42 @@ impl Game {
   }
   fn tex_key_font() -> TextureKey {
     TextureKey("font".to_string())
+  }
+
+  fn setup_startscreen(&self, ctx: &mut Context) {
+    ctx
+      .assets
+      .load_font(
+        Self::tex_key_font(),
+        include_bytes!("assets/Kenney Rocket.ttf"),
+      )
+      .expect("could not load font");
+
+    let pos = Rect::new(-0.3, -0.1, 0.6, 0.2);
+    let btn = Button::new(pos, grey(), Self::tex_key_white());
+    ctx.gui.add_button("start".to_string(), btn);
+    let label_quads = Label::new(
+      String::from("Start"),
+      math::Rect::new(-0.25, -0.05, 0.07, 0.1),
+      black(),
+      Self::tex_key_font(),
+    )
+    .quads(ctx.assets.get_fonts());
+    for (i, q) in label_quads.into_iter().enumerate() {
+      ctx.gui.add_quad(format!("startgame_{}", i), q);
+    }
+
+    let label_quads = Label::new(
+      String::from("tictactoe"),
+      math::Rect::new(-0.35, 0.4, 0.07, 0.1),
+      white(),
+      Self::tex_key_font(),
+    )
+    .quads(ctx.assets.get_fonts());
+    for (i, q) in label_quads.into_iter().enumerate() {
+      ctx.gui.add_quad(format!("ttt_{}", i), q);
+    }
+
   }
 
   fn setup_ui(&self, ctx: &mut Context) {
@@ -210,7 +256,8 @@ impl Game {
 impl playmat_engine::framework::Game for Game {
   fn update(&mut self, ctx: &mut Context) {
     if !self.initialized {
-      self.setup_ui(ctx);
+      self.setup_startscreen(ctx);
+      // self.setup_ui(ctx);
       self.initialized = true;
       return;
     }
