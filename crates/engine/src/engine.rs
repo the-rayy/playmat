@@ -41,6 +41,10 @@ impl<T: framework::Game> Engine<T> {
     self.renderer = Some(renderer);
   }
 
+  pub fn init(&mut self) {
+    self.game.init(&mut self.context);
+  }
+
   pub fn update(&mut self) {
     self.context.handle_input(&self.input);
 

@@ -3,6 +3,7 @@ use std::sync::mpsc::{self, TryRecvError};
 use crate::input::Input;
 
 pub trait Game {
+  fn init(&mut self, ctx: &mut Context);
   fn update(&mut self, ctx: &mut Context);
 }
 

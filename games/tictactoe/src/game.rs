@@ -78,7 +78,6 @@ fn grey() -> math::Color {
 }
 
 pub struct Game {
-  initialized: bool,
   grid: Vec<Cell>,
 }
 
@@ -94,7 +93,6 @@ impl Game {
       .collect();
 
     Self {
-      initialized: false,
       grid,
     }
   }
@@ -253,14 +251,11 @@ impl Game {
 }
 
 impl playmat_engine::framework::Game for Game {
-  fn update(&mut self, ctx: &mut Context) {
-    if !self.initialized {
-      self.setup_startscreen(ctx);
-      // self.setup_ui(ctx);
-      self.initialized = true;
-      return;
-    }
+  fn init(&mut self, ctx: &mut Context) {
+    self.setup_startscreen(ctx);
+  }
 
+  fn update(&mut self, ctx: &mut Context) {
     for ev in ctx.events() {
       match ev {
         Event::Gui(gui::Event::ButtonClicked { id }) => {

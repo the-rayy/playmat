@@ -26,6 +26,8 @@ impl<T: Game> ApplicationHandler for App<T> {
     let window = Arc::new(window);
     self.engine.init_rendering(window.clone());
     self.window = Some(window);
+
+    self.engine.init();
   }
 
   fn window_event(
