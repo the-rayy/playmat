@@ -92,9 +92,7 @@ impl Game {
       })
       .collect();
 
-    Self {
-      grid,
-    }
+    Self { grid }
   }
 
   fn set_cell_state(&mut self, id: &String, state: CellState) {
