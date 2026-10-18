@@ -219,7 +219,6 @@ impl Game {
     for (i, q) in label_quads.into_iter().enumerate() {
       ctx.gui.add_quad(format!("ttt_{}", i), q);
     }
-
   }
 
   fn setup_ui(&self, ctx: &mut Context) {
