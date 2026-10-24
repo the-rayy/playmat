@@ -14,6 +14,5 @@ test:
 TARGET := shell("rustc -vV | sed -n 's|host: ||p'")
 build:
   cargo build --all --target {{ TARGET }}
-  # cd client && just build build_web
 
 ci: lint test build
