@@ -1,4 +1,4 @@
-# Intro
+# Playmat
 
 ## What this is
 Rust game engine made specifically for turn based games. Mostly for board and card games that can be played anywhere, online, asynchronously.
