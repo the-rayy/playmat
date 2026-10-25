@@ -10,8 +10,8 @@ pub use quad::Quad;
 
 use crate::{
   input::{ButtonState, Input, MouseButton},
-  math::{Color, Rect},
-  rendering::{canvas::draw_list::DrawList, texture::TextureKey},
+  math::Rect,
+  rendering::canvas::draw_list::DrawList,
 };
 
 #[derive(Debug)]
@@ -21,7 +21,9 @@ pub enum Event {
 
 #[derive(Debug)]
 pub enum InternalEvent {
-  Click, Hover, Clear
+  Click,
+  Hover,
+  Clear,
 }
 
 pub trait Widget: Any {
@@ -63,9 +65,14 @@ impl Context {
   }
 
   pub fn get_mut<T: Widget>(&mut self, id: &String) -> &mut T {
-    let widget: &mut dyn Widget = self.widgets.get_mut(id).expect("trying to get nonexistent widget").as_mut();
+    let widget: &mut dyn Widget = self
+      .widgets
+      .get_mut(id)
+      .expect("trying to get nonexistent widget")
+      .as_mut();
     let a: &mut dyn Any = widget;
-    a.downcast_mut::<T>().expect("trying to get wrong type of widget")
+    a.downcast_mut::<T>()
+      .expect("trying to get wrong type of widget")
   }
 
   pub fn get_draw_list(&self) -> DrawList {
@@ -73,7 +80,7 @@ impl Context {
     self.widgets.values().for_each(|w| {
       w.quads()
         .iter()
-        .for_each(|q| draw_list.push_rect(&q.rect, &q.uv, q.color.clone(), q.texture_key.clone()))
+        .for_each(|q| draw_list.push_rect(&q.rect, &q.uv, q.color, q.texture_key.clone()))
     });
     draw_list
   }
@@ -98,9 +105,7 @@ impl Context {
           id: id.clone(),
         }));
         log::info!("{:?}", res); //FIXME without logging res, send gets optimized away by compiler
-        //on wasm. weird
-
-
+      //on wasm. weird
       } else if hover {
         b.on_event(&InternalEvent::Hover);
       } else {

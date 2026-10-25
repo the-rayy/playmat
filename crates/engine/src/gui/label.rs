@@ -1,7 +1,9 @@
 use std::collections::HashMap;
 
 use crate::{
-  gui::{self, Quad}, math::{self, Color, Rect}, rendering::texture::TextureKey,
+  gui::{self, Quad},
+  math::{self, Color, Rect},
+  rendering::texture::TextureKey,
 };
 
 #[derive(Debug)]
@@ -53,11 +55,11 @@ impl Label {
 }
 
 impl gui::Widget for Label {
-    fn quads(&self) -> Vec<Quad> {
-        self.quads.clone()
-    }
+  fn quads(&self) -> Vec<Quad> {
+    self.quads.clone()
+  }
 
-    fn rect(&self) -> Rect {
-        self.rect.clone()
-    }
+  fn rect(&self) -> Rect {
+    self.rect
+  }
 }

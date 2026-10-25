@@ -1,5 +1,7 @@
 use crate::{
-  gui, math::{Color, Rect}, rendering::texture::TextureKey,
+  gui,
+  math::{Color, Rect},
+  rendering::texture::TextureKey,
 };
 
 #[derive(Debug, Clone)]
@@ -22,11 +24,11 @@ impl Quad {
 }
 
 impl gui::Widget for Quad {
-    fn quads(&self) -> Vec<Quad> {
-        vec![self.clone()]
-    }
+  fn quads(&self) -> Vec<Quad> {
+    vec![self.clone()]
+  }
 
-    fn rect(&self) -> Rect {
-        self.rect.clone()
-    }
+  fn rect(&self) -> Rect {
+    self.rect
+  }
 }

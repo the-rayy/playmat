@@ -34,7 +34,7 @@ impl Button {
 impl gui::Widget for Button {
   fn quads(&self) -> Vec<gui::Quad> {
     let quad = Quad::new(
-      self.rect.clone(),
+      self.rect,
       Rect::unit(),
       self.color(),
       self.texture_key.clone(),
@@ -43,7 +43,7 @@ impl gui::Widget for Button {
   }
 
   fn rect(&self) -> Rect {
-    self.rect.clone()
+    self.rect
   }
 
   fn on_event(&mut self, event: &gui::InternalEvent) {
