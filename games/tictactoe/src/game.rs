@@ -125,7 +125,7 @@ impl Game {
       )
       .quads(ctx.assets.get_fonts());
       for (i, q) in label_quads.into_iter().enumerate() {
-        ctx.gui.add_quad(format!("label_{}", i), q);
+        ctx.gui.add(format!("label_{}", i), q);
       }
     }
 
@@ -138,7 +138,7 @@ impl Game {
       )
       .quads(ctx.assets.get_fonts());
       for (i, q) in label_quads.into_iter().enumerate() {
-        ctx.gui.add_quad(format!("label_{}", i), q);
+        ctx.gui.add(format!("label_{}", i), q);
       }
     }
   }
@@ -202,7 +202,7 @@ impl Game {
     )
     .quads(ctx.assets.get_fonts());
     for (i, q) in label_quads.into_iter().enumerate() {
-      ctx.gui.add_quad(format!("startgame_{}", i), q);
+      ctx.gui.add(format!("startgame_{}", i), q);
     }
 
     let label_quads = Label::new(
@@ -213,7 +213,7 @@ impl Game {
     )
     .quads(ctx.assets.get_fonts());
     for (i, q) in label_quads.into_iter().enumerate() {
-      ctx.gui.add_quad(format!("ttt_{}", i), q);
+      ctx.gui.add(format!("ttt_{}", i), q);
     }
   }
 

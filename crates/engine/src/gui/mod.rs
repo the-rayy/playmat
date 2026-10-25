@@ -9,9 +9,7 @@ pub use label::Label;
 pub use quad::Quad;
 
 use crate::{
-  input::{ButtonState, Input, MouseButton},
-  math::Rect,
-  rendering::canvas::draw_list::DrawList,
+  input::{ButtonState, Input, MouseButton}, math::{Color, Rect}, rendering::{canvas::draw_list::DrawList, texture::TextureKey},
 };
 
 #[derive(Debug)]
@@ -19,11 +17,19 @@ pub enum Event {
   ButtonClicked { id: String },
 }
 
+pub trait Widget {
+  fn rect(&self) -> &Rect;
+  fn uv(&self) -> &Rect;
+  fn color(&self) -> Color;
+  fn texture_key(&self) -> TextureKey;
+}
+
 pub struct Context {
   screen_width: u32,
   screen_height: u32,
   buttons: HashMap<String, Button>,
-  quads: HashMap<String, Quad>,
+
+  widgets: HashMap<String, Box<dyn Widget>>,
 
   tx: mpsc::Sender<crate::event::Event>,
 }
@@ -34,7 +40,7 @@ impl Context {
       screen_width: 0,
       screen_height: 0,
       buttons: HashMap::default(),
-      quads: HashMap::default(),
+      widgets: HashMap::default(),
       tx,
     }
   }
@@ -44,17 +50,18 @@ impl Context {
     self.screen_height = h;
   }
 
+  pub fn add<T: Widget + 'static>(&mut self, id: String, widget: T) {
+    let widget = Box::new(widget);
+    self.widgets.insert(id, widget);
+  }
+
   pub fn add_button(&mut self, id: String, button: Button) {
     self.buttons.insert(id, button);
   }
 
-  pub fn add_quad(&mut self, id: String, quad: Quad) {
-    self.quads.insert(id, quad);
-  }
-
   pub fn reset(&mut self) {
     self.buttons.clear();
-    self.quads.clear();
+    self.widgets.clear();
   }
 
   pub fn get_mut_button(&mut self, id: &String) -> &mut Button {
@@ -70,10 +77,8 @@ impl Context {
       .buttons
       .values()
       .for_each(|b| draw_list.push_rect(&b.rect, &Rect::unit(), b.color(), b.texture_key()));
-    self
-      .quads
-      .values()
-      .for_each(|q| draw_list.push_rect(&q.rect, &q.uv, q.color(), q.texture_key()));
+    self.widgets.values()
+    .for_each(|w| draw_list.push_rect(w.rect(), w.uv(), w.color(), w.texture_key()));
     draw_list
   }
 

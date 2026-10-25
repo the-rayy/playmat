@@ -1,6 +1,5 @@
 use crate::{
-  math::{Color, Rect},
-  rendering::texture::TextureKey,
+  gui, math::{Color, Rect}, rendering::texture::TextureKey,
 };
 
 #[derive(Debug)]
@@ -20,12 +19,22 @@ impl Quad {
       texture_key,
     }
   }
+}
 
-  pub const fn color(&self) -> Color {
-    self.color
-  }
+impl gui::Widget for Quad {
+    fn rect(&self) -> &Rect {
+        &self.rect
+    }
 
-  pub fn texture_key(&self) -> TextureKey {
-    self.texture_key.clone()
-  }
+    fn uv(&self) -> &Rect {
+        &self.uv
+    }
+
+    fn color(&self) -> Color {
+        self.color
+    }
+
+    fn texture_key(&self) -> TextureKey {
+        self.texture_key.clone()
+    }
 }
