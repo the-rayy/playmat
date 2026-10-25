@@ -2,7 +2,7 @@ mod button;
 mod label;
 mod quad;
 
-use std::{collections::HashMap, sync::mpsc};
+use std::{any::Any, collections::HashMap, sync::mpsc};
 
 pub use button::Button;
 pub use label::Label;
@@ -19,15 +19,20 @@ pub enum Event {
   ButtonClicked { id: String },
 }
 
-pub trait Widget {
+#[derive(Debug)]
+pub enum InternalEvent {
+  Click, Hover, Clear
+}
+
+pub trait Widget: Any {
+  fn rect(&self) -> Rect;
   fn quads(&self) -> Vec<Quad>;
+  fn on_event(&mut self, _event: &InternalEvent) {}
 }
 
 pub struct Context {
   screen_width: u32,
   screen_height: u32,
-  buttons: HashMap<String, Button>,
-
   widgets: HashMap<String, Box<dyn Widget>>,
 
   tx: mpsc::Sender<crate::event::Event>,
@@ -38,7 +43,6 @@ impl Context {
     Self {
       screen_width: 0,
       screen_height: 0,
-      buttons: HashMap::default(),
       widgets: HashMap::default(),
       tx,
     }
@@ -54,28 +58,18 @@ impl Context {
     self.widgets.insert(id, widget);
   }
 
-  pub fn add_button(&mut self, id: String, button: Button) {
-    self.buttons.insert(id, button);
-  }
-
   pub fn reset(&mut self) {
-    self.buttons.clear();
     self.widgets.clear();
   }
 
-  pub fn get_mut_button(&mut self, id: &String) -> &mut Button {
-    self
-      .buttons
-      .get_mut(id)
-      .expect("trying to get nonexistent button")
+  pub fn get_mut<T: Widget>(&mut self, id: &String) -> &mut T {
+    let widget: &mut dyn Widget = self.widgets.get_mut(id).expect("trying to get nonexistent widget").as_mut();
+    let a: &mut dyn Any = widget;
+    a.downcast_mut::<T>().expect("trying to get wrong type of widget")
   }
 
   pub fn get_draw_list(&self) -> DrawList {
     let mut draw_list = DrawList::default();
-    self
-      .buttons
-      .values()
-      .for_each(|b| draw_list.push_rect(&b.rect, &Rect::unit(), b.color(), b.texture_key()));
     self.widgets.values().for_each(|w| {
       w.quads()
         .iter()
@@ -89,25 +83,28 @@ impl Context {
       return;
     }
 
-    self.buttons.iter_mut().for_each(|(id, b)| {
-      let hover = b.rect.contains(
+    self.widgets.iter_mut().for_each(|(id, b)| {
+      let hover = b.rect().contains(
         &input
           .get_cursor_pos()
           .in_screen_space(self.screen_width, self.screen_height),
       );
 
-      b.state = if hover && input.get_mouse_button(MouseButton::Left) == &ButtonState::Pressed {
+      if hover && input.get_mouse_button(MouseButton::Left) == &ButtonState::Pressed {
+        b.on_event(&InternalEvent::Click);
+
+        //TODO this should probably not be here, but in button...
         let res = self.tx.send(crate::event::Event::Gui(Event::ButtonClicked {
           id: id.clone(),
         }));
         log::info!("{:?}", res); //FIXME without logging res, send gets optimized away by compiler
         //on wasm. weird
 
-        button::State::Down
+
       } else if hover {
-        button::State::Hovered
+        b.on_event(&InternalEvent::Hover);
       } else {
-        button::State::Neutral
+        b.on_event(&InternalEvent::Clear);
       };
     });
   }

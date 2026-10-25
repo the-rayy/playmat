@@ -1,4 +1,5 @@
 use crate::{
+  gui::{self, Quad},
   math::{Color, Rect},
   rendering::texture::TextureKey,
 };
@@ -28,9 +29,29 @@ impl Button {
       State::Down => self.color + Color::new(0.05, 0.05, 0.05, 0.0),
     }
   }
+}
 
-  pub fn texture_key(&self) -> TextureKey {
-    self.texture_key.clone()
+impl gui::Widget for Button {
+  fn quads(&self) -> Vec<gui::Quad> {
+    let quad = Quad::new(
+      self.rect.clone(),
+      Rect::unit(),
+      self.color(),
+      self.texture_key.clone(),
+    );
+    vec![quad]
+  }
+
+  fn rect(&self) -> Rect {
+    self.rect.clone()
+  }
+
+  fn on_event(&mut self, event: &gui::InternalEvent) {
+    self.state = match event {
+      gui::InternalEvent::Click => State::Down,
+      gui::InternalEvent::Hover => State::Hovered,
+      gui::InternalEvent::Clear => State::Neutral,
+    }
   }
 }
 

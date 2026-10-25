@@ -56,4 +56,8 @@ impl gui::Widget for Label {
     fn quads(&self) -> Vec<Quad> {
         self.quads.clone()
     }
+
+    fn rect(&self) -> Rect {
+        self.rect.clone()
+    }
 }

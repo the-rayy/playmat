@@ -114,7 +114,7 @@ impl Game {
 
   fn play_move(&mut self, ctx: &mut Context, id: &String, state: CellState) {
     self.set_cell_state(id, state);
-    ctx.gui.get_mut_button(id).texture_key = state.tex();
+    ctx.gui.get_mut::<Button>(id).texture_key = state.tex();
 
     if check_winner(&self.grid) == Some(CellState::Player1) {
       let mut label = Label::new(
@@ -189,7 +189,7 @@ impl Game {
 
     let pos = Rect::new(-0.3, -0.1, 0.6, 0.2);
     let btn = Button::new(pos, grey(), Self::tex_key_white());
-    ctx.gui.add_button("start".to_string(), btn);
+    ctx.gui.add("start".to_string(), btn);
     let mut label = Label::new(
       String::from("Start"),
       math::Rect::new(-0.25, -0.05, 0.07, 0.1),
@@ -235,7 +235,7 @@ impl Game {
 
     for &pos in CELL_POSITIONS.iter() {
       let btn = Button::new(pos.rect(), grey(), Self::tex_key_white());
-      ctx.gui.add_button(pos.id().to_string(), btn);
+      ctx.gui.add(pos.id().to_string(), btn);
     }
   }
 }

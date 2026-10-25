@@ -25,4 +25,8 @@ impl gui::Widget for Quad {
     fn quads(&self) -> Vec<Quad> {
         vec![self.clone()]
     }
+
+    fn rect(&self) -> Rect {
+        self.rect.clone()
+    }
 }
