@@ -117,29 +117,25 @@ impl Game {
     ctx.gui.get_mut_button(id).texture_key = state.tex();
 
     if check_winner(&self.grid) == Some(CellState::Player1) {
-      let label_quads = Label::new(
+      let mut label = Label::new(
         String::from("P1 won"),
         math::Rect::new(-0.3, -0.7, 0.10, 0.15),
         white(),
         Self::tex_key_font(),
-      )
-      .quads(ctx.assets.get_fonts());
-      for (i, q) in label_quads.into_iter().enumerate() {
-        ctx.gui.add(format!("label_{}", i), q);
-      }
+      );
+      label.build(ctx.assets.get_fonts());
+      ctx.gui.add("label".to_string(), label);
     }
 
     if check_winner(&self.grid) == Some(CellState::Player2) {
-      let label_quads = Label::new(
+      let mut label = Label::new(
         String::from("P2 won"),
         math::Rect::new(-0.3, -0.7, 0.10, 0.15),
         white(),
         Self::tex_key_font(),
-      )
-      .quads(ctx.assets.get_fonts());
-      for (i, q) in label_quads.into_iter().enumerate() {
-        ctx.gui.add(format!("label_{}", i), q);
-      }
+      );
+      label.build(ctx.assets.get_fonts());
+      ctx.gui.add("label".to_string(), label);
     }
   }
 
@@ -194,27 +190,23 @@ impl Game {
     let pos = Rect::new(-0.3, -0.1, 0.6, 0.2);
     let btn = Button::new(pos, grey(), Self::tex_key_white());
     ctx.gui.add_button("start".to_string(), btn);
-    let label_quads = Label::new(
+    let mut label = Label::new(
       String::from("Start"),
       math::Rect::new(-0.25, -0.05, 0.07, 0.1),
       black(),
       Self::tex_key_font(),
-    )
-    .quads(ctx.assets.get_fonts());
-    for (i, q) in label_quads.into_iter().enumerate() {
-      ctx.gui.add(format!("startgame_{}", i), q);
-    }
+    );
+    label.build(ctx.assets.get_fonts());
+    ctx.gui.add("startgame".to_string(), label);
 
-    let label_quads = Label::new(
+    let mut label = Label::new(
       String::from("tictactoe"),
       math::Rect::new(-0.35, 0.4, 0.07, 0.1),
       white(),
       Self::tex_key_font(),
-    )
-    .quads(ctx.assets.get_fonts());
-    for (i, q) in label_quads.into_iter().enumerate() {
-      ctx.gui.add(format!("ttt_{}", i), q);
-    }
+    );
+    label.build(ctx.assets.get_fonts());
+    ctx.gui.add("ttt".to_string(), label);
   }
 
   fn setup_ui(&self, ctx: &mut Context) {
