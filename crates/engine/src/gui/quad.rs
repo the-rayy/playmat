@@ -2,7 +2,7 @@ use crate::{
   gui, math::{Color, Rect}, rendering::texture::TextureKey,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Quad {
   pub rect: Rect,
   pub uv: Rect,
@@ -22,19 +22,7 @@ impl Quad {
 }
 
 impl gui::Widget for Quad {
-    fn rect(&self) -> &Rect {
-        &self.rect
-    }
-
-    fn uv(&self) -> &Rect {
-        &self.uv
-    }
-
-    fn color(&self) -> Color {
-        self.color
-    }
-
-    fn texture_key(&self) -> TextureKey {
-        self.texture_key.clone()
+    fn quads(&self) -> Vec<Quad> {
+        vec![self.clone()]
     }
 }

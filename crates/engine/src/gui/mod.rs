@@ -9,7 +9,9 @@ pub use label::Label;
 pub use quad::Quad;
 
 use crate::{
-  input::{ButtonState, Input, MouseButton}, math::{Color, Rect}, rendering::{canvas::draw_list::DrawList, texture::TextureKey},
+  input::{ButtonState, Input, MouseButton},
+  math::{Color, Rect},
+  rendering::{canvas::draw_list::DrawList, texture::TextureKey},
 };
 
 #[derive(Debug)]
@@ -18,10 +20,7 @@ pub enum Event {
 }
 
 pub trait Widget {
-  fn rect(&self) -> &Rect;
-  fn uv(&self) -> &Rect;
-  fn color(&self) -> Color;
-  fn texture_key(&self) -> TextureKey;
+  fn quads(&self) -> Vec<Quad>;
 }
 
 pub struct Context {
@@ -77,8 +76,11 @@ impl Context {
       .buttons
       .values()
       .for_each(|b| draw_list.push_rect(&b.rect, &Rect::unit(), b.color(), b.texture_key()));
-    self.widgets.values()
-    .for_each(|w| draw_list.push_rect(w.rect(), w.uv(), w.color(), w.texture_key()));
+    self.widgets.values().for_each(|w| {
+      w.quads()
+        .iter()
+        .for_each(|q| draw_list.push_rect(&q.rect, &q.uv, q.color.clone(), q.texture_key.clone()))
+    });
     draw_list
   }
 
