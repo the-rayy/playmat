@@ -122,6 +122,7 @@ impl Game {
         math::Rect::new(-0.3, -0.7, 0.10, 0.15),
         white(),
         Self::tex_key_font(),
+        1,
       );
       label.build(ctx.assets.get_fonts());
       ctx.gui.add("label".to_string(), label);
@@ -133,6 +134,7 @@ impl Game {
         math::Rect::new(-0.3, -0.7, 0.10, 0.15),
         white(),
         Self::tex_key_font(),
+        1,
       );
       label.build(ctx.assets.get_fonts());
       ctx.gui.add("label".to_string(), label);
@@ -188,13 +190,14 @@ impl Game {
       .expect("could not load font");
 
     let pos = Rect::new(-0.3, -0.1, 0.6, 0.2);
-    let btn = Button::new(pos, grey(), Self::tex_key_white());
+    let btn = Button::new(pos, grey(), Self::tex_key_white(), 0);
     ctx.gui.add("start".to_string(), btn);
     let mut label = Label::new(
       String::from("Start"),
       math::Rect::new(-0.25, -0.05, 0.07, 0.1),
       black(),
       Self::tex_key_font(),
+      1,
     );
     label.build(ctx.assets.get_fonts());
     ctx.gui.add("startgame".to_string(), label);
@@ -204,6 +207,7 @@ impl Game {
       math::Rect::new(-0.35, 0.4, 0.07, 0.1),
       white(),
       Self::tex_key_font(),
+      1,
     );
     label.build(ctx.assets.get_fonts());
     ctx.gui.add("ttt".to_string(), label);
@@ -234,7 +238,7 @@ impl Game {
       .expect("could not load font");
 
     for &pos in CELL_POSITIONS.iter() {
-      let btn = Button::new(pos.rect(), grey(), Self::tex_key_white());
+      let btn = Button::new(pos.rect(), grey(), Self::tex_key_white(), 0);
       ctx.gui.add(pos.id().to_string(), btn);
     }
   }

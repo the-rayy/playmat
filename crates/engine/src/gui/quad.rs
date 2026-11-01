@@ -10,15 +10,18 @@ pub struct Quad {
   pub uv: Rect,
   pub color: Color,
   pub texture_key: TextureKey,
+
+  pub layer: u8,
 }
 
 impl Quad {
-  pub const fn new(rect: Rect, uv: Rect, color: Color, texture_key: TextureKey) -> Self {
+  pub const fn new(rect: Rect, uv: Rect, color: Color, texture_key: TextureKey, layer: u8) -> Self {
     Self {
       rect,
       uv,
       color,
       texture_key,
+      layer,
     }
   }
 }

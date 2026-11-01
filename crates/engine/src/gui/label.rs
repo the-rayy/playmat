@@ -12,17 +12,25 @@ pub struct Label {
   pub rect: Rect,
   pub color: Color,
   pub texture_key: TextureKey,
+  pub layer: u8,
 
   quads: Vec<Quad>,
 }
 
 impl Label {
-  pub const fn new(s: String, rect: Rect, color: Color, texture_key: TextureKey) -> Self {
+  pub const fn new(
+    label: String,
+    rect: Rect,
+    color: Color,
+    texture_key: TextureKey,
+    layer: u8,
+  ) -> Self {
     Self {
-      label: s,
+      label,
       rect,
       color,
       texture_key,
+      layer,
       quads: vec![],
     }
   }
@@ -48,6 +56,7 @@ impl Label {
             .expect("char not in charset"),
           self.color,
           self.texture_key.clone(),
+          self.layer,
         )
       })
       .collect();

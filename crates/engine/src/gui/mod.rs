@@ -75,13 +75,20 @@ impl Context {
       .expect("trying to get wrong type of widget")
   }
 
+  // TODO: avoid copying, make better Quad -> DrawList primitive conversion, cache DrawList to not
+  // compute every frame
   pub fn get_draw_list(&self) -> DrawList {
+    let mut quads = self
+      .widgets
+      .values()
+      .flat_map(|w| w.quads())
+      .collect::<Vec<Quad>>();
+    quads.sort_by_key(|q| q.layer);
+
     let mut draw_list = DrawList::default();
-    self.widgets.values().for_each(|w| {
-      w.quads()
-        .iter()
-        .for_each(|q| draw_list.push_rect(&q.rect, &q.uv, q.color, q.texture_key.clone()))
-    });
+    quads
+      .iter()
+      .for_each(|q| draw_list.push_rect(&q.rect, &q.uv, q.color, q.texture_key.clone()));
     draw_list
   }
 

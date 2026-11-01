@@ -10,15 +10,17 @@ pub struct Button {
   pub color: Color,
   pub texture_key: TextureKey,
   pub state: State,
+  pub layer: u8,
 }
 
 impl Button {
-  pub const fn new(rect: Rect, color: Color, texture_key: TextureKey) -> Self {
+  pub const fn new(rect: Rect, color: Color, texture_key: TextureKey, layer: u8) -> Self {
     Self {
       rect,
       color,
       texture_key,
       state: State::Neutral,
+      layer,
     }
   }
 
@@ -38,6 +40,7 @@ impl gui::Widget for Button {
       Rect::unit(),
       self.color(),
       self.texture_key.clone(),
+      self.layer,
     );
     vec![quad]
   }
